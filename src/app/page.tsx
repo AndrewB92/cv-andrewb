@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { Section } from "@/components/Section";
-import {
-  experiences,
-  profile,
-  projects,
-  skills,
-} from "@/data/profile";
+import { getPortfolioContent } from "@/data/profile";
 
-export default function Home() {
+export default async function Home() {
+  const { profile, skills, experiences, projects } =
+    await getPortfolioContent();
+
   return (
     <div className="relative min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),_transparent_50%),linear-gradient(180deg,_#f1f5f9_0%,_#ffffff_40%)] px-4 py-14 text-zinc-900 dark:bg-black dark:text-white sm:px-8">
       <div className="mx-auto flex max-w-5xl flex-col gap-8">
