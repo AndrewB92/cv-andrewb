@@ -222,11 +222,14 @@ const findDocInCollections = async (
   docIds: string[],
 ) => {
   for (const name of collectionNames) {
-    const document = (await db
-      .collection(name)
-      .findOne({ _id: { $in: docIds } })) as Record<string, unknown> | null;
-    if (document) {
-      return document;
+    const collection = db.collection(name);
+    for (const docId of docIds) {
+      const document = (await collection.findOne({
+        _id: docId,
+      })) as Record<string, unknown> | null;
+      if (document) {
+        return document;
+      }
     }
   }
 
