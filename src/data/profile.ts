@@ -222,7 +222,8 @@ const findDocInCollections = async (
   docIds: string[],
 ) => {
   for (const name of collectionNames) {
-    const collection = db.collection(name);
+    const collection =
+      db.collection<Record<string, unknown> & { _id: string }>(name);
     for (const docId of docIds) {
       const document = (await collection.findOne({
         _id: docId,
