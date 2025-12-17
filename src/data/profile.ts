@@ -1,13 +1,5 @@
-import {
-  DocumentData,
-  DocumentReference,
-  DocumentSnapshot,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { Db } from "mongodb";
+import { getDatabase } from "@/lib/mongodb";
 
 export type SkillGroup = {
   title: string;
@@ -44,10 +36,15 @@ export type Profile = {
   socials: SocialLink[];
 };
 
-const PROFILE_COLLECTION = "_profile";
+const PROFILE_COLLECTIONS = ["_profile", "profiles"];
 const PROFILE_MAIN_DOCS = ["main", "_main"];
 const PROFILE_SKILLS_DOCS = ["skills", "_skills"];
-const PORTFOLIO_COLLECTION = "_portfolio";
+const EXPERIENCE_COLLECTIONS = [
+  "_profile_experiences",
+  "_experiences",
+  "experiences",
+];
+const PROJECT_COLLECTIONS = ["_portfolio", "projects"];
 
 const fallbackProfile: Profile = {
   name: "Andrew B.",
@@ -137,99 +134,189 @@ const toTitleCase = (value: string) =>
     .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
     .join(" ") || value;
 
-const fetchDocSnapshot = async (
-  collectionPath: string,
-  docIds: string[],
-): Promise<{
-  ref: DocumentReference<DocumentData, DocumentData>;
-  snapshot?: DocumentSnapshot<DocumentData, DocumentData>;
-}> => {
-  for (const docId of docIds) {
-    const candidateRef = doc(db, collectionPath, docId);
-    const candidateSnapshot = await getDoc(candidateRef);
-    if (candidateSnapshot.exists()) {
-      return { ref: candidateRef, snapshot: candidateSnapshot };
-    }
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const normalizeSocials = (value: unknown): SocialLink[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) {
+        return undefined;
+      }
+
+      const label =
+        typeof item.label === "string" ? (item.label as string) : undefined;
+      const url = typeof item.url === "string" ? (item.url as string) : undefined;
+
+      if (!label || !url) {
+        return undefined;
+      }
+
+      return { label, url };
+    })
+    .filter((social): social is SocialLink => Boolean(social));
+};
+
+const mapExperience = (payload: Record<string, unknown>): Experience | undefined => {
+  const company =
+    typeof payload.company === "string" ? (payload.company as string) : undefined;
+  const role =
+    typeof payload.role === "string" ? (payload.role as string) : undefined;
+  const start =
+    typeof payload.start === "string" ? (payload.start as string) : undefined;
+  const end = typeof payload.end === "string" ? (payload.end as string) : undefined;
+  const achievements = sanitizeStringArray(payload.achievements);
+
+  if (!company || !role || !start || !end) {
+    return undefined;
   }
 
   return {
-    ref: doc(db, collectionPath, docIds[0]),
-    snapshot: undefined,
+    company,
+    role,
+    start,
+    end,
+    achievements,
   };
 };
 
+const mapProject = (payload: Record<string, unknown>): Project | undefined => {
+  const name =
+    typeof payload.name === "string"
+      ? payload.name
+      : typeof payload.title === "string"
+        ? payload.title
+        : typeof payload._id === "string"
+          ? payload._id
+          : undefined;
+  const link =
+    typeof payload.link === "string"
+      ? payload.link
+      : typeof payload.url === "string"
+        ? payload.url
+        : undefined;
+
+  if (!name || !link) {
+    return undefined;
+  }
+
+  const description =
+    typeof payload.description === "string" ? payload.description : "";
+  const stack = sanitizeStringArray(payload.stack);
+
+  return {
+    name,
+    description,
+    stack,
+    link,
+  };
+};
+
+const findDocInCollections = async (
+  db: Db,
+  collectionNames: string[],
+  docIds: string[],
+) => {
+  for (const name of collectionNames) {
+    const document = (await db
+      .collection(name)
+      .findOne({ _id: { $in: docIds } })) as Record<string, unknown> | null;
+    if (document) {
+      return document;
+    }
+  }
+
+  return null;
+};
+
+const fetchCollectionItems = async (db: Db, collectionNames: string[]) => {
+  for (const name of collectionNames) {
+    const documents = (await db
+      .collection(name)
+      .find({})
+      .sort({ order: 1, _id: 1 })
+      .toArray()) as Record<string, unknown>[];
+
+    if (documents.length) {
+      return documents;
+    }
+  }
+
+  return [];
+};
+
 export async function getProfile(): Promise<Profile> {
-  const { ref: mainRef, snapshot: mainSnapshot } = await fetchDocSnapshot(
-    PROFILE_COLLECTION,
-    PROFILE_MAIN_DOCS,
-  );
-
   try {
-    const data = mainSnapshot?.data();
+    const db = await getDatabase();
+    const profileDoc = await findDocInCollections(
+      db,
+      PROFILE_COLLECTIONS,
+      PROFILE_MAIN_DOCS,
+    );
 
-    const socialsSnapshot = await getDocs(collection(mainRef, "socials"));
-    const socials =
-      socialsSnapshot.docs
-        .map((snapshot) => {
-          const payload = snapshot.data();
-          const label =
-            typeof payload.label === "string" ? payload.label : undefined;
-          const url = typeof payload.url === "string" ? payload.url : undefined;
-          if (!label || !url) {
-            return undefined;
-          }
-          return { label, url };
-        })
-        .filter((social): social is SocialLink => Boolean(social)) ??
-      fallbackProfile.socials;
+    const socials = normalizeSocials(profileDoc?.socials);
 
     return {
       ...fallbackProfile,
-      name: typeof data?.name === "string" ? data.name : fallbackProfile.name,
+      name:
+        typeof profileDoc?.name === "string"
+          ? (profileDoc.name as string)
+          : fallbackProfile.name,
       title:
-        typeof data?.job_title === "string"
-          ? data.job_title
-          : typeof data?.title === "string"
-            ? data.title
+        typeof profileDoc?.job_title === "string"
+          ? (profileDoc.job_title as string)
+          : typeof profileDoc?.title === "string"
+            ? (profileDoc.title as string)
             : fallbackProfile.title,
       summary:
-        typeof data?.summary === "string"
-          ? data.summary
+        typeof profileDoc?.summary === "string"
+          ? (profileDoc.summary as string)
           : fallbackProfile.summary,
       location:
-        typeof data?.location === "string"
-          ? data.location
+        typeof profileDoc?.location === "string"
+          ? (profileDoc.location as string)
           : fallbackProfile.location,
       email:
-        typeof data?.email === "string" ? data.email : fallbackProfile.email,
+        typeof profileDoc?.email === "string"
+          ? (profileDoc.email as string)
+          : fallbackProfile.email,
       resumeUrl:
-        typeof data?.resume_url === "string"
-          ? data.resume_url
-          : typeof data?.resumeUrl === "string"
-            ? data.resumeUrl
+        typeof profileDoc?.resume_url === "string"
+          ? (profileDoc.resume_url as string)
+          : typeof profileDoc?.resumeUrl === "string"
+            ? (profileDoc.resumeUrl as string)
             : fallbackProfile.resumeUrl,
       socials: socials.length ? socials : fallbackProfile.socials,
     };
   } catch (error) {
-    console.error("Failed to fetch profile from Firestore", error);
+    console.error("Failed to fetch profile from MongoDB", error);
     return fallbackProfile;
   }
 }
 
 export async function getSkills(): Promise<SkillGroup[]> {
   try {
-    const { snapshot: skillsSnapshot } = await fetchDocSnapshot(
-      PROFILE_COLLECTION,
+    const db = await getDatabase();
+    const skillsDoc = await findDocInCollections(
+      db,
+      PROFILE_COLLECTIONS,
       PROFILE_SKILLS_DOCS,
     );
-    const data = skillsSnapshot?.data();
 
-    if (!data) {
+    if (!skillsDoc) {
       return fallbackSkills;
     }
 
-    const groups = Object.entries(data)
+    const groups = Object.entries(skillsDoc)
       .map(([key, value]) => {
+        if (key.startsWith("_")) {
+          return undefined;
+        }
+
         const items = sanitizeStringArray(value);
         if (!items.length) {
           return undefined;
@@ -244,87 +331,47 @@ export async function getSkills(): Promise<SkillGroup[]> {
 
     return groups.length ? groups : fallbackSkills;
   } catch (error) {
-    console.error("Failed to fetch skills from Firestore", error);
+    console.error("Failed to fetch skills from MongoDB", error);
     return fallbackSkills;
   }
 }
 
 export async function getExperiences(): Promise<Experience[]> {
   try {
-    const { ref: mainRef } = await fetchDocSnapshot(
-      PROFILE_COLLECTION,
-      PROFILE_MAIN_DOCS,
-    );
-    const experiencesRef = collection(mainRef, "experiences");
-    const experiencesSnapshot = await getDocs(experiencesRef);
-    const data = experiencesSnapshot.docs
-      .map((snapshot) => {
-        const payload = snapshot.data();
-        const company =
-          typeof payload.company === "string" ? payload.company : undefined;
-        const role =
-          typeof payload.role === "string" ? payload.role : undefined;
-        const start =
-          typeof payload.start === "string" ? payload.start : undefined;
-        const end = typeof payload.end === "string" ? payload.end : undefined;
-        const achievements = sanitizeStringArray(payload.achievements);
+    const db = await getDatabase();
+    const experienceDocs = await fetchCollectionItems(db, EXPERIENCE_COLLECTIONS);
 
-        if (!company || !role || !start || !end) {
-          return undefined;
-        }
+    const rawExperiences = experienceDocs.length
+      ? experienceDocs
+      : ((await findDocInCollections(
+          db,
+          PROFILE_COLLECTIONS,
+          PROFILE_MAIN_DOCS,
+        ))?.experiences as unknown[]) ?? [];
 
-        return {
-          company,
-          role,
-          start,
-          end,
-          achievements: achievements.length ? achievements : [],
-        };
-      })
+    const experiences = rawExperiences
+      .filter(isRecord)
+      .map((document) => mapExperience(document))
       .filter((experience): experience is Experience => Boolean(experience));
 
-    return data.length ? data : fallbackExperiences;
+    return experiences.length ? experiences : fallbackExperiences;
   } catch (error) {
-    console.error("Failed to fetch experiences from Firestore", error);
+    console.error("Failed to fetch experiences from MongoDB", error);
     return fallbackExperiences;
   }
 }
 
 export async function getProjects(): Promise<Project[]> {
-  const projectsRef = collection(db, PORTFOLIO_COLLECTION);
-
   try {
-    const projectsSnapshot = await getDocs(projectsRef);
-    const data = projectsSnapshot.docs
-      .map((snapshot) => {
-        const payload = snapshot.data();
-        const name =
-          typeof payload.title === "string"
-            ? payload.title
-            : snapshot.id ?? undefined;
-        const link =
-          typeof payload.url === "string" ? payload.url : undefined;
-
-        if (!name || !link) {
-          return undefined;
-        }
-
-        const description =
-          typeof payload.description === "string" ? payload.description : "";
-        const stack = sanitizeStringArray(payload.stack);
-
-        return {
-          name,
-          description,
-          stack,
-          link,
-        };
-      })
+    const db = await getDatabase();
+    const projectDocs = await fetchCollectionItems(db, PROJECT_COLLECTIONS);
+    const projects = projectDocs
+      .map((document) => mapProject(document))
       .filter((project): project is Project => Boolean(project));
 
-    return data.length ? data : fallbackProjects;
+    return projects.length ? projects : fallbackProjects;
   } catch (error) {
-    console.error("Failed to fetch projects from Firestore", error);
+    console.error("Failed to fetch projects from MongoDB", error);
     return fallbackProjects;
   }
 }
