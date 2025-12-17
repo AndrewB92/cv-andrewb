@@ -250,12 +250,12 @@ export async function getSkills(): Promise<SkillGroup[]> {
 }
 
 export async function getExperiences(): Promise<Experience[]> {
-  const experiencesRef = collection(
-    doc(db, PROFILE_COLLECTION, PROFILE_MAIN_DOC),
-    "experiences",
-  );
-
   try {
+    const { ref: mainRef } = await fetchDocSnapshot(
+      PROFILE_COLLECTION,
+      PROFILE_MAIN_DOCS,
+    );
+    const experiencesRef = collection(mainRef, "experiences");
     const experiencesSnapshot = await getDocs(experiencesRef);
     const data = experiencesSnapshot.docs
       .map((snapshot) => {
