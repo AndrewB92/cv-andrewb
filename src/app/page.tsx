@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 
+export const revalidate = 300;
+
 export default async function Home() {
   const { profile, skills, experiences, projects } =
     await getPortfolioContent();
