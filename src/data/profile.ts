@@ -1,4 +1,12 @@
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+  DocumentData,
+  DocumentReference,
+  DocumentSnapshot,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export type SkillGroup = {
@@ -37,8 +45,8 @@ export type Profile = {
 };
 
 const PROFILE_COLLECTION = "_profile";
-const PROFILE_MAIN_DOC = "main";
-const PROFILE_SKILLS_DOC = "skills";
+const PROFILE_MAIN_DOCS = ["main", "_main"];
+const PROFILE_SKILLS_DOCS = ["skills", "_skills"];
 const PORTFOLIO_COLLECTION = "_portfolio";
 
 const fallbackProfile: Profile = {
@@ -129,12 +137,35 @@ const toTitleCase = (value: string) =>
     .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
     .join(" ") || value;
 
+const fetchDocSnapshot = async (
+  collectionPath: string,
+  docIds: string[],
+): Promise<{
+  ref: DocumentReference<DocumentData, DocumentData>;
+  snapshot?: DocumentSnapshot<DocumentData, DocumentData>;
+}> => {
+  for (const docId of docIds) {
+    const candidateRef = doc(db, collectionPath, docId);
+    const candidateSnapshot = await getDoc(candidateRef);
+    if (candidateSnapshot.exists()) {
+      return { ref: candidateRef, snapshot: candidateSnapshot };
+    }
+  }
+
+  return {
+    ref: doc(db, collectionPath, docIds[0]),
+    snapshot: undefined,
+  };
+};
+
 export async function getProfile(): Promise<Profile> {
-  const mainRef = doc(db, PROFILE_COLLECTION, PROFILE_MAIN_DOC);
+  const { ref: mainRef, snapshot: mainSnapshot } = await fetchDocSnapshot(
+    PROFILE_COLLECTION,
+    PROFILE_MAIN_DOCS,
+  );
 
   try {
-    const mainSnapshot = await getDoc(mainRef);
-    const data = mainSnapshot.data();
+    const data = mainSnapshot?.data();
 
     const socialsSnapshot = await getDocs(collection(mainRef, "socials"));
     const socials =
@@ -186,11 +217,12 @@ export async function getProfile(): Promise<Profile> {
 }
 
 export async function getSkills(): Promise<SkillGroup[]> {
-  const skillsRef = doc(db, PROFILE_COLLECTION, PROFILE_SKILLS_DOC);
-
   try {
-    const skillsSnapshot = await getDoc(skillsRef);
-    const data = skillsSnapshot.data();
+    const { snapshot: skillsSnapshot } = await fetchDocSnapshot(
+      PROFILE_COLLECTION,
+      PROFILE_SKILLS_DOCS,
+    );
+    const data = skillsSnapshot?.data();
 
     if (!data) {
       return fallbackSkills;
