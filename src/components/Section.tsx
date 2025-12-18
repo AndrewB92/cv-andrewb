@@ -1,11 +1,13 @@
 import { ReactNode } from "react";
+import styles from "./Section.module.css";
 
 type SectionProps = {
-  id: string;
+  id?: string;
   title: string;
   eyebrow?: string;
   description?: string;
   children: ReactNode;
+  as?: keyof JSX.IntrinsicElements;
 };
 
 export function Section({
@@ -14,28 +16,18 @@ export function Section({
   eyebrow,
   description,
   children,
+  as: Tag = "section",
 }: SectionProps) {
   return (
-    <section
-      id={id}
-      className="scroll-mt-24 border border-zinc-200/60 bg-white/80 p-6 shadow-sm shadow-zinc-100/60 backdrop-blur-sm dark:border-zinc-800/80 dark:bg-zinc-900/40 dark:shadow-none sm:rounded-2xl"
-    >
-      <div className="space-y-1">
-        {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500">
-            {eyebrow}
-          </p>
-        ) : null}
-        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
-          {title}
-        </h2>
+    <Tag id={id} className={styles.section}>
+      <div className={styles.header}>
+        {eyebrow ? <p className={styles.eyebrow}>{eyebrow}</p> : null}
+        <h2 className={styles.title}>{title}</h2>
         {description ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            {description}
-          </p>
+          <p className={styles.description}>{description}</p>
         ) : null}
       </div>
-      <div className="mt-5">{children}</div>
-    </section>
+      <div className={styles.body}>{children}</div>
+    </Tag>
   );
 }

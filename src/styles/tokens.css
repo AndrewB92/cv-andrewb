@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light;
+
+  --color-surface: #f6f7fb;
+  --color-surface-alt: #ffffff;
+  --color-border: #e2e6f0;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #6b7280;
+  --color-accent: #2563eb;
+  --color-accent-contrast: #ffffff;
+  --color-muted: #f1f5f9;
+
+  --color-surface-dark: #020617;
+  --color-surface-alt-dark: #0f172a;
+  --color-border-dark: #1e293b;
+  --color-text-primary-dark: #f8fafc;
+  --color-text-secondary-dark: #cbd5f5;
+  --color-text-muted-dark: #94a3b8;
+  --color-muted-dark: #0f172a;
+
+  --font-sans-stack: var(--font-geist-sans), "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono-stack: var(--font-geist-mono), "JetBrains Mono", monospace;
+
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+
+  --shadow-soft: 0 20px 55px rgba(15, 23, 42, 0.08);
+  --shadow-card: 0 12px 40px rgba(15, 23, 42, 0.09);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-surface: var(--color-surface-dark);
+    --color-surface-alt: var(--color-surface-alt-dark);
+    --color-border: var(--color-border-dark);
+    --color-text-primary: var(--color-text-primary-dark);
+    --color-text-secondary: var(--color-text-secondary-dark);
+    --color-text-muted: var(--color-text-muted-dark);
+    --color-muted: var(--color-muted-dark);
+  }
+}
