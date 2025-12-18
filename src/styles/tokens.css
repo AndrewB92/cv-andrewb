@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 :root {
   color-scheme: light;
 
@@ -19,8 +21,10 @@
   --color-text-muted-dark: #94a3b8;
   --color-muted-dark: #0f172a;
 
+  --font-geist-sans: "Geist Mono", monospace;
+  --font-geist-mono: "Geist Mono", monospace;
   --font-sans-stack: var(--font-geist-sans), "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono-stack: var(--font-geist-mono), "JetBrains Mono", monospace;
+  --font-mono-stack: var(--font-geist-mono), "Geist Mono", monospace;
 
   --space-2xs: 0.25rem;
   --space-xs: 0.5rem;

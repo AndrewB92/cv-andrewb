@@ -8,18 +8,18 @@ export const siteMetadata = {
 
 export const primaryNavigation = [
   { label: "About", href: "/" },
-  { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/contact" },
+  { label: "My works", href: "/projects" },
+  { label: "Ways to contact", href: "/contact" },
 ];
 
 export const footerNavigation = [
-  { label: "Résumé", href: "/resume.pdf", external: true },
-  { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/contact" },
+  { label: "Get my CV", href: "/resume.pdf", external: true },
+  { label: "My works", href: "/projects" },
+  { label: "Ways to contact", href: "/contact" },
 ];
 
 export const contactDefaults = {
-  email: "hello@andrewb.dev",
+  email: "babujoh@gmai.com",
   location: "Remote",
   socials: [
     { label: "GitHub", url: "https://github.com/andrewb" },

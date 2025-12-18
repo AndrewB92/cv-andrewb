@@ -11,7 +11,7 @@ export function Footer() {
           <span className={styles.heart} aria-hidden="true">
             ♥
           </span>
-          by Andrew.
+          by me.
         </p>
         <nav aria-label="Footer" role="navigation">
           <ul className={styles.navigation}>
