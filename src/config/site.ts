@@ -1,6 +1,6 @@
 export const siteMetadata = {
   siteName: "Andrew Bielous",
-  tagline: "Product-focused web engineer",
+  tagline: "Product-focused web developer",
   description:
     "Frontend-focused engineer building thoughtful WordPress & React experiences with a focus on performance and storytelling.",
   baseUrl: "https://cv-andrewb.vercel.app",

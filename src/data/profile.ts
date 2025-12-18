@@ -238,6 +238,23 @@ const findDocInCollections = async (
   return null;
 };
 
+const parseDateValue = (value: string | undefined) => {
+  if (!value) {
+    return 0;
+  }
+
+  if (/^\d{4}$/.test(value)) {
+    return new Date(`${value}-01-01`).getTime();
+  }
+
+  if (/^\d{4}-\d{2}$/.test(value)) {
+    return new Date(`${value}-01`).getTime();
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 const fetchCollectionItems = async (db: Db, collectionNames: string[]) => {
   for (const name of collectionNames) {
     const documents = (await db
@@ -357,7 +374,14 @@ export async function getExperiences(): Promise<Experience[]> {
     const experiences = rawExperiences
       .filter(isRecord)
       .map((document) => mapExperience(document))
-      .filter((experience): experience is Experience => Boolean(experience));
+      .filter((experience): experience is Experience => Boolean(experience))
+      .sort((a, b) => {
+        const startDiff = parseDateValue(b.start) - parseDateValue(a.start);
+        if (startDiff !== 0) {
+          return startDiff;
+        }
+        return parseDateValue(b.end) - parseDateValue(a.end);
+      });
 
     return experiences.length ? experiences : fallbackExperiences;
   } catch (error) {
