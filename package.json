@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "seed:db": "node scripts/seed-db.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "mongodb": "^7.0.0",
