@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ElementType, ReactNode } from "react";
 import styles from "./Section.module.css";
 
 type SectionProps = {
@@ -7,7 +7,7 @@ type SectionProps = {
   eyebrow?: string;
   description?: string;
   children: ReactNode;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
 };
 
 export function Section({
