@@ -36,7 +36,7 @@ export type Profile = {
   socials: SocialLink[];
 };
 
-const PROFILE_COLLECTIONS = ["_profile", "profiles"];
+const PROFILE_COLLECTIONS = ["_profile", "profiles", "profile"];
 const PROFILE_MAIN_DOCS = ["main", "_main"];
 const PROFILE_SKILLS_DOCS = ["skills", "_skills"];
 const EXPERIENCE_COLLECTIONS = [
@@ -44,7 +44,8 @@ const EXPERIENCE_COLLECTIONS = [
   "_experiences",
   "experiences",
 ];
-const PROJECT_COLLECTIONS = ["_portfolio", "projects"];
+const PROJECT_COLLECTIONS = ["_portfolio", "portfolio", "projects"];
+const PROJECT_DOC_IDS = ["projects", "_projects"];
 
 const fallbackProfile: Profile = {
   name: "Andrew B.",
@@ -369,7 +370,29 @@ export async function getProjects(): Promise<Project[]> {
   try {
     const db = await getDatabase();
     const projectDocs = await fetchCollectionItems(db, PROJECT_COLLECTIONS);
-    const projects = projectDocs
+    let rawProjects: unknown[] = [];
+
+    if (projectDocs.length) {
+      rawProjects = projectDocs.flatMap((document) => {
+        const record = document as Record<string, unknown>;
+        if (Array.isArray(record.items)) {
+          return record.items as unknown[];
+        }
+        return [record];
+      });
+    } else {
+      const projectsDoc = await findDocInCollections(
+        db,
+        PROJECT_COLLECTIONS,
+        PROJECT_DOC_IDS,
+      );
+      if (Array.isArray(projectsDoc?.items)) {
+        rawProjects = projectsDoc.items as unknown[];
+      }
+    }
+
+    const projects = rawProjects
+      .filter(isRecord)
       .map((document) => mapProject(document))
       .filter((project): project is Project => Boolean(project));
 
