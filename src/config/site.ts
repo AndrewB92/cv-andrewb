@@ -1,5 +1,5 @@
 export const siteMetadata = {
-  siteName: "Andrew Bielous",
+  siteName: "<Andrew_Dev/>",
   tagline: "Product-focused web developer",
   description:
     "Frontend-focused engineer building thoughtful WordPress & React experiences with a focus on performance and storytelling.",
