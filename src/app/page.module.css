@@ -83,7 +83,8 @@
 .skillPill {
   padding: var(--space-xs) var(--space-md);
   border-radius: 999px;
-  background: var(--color-muted);
+  /* background: var(--color-muted); */
+  background-color: #192133;
   color: var(--color-text-primary);
   font-size: 0.9rem;
 }
