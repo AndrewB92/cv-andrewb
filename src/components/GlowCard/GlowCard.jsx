@@ -3,190 +3,159 @@
 import { useEffect, useRef } from "react";
 import styles from "./GlowCard.module.css";
 
-export default function GlowCard({
-  children,
-  className = "",
-  intro = true, // set false if you don't want the initial sweep animation
-}) {
+/**
+ * GlowCard (optimized)
+ * - No intro animation
+ * - Pointer listeners only while hovered
+ * - Cached geometry (ResizeObserver + scroll capture)
+ * - Single RAF loop (latest event), optional coalesced events
+ * - Thresholded CSS var updates to reduce style churn
+ */
+export default function GlowCard({ children, className = "" }) {
   const cardRef = useRef(null);
 
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
 
-    // Reduced motion support
     const reduceMotion =
       window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
-    // ---------- utils ----------
-    const round = (value, precision = 3) => parseFloat(value.toFixed(precision));
-    const clamp = (value, min = 0, max = 100) => Math.min(Math.max(value, min), max);
+    // If reduced motion, we keep the card static (no pointer tracking).
+    if (reduceMotion) return;
 
-    const centerOfElement = ($el) => {
-      const { width, height } = $el.getBoundingClientRect();
-      return [width / 2, height / 2];
+    // ---------- helpers ----------
+    const clamp = (v, min = 0, max = 100) => Math.min(Math.max(v, min), max);
+    const angleFrom = (dx, dy) => {
+      if (dx === 0 && dy === 0) return 0;
+      let a = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+      if (a < 0) a += 360;
+      return a;
     };
 
-    const pointerPositionRelativeToElement = ($el, e) => {
-      const { left, top, width, height } = $el.getBoundingClientRect();
-      const x = e.clientX - left;
-      const y = e.clientY - top;
-      const px = clamp((100 / width) * x);
-      const py = clamp((100 / height) * y);
-      return { pixels: [x, y], percent: [px, py] };
+    // ---------- cached geometry ----------
+    let rect = null;
+    let cx = 0;
+    let cy = 0;
+
+    const measure = () => {
+      rect = card.getBoundingClientRect();
+      cx = rect.width / 2;
+      cy = rect.height / 2;
     };
 
-    const distanceFromCenter = ($el, x, y) => {
-      const [cx, cy] = centerOfElement($el);
-      return [x - cx, y - cy];
+    // Initial measure
+    measure();
+
+    // Keep rect fresh when card changes size
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(card);
+
+    // Keep rect fresh when layout shifts due to scroll
+    const onScroll = () => measure();
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+
+    // ---------- thresholded CSS var writes ----------
+    const EPS_PCT = 0.15;  // percent
+    const EPS_DEG = 0.4;   // degrees
+    const EPS_EDGE = 0.25; // 0..100
+
+    const prev = { x: null, y: null, a: null, d: null };
+
+    const setVarIfChanged = (key, next, prevKey, eps, fmt) => {
+      const prevVal = prev[prevKey];
+      if (prevVal === null || Math.abs(prevVal - next) > eps) {
+        card.style.setProperty(key, fmt(next));
+        prev[prevKey] = next;
+      }
     };
 
-    const closenessToEdge = ($el, x, y) => {
-      // fraction [0..1]
-      const [cx, cy] = centerOfElement($el);
-      const [dx, dy] = distanceFromCenter($el, x, y);
+    const commitVars = (xPct, yPct, angleDeg, edge100) => {
+      setVarIfChanged("--pointer-x", xPct, "x", EPS_PCT, (v) => `${v.toFixed(3)}%`);
+      setVarIfChanged("--pointer-y", yPct, "y", EPS_PCT, (v) => `${v.toFixed(3)}%`);
+      setVarIfChanged("--pointer-°", angleDeg, "a", EPS_DEG, (v) => `${v.toFixed(3)}deg`);
+      setVarIfChanged("--pointer-d", edge100, "d", EPS_EDGE, (v) => `${v.toFixed(3)}`);
+    };
 
+    // Set sane defaults to avoid first-hover jump
+    commitVars(50, 50, 45, 0);
+
+    // ---------- RAF loop ----------
+    let rafId = 0;
+    let lastEvent = null;
+
+    const frame = () => {
+      rafId = 0;
+      if (!lastEvent || !rect) return;
+
+      // Use coalesced events if available, still one RAF.
+      const events =
+        typeof lastEvent.getCoalescedEvents === "function"
+          ? lastEvent.getCoalescedEvents()
+          : [lastEvent];
+
+      const e = events[events.length - 1];
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const xPct = clamp((100 / rect.width) * x);
+      const yPct = clamp((100 / rect.height) * y);
+
+      const dx = x - cx;
+      const dy = y - cy;
+
+      // closeness to edge in [0..1] => [0..100]
       let kx = Infinity;
       let ky = Infinity;
       if (dx !== 0) kx = cx / Math.abs(dx);
       if (dy !== 0) ky = cy / Math.abs(dy);
 
-      return clamp(1 / Math.min(kx, ky), 0, 1);
+      const edge100 = clamp(1 / Math.min(kx, ky), 0, 1) * 100;
+      const angleDeg = angleFrom(dx, dy);
+
+      commitVars(xPct, yPct, angleDeg, edge100);
     };
 
-    const angleFromPointer = (dx, dy) => {
-      // degrees, normalized
-      if (dx === 0 && dy === 0) return 0;
-      let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
-      if (angle < 0) angle += 360;
-      return angle;
+    const requestFrame = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(frame);
     };
 
-    // ---------- pointer handler ----------
-    let raf = 0;
+    const onPointerMove = (e) => {
+      lastEvent = e;
+      requestFrame();
+    };
 
-    const updateFromEvent = (e) => {
-      // keep it super light: single RAF per frame
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const pos = pointerPositionRelativeToElement(card, e);
-        const [px, py] = pos.pixels;
-        const [perx, pery] = pos.percent;
-
-        const [dx, dy] = distanceFromCenter(card, px, py);
-        const edge = closenessToEdge(card, px, py);
-        const angle = angleFromPointer(dx, dy);
-
-        card.style.setProperty("--pointer-x", `${round(perx)}%`);
-        card.style.setProperty("--pointer-y", `${round(pery)}%`);
-        card.style.setProperty("--pointer-°", `${round(angle)}deg`);
-        card.style.setProperty("--pointer-d", `${round(edge * 100)}`);
-
-        card.classList.remove(styles.animating);
-      });
+    // Attach pointermove only while hovered (major CPU win)
+    const onEnter = () => {
+      measure();
+      card.addEventListener("pointermove", onPointerMove, { passive: true });
     };
 
     const onLeave = () => {
-      // When leaving, fade effects out via CSS rule (not(:hover):not(.animating))
-      cancelAnimationFrame(raf);
-      raf = 0;
+      card.removeEventListener("pointermove", onPointerMove);
+      lastEvent = null;
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
     };
 
-    card.addEventListener("pointermove", updateFromEvent, { passive: true });
+    card.addEventListener("pointerenter", onEnter, { passive: true });
     card.addEventListener("pointerleave", onLeave, { passive: true });
 
-    // ---------- optional intro animation ----------
-    const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
-    const easeInCubic = (x) => x * x * x;
-
-    const animateNumber = ({
-      startValue = 0,
-      endValue = 100,
-      duration = 1000,
-      delay = 0,
-      ease = (t) => t,
-      onUpdate = () => {},
-      onEnd = () => {},
-    }) => {
-      const startTime = performance.now() + delay;
-
-      const tick = () => {
-        const now = performance.now();
-        const elapsed = now - startTime;
-        const t = Math.min(Math.max(elapsed / duration, 0), 1);
-        const v = startValue + (endValue - startValue) * ease(t);
-        onUpdate(v);
-        if (t < 1) requestAnimationFrame(tick);
-        else onEnd();
-      };
-
-      if (delay) setTimeout(() => requestAnimationFrame(tick), delay);
-      else requestAnimationFrame(tick);
-    };
-
-    const playIntro = () => {
-      if (reduceMotion) return;
-      const angleStart = 110;
-      const angleEnd = 465;
-
-      card.style.setProperty("--pointer-°", `${angleStart}deg`);
-      card.classList.add(styles.animating);
-
-      animateNumber({
-        ease: easeOutCubic,
-        duration: 500,
-        onUpdate: (v) => card.style.setProperty("--pointer-d", v),
-      });
-
-      animateNumber({
-        ease: easeInCubic,
-        duration: 1500,
-        endValue: 50,
-        onUpdate: (v) => {
-          const d = (angleEnd - angleStart) * (v / 100) + angleStart;
-          card.style.setProperty("--pointer-°", `${d}deg`);
-        },
-      });
-
-      animateNumber({
-        ease: easeOutCubic,
-        delay: 1500,
-        duration: 2250,
-        startValue: 50,
-        endValue: 100,
-        onUpdate: (v) => {
-          const d = (angleEnd - angleStart) * (v / 100) + angleStart;
-          card.style.setProperty("--pointer-°", `${d}deg`);
-        },
-      });
-
-      animateNumber({
-        ease: easeInCubic,
-        delay: 2500,
-        duration: 1500,
-        startValue: 100,
-        endValue: 0,
-        onUpdate: (v) => card.style.setProperty("--pointer-d", v),
-        onEnd: () => card.classList.remove(styles.animating),
-      });
-    };
-
-    if (intro) {
-      const t = setTimeout(playIntro, 350);
-      return () => {
-        clearTimeout(t);
-        cancelAnimationFrame(raf);
-        card.removeEventListener("pointermove", updateFromEvent);
-        card.removeEventListener("pointerleave", onLeave);
-      };
-    }
-
     return () => {
-      cancelAnimationFrame(raf);
-      card.removeEventListener("pointermove", updateFromEvent);
+      ro.disconnect();
+      window.removeEventListener("scroll", onScroll, true);
+
+      card.removeEventListener("pointerenter", onEnter);
       card.removeEventListener("pointerleave", onLeave);
+      card.removeEventListener("pointermove", onPointerMove);
+
+      lastEvent = null;
+      if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [intro]);
+  }, []);
 
   return (
     <div ref={cardRef} className={`${styles.card} ${className}`}>
