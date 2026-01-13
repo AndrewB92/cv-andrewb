@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import TypedLogo from "@/components/TypedLogo";
 import { usePathname } from "next/navigation";
 import styles from "./Header.module.css";
 import { primaryNavigation, siteMetadata } from "@/config/site";
@@ -19,13 +20,8 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand}>
-          ${siteMetadata.siteName}
-          <div className="cv-logo" id="cvLogo" aria-label="andrew.dev logo">
-            <span className="cv-logo__prefix">&lt;</span>
-            <span className="cv-logo__typed" aria-hidden="true"></span>
-            <span className="cv-logo__suffix">/&gt;</span>
-            <span className="cv-logo__cursor" aria-hidden="true">|</span>
-          </div>
+          {/* {siteMetadata.siteName} */}
+          <TypedLogo />
         </Link>
         <nav aria-label="Primary">
           <ul className={styles.navList}>
