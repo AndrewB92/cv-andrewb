@@ -5,6 +5,8 @@ import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 
 import GlowCard from "@/components/GlowCard/GlowCard";
+import { useGlowPointer } from "@/hooks/useGlowPointer";
+
 
 export const dynamic = "force-dynamic";
 
@@ -13,15 +15,10 @@ export default async function HomePage() {
     await getPortfolioContent();
   const featuredProjects = projects.slice(0, 3);
 
+
   return (
     <main>
-    <GlowCard>
-      <div style={{ padding: 18 }}>
-        <h2 style={{ margin: 0, fontWeight: 600 }}>Hello</h2>
-        <p style={{ opacity: 0.8 }}>This is inside the GlowCard.</p>
-      </div>
-    </GlowCard>
-      <article className={styles.hero}>
+      <article className={styles.hero} glow-card>
         <div className={styles.heroContent}>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
           <h1>{profile.name}</h1>
