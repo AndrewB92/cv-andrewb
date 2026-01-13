@@ -19,6 +19,7 @@ export default async function HomePage() {
   return (
     <main>
       <article className={styles.hero} glow-card>
+        <span className="glow" aria-hidden />
         <div className={styles.heroContent}>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
           <h1>{profile.name}</h1>
