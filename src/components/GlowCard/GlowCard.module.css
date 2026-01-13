@@ -24,15 +24,17 @@
   --pointer-y: 50%;
 
   position: relative;
-  width: clamp(320px, calc(100svw - calc(var(--pads) * 2)), 600px);
+  /* width: clamp(320px, calc(100svw - calc(var(--pads) * 2)), 600px);
   height: calc(100svh - calc(var(--pads) * 2));
-  max-height: 600px;
+  max-height: 600px; */
 
   border-radius: 1.768em;
   isolation: isolate;
   transform: translate3d(0, 0, 0.01px);
 
-  display: grid;
+  /* display: grid; */
+  display: flex;
+
   border: 1px solid rgb(255 255 255 / 25%);
   background: var(--card-bg);
   background-repeat: no-repeat;
