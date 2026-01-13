@@ -5,8 +5,6 @@ import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 
 import GlowCard from "@/components/GlowCard/GlowCard";
-import { useGlowPointer } from "@/hooks/useGlowPointer";
-
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +16,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <article className={styles.hero} glow-card>
-        <span className="glow" aria-hidden />
+      <article className={`${styles.hero} glow-card`}>
         <div className={styles.heroContent}>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
           <h1>{profile.name}</h1>
