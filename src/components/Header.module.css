@@ -36,10 +36,10 @@
   letter-spacing: 0.2em;
 }
 
-.brand .cv-logo__prefix,
-.brand .cv-logo__suffix,
-.brand .cv-logo__cursor {
-  color: #ba25d1 !important;
+.brand :global(.cv-logo__prefix),
+.brand :global(.cv-logo__suffix),
+.brand :global(.cv-logo__cursor) {
+  color: #ba25d1;
 }
 
 .navList {
