@@ -19,7 +19,13 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand}>
-          {siteMetadata.siteName}
+          ${siteMetadata.siteName}
+          <div className="cv-logo" id="cvLogo" aria-label="andrew.dev logo">
+            <span className="cv-logo__prefix">&lt;</span>
+            <span className="cv-logo__typed" aria-hidden="true"></span>
+            <span className="cv-logo__suffix">/&gt;</span>
+            <span className="cv-logo__cursor" aria-hidden="true">|</span>
+          </div>
         </Link>
         <nav aria-label="Primary">
           <ul className={styles.navList}>

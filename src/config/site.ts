@@ -1,10 +1,5 @@
 export const siteMetadata = {
-  siteName: '<div class="cv-logo" id="cvLogo" aria-label="andrew.dev logo">\n' +
-    '  <span class="cv-logo__prefix">&lt;</span>\n' +
-    '  <span class="cv-logo__typed" aria-hidden="true"></span>\n' +
-    '  <span class="cv-logo__suffix">/&gt;</span>\n' +
-    '  <span class="cv-logo__cursor" aria-hidden="true">|</span>\n' +
-    '</div>',
+  siteName: "<Andrew_Dev/>",
   tagline: "Product-focused web developer",
   description:
     "Frontend-focused engineer building thoughtful WordPress & React experiences with a focus on performance and storytelling.",
