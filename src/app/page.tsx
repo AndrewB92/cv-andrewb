@@ -16,7 +16,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <GlowCard intro>
+      <GlowCard>
         <article className={styles.hero}>
           <div className={styles.heroContent}>
             <p aria-label="Tagline">{siteMetadata.tagline}</p>
