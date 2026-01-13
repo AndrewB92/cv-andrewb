@@ -15,7 +15,7 @@ export default async function HomePage() {
 
   return (
     <main>
-    <GlowCard intro>
+    <GlowCard>
       <div style={{ padding: 18 }}>
         <h2 style={{ margin: 0, fontWeight: 600 }}>Hello</h2>
         <p style={{ opacity: 0.8 }}>This is inside the GlowCard.</p>
