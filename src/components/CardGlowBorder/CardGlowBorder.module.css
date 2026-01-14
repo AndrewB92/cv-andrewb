@@ -1,81 +1,71 @@
-.cardGlowBorder {
-  /* optional sizing variables */
-  --card-w: 500px;
-  --card-h: 500px;
+.card {
+  /* Optional sizing variables */
+  --card-w: 100%;
+  --card-h: auto;
 
-  padding: 1px;
-  border-radius: 10px;
-  cursor: pointer;
-  background: rgba(245, 245, 245, 0.2);
-  position: relative;
-  box-shadow: 0 0px 15px rgba(0, 0, 0, 0.7);
+  /* Cosmetics */
+  --radius: 20px;
+  --border-w: 1px;
+  --glow-size: 480px;
 
-  /* defaults so gradients don't break before first move */
+  /* Defaults so gradient doesn't break before first move */
   --mouse-x: 50%;
   --mouse-y: 50%;
-}
 
-.cardGlowBorder::before {
-  content: "";
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  background: radial-gradient(
-    500px circle at var(--mouse-x) var(--mouse-y),
-    rgba(255, 255, 255, 0.8),
-    transparent
-  );
-  z-index: -1;
-  top: 0;
-  left: 0;
-  border-radius: 10px;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-
-.cardGlowBorder:hover::before {
-  opacity: 1;
-}
-
-.cardMiddle {
-  background: rgb(20, 20, 20);
-  padding: 5px;
-  border-radius: 10px;
-}
-
-.cardContent {
-  height: var(--card-h);
   width: var(--card-w);
-  border: 1px solid rgba(245, 245, 245, 0.2);
-  border-radius: 5px;
-  background-color: rgb(30, 30, 30);
-  overflow: hidden;
+  height: var(--card-h);
+
   position: relative;
+  border-radius: var(--radius);
+
+  /* Your actual card surface */
+  background: rgb(20, 20, 20);
+  color: #fff;
+
+  /* Normal border (static) */
+  border: var(--border-w) solid rgba(245, 245, 245, 0.18);
+
+  /* Layout */
+  overflow: hidden; /* keep everything tidy */
 }
 
-.cardContent::before {
-  position: absolute;
+/* The glow ring (ONLY the border ring is visible because of the mask) */
+.card::before {
   content: "";
-  height: 100%;
-  width: 100%;
-  background: radial-gradient(
-    400px circle at var(--mouse-x) var(--mouse-y),
-    rgba(245, 245, 245, 0.07),
-    transparent
-  );
-  opacity: 0;
-  transition: opacity 0.5s;
+  position: absolute;
+  inset: calc(-1 * var(--border-w));
+  border-radius: calc(var(--radius) + var(--border-w));
   pointer-events: none;
+
+  background: radial-gradient(
+    var(--glow-size) circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 38, 183, 0.95),
+    transparent 60%
+  );
+
+  opacity: 0;
+  transition: opacity 200ms ease;
+
+  /* mask => show only the ring */
+  padding: var(--border-w);
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  /* soft glow without filling the card */
+  filter: blur(2px);
 }
 
-.cardGlowBorder:hover .cardContent::before {
+.card:hover::before {
   opacity: 1;
 }
 
-/* accessibility */
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .cardGlowBorder::before,
-  .cardContent::before {
+  .card::before {
     transition: none !important;
   }
 }

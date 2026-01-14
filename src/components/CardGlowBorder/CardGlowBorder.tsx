@@ -6,9 +6,15 @@ import styles from "./CardGlowBorder.module.css";
 type Props = {
   children?: React.ReactNode;
   className?: string;
-  /** Optional: set fixed size via props, otherwise use CSS defaults */
+
+  /** Optional sizing via props (falls back to CSS defaults) */
   width?: number;
   height?: number;
+
+  /** Optional cosmetics */
+  radius?: number;       // px
+  borderWidth?: number;  // px
+  glowSize?: number;     // px (radial size)
 };
 
 export default function CardGlowBorder({
@@ -16,6 +22,9 @@ export default function CardGlowBorder({
   className = "",
   width,
   height,
+  radius,
+  borderWidth,
+  glowSize,
 }: Props) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,7 +48,6 @@ export default function CardGlowBorder({
       if (!rect) measure();
       if (!rect) return;
 
-      // Use latest coalesced event if supported (still one RAF)
       const events =
         typeof e.getCoalescedEvents === "function" ? e.getCoalescedEvents() : [e];
       const ev = events[events.length - 1];
@@ -75,8 +83,6 @@ export default function CardGlowBorder({
       raf = 0;
     };
 
-    // Keep rect fresh on scroll/resize (only while hovered would be even more strict,
-    // but this is already light because we only measure on enter + these)
     const onScroll = () => measure();
     const onResize = () => measure();
 
@@ -96,20 +102,27 @@ export default function CardGlowBorder({
     };
   }, []);
 
+  const styleVars = {
+    ...(width ? ({ ["--card-w" as any]: `${width}px` } as const) : null),
+    ...(height ? ({ ["--card-h" as any]: `${height}px` } as const) : null),
+    ...(typeof radius === "number"
+      ? ({ ["--radius" as any]: `${radius}px` } as const)
+      : null),
+    ...(typeof borderWidth === "number"
+      ? ({ ["--border-w" as any]: `${borderWidth}px` } as const)
+      : null),
+    ...(typeof glowSize === "number"
+      ? ({ ["--glow-size" as any]: `${glowSize}px` } as const)
+      : null),
+  } as React.CSSProperties;
+
   return (
     <div
       ref={rootRef}
-      className={`${styles.cardGlowBorder} ${className}`}
-      style={
-        {
-          ...(width ? { ["--card-w" as any]: `${width}px` } : null),
-          ...(height ? { ["--card-h" as any]: `${height}px` } : null),
-        } as React.CSSProperties
-      }
+      className={`${styles.card} ${className}`}
+      style={styleVars}
     >
-      <div className={styles.cardMiddle}>
-        <div className={styles.cardContent}>{children}</div>
-      </div>
+      {children}
     </div>
   );
 }
