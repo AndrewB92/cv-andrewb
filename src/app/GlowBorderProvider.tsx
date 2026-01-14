@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 
-function isHTMLElement(node: Element | null): node is HTMLElement {
-  return !!node && node instanceof HTMLElement;
+function isElement(v: unknown): v is Element {
+  return v instanceof Element;
 }
 
 export default function GlowBorderProvider() {
@@ -19,9 +19,7 @@ export default function GlowBorderProvider() {
       if (!lastEvent) return;
 
       const { clientX, clientY } = lastEvent;
-      const els = getTargets();
-
-      for (const el of els) {
+      for (const el of getTargets()) {
         const rect = el.getBoundingClientRect();
         el.style.setProperty('--mouse-x', `${clientX - rect.left}px`);
         el.style.setProperty('--mouse-y', `${clientY - rect.top}px`);
@@ -33,15 +31,14 @@ export default function GlowBorderProvider() {
       if (raf == null) raf = requestAnimationFrame(update);
     };
 
-    const onEnter = (e: PointerEvent) => {
-      const el = (e.target as Element | null)?.closest('.glow-border');
-      if (isHTMLElement(el)) el.style.setProperty('--glow-opacity', '1');
+    const setOpacityFromEventTarget = (e: PointerEvent, value: '0' | '1') => {
+      if (!isElement(e.target)) return;
+      const host = e.target.closest('.glow-border');
+      if (host instanceof HTMLElement) host.style.setProperty('--glow-opacity', value);
     };
 
-    const onLeave = (e: PointerEvent) => {
-      const el = (e.target as Element | null)?.closest('.glow-border');
-      if (isHTMLElement(el)) el.style.setProperty('--glow-opacity', '0');
-    };
+    const onEnter = (e: PointerEvent) => setOpacityFromEventTarget(e, '1');
+    const onLeave = (e: PointerEvent) => setOpacityFromEventTarget(e, '0');
 
     document.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('pointerover', onEnter);
