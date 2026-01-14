@@ -1,12 +1,12 @@
 .card {
   /* Optional sizing variables */
-  --card-w: 100%;
-  --card-h: auto;
+  --card-w: 500px;
+  --card-h: 500px;
 
   /* Cosmetics */
-  --radius: 20px;
+  --radius: 12px;
   --border-w: 1px;
-  --glow-size: 480px;
+  --glow-size: 520px;
 
   /* Defaults so gradient doesn't break before first move */
   --mouse-x: 50%;
@@ -39,7 +39,7 @@
 
   background: radial-gradient(
     var(--glow-size) circle at var(--mouse-x) var(--mouse-y),
-    rgba(255, 38, 183, 0.95),
+    rgba(255, 255, 255, 0.95),
     transparent 60%
   );
 

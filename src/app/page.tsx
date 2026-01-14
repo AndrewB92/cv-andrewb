@@ -19,9 +19,8 @@ export default async function HomePage() {
   return (
     <main>
       {/* <GlowCard> */}
-        <CardGlowBorder radius={20} borderWidth={1} glowSize={520}>
-            <h3 style={{ margin: 0 }}>Glow Card</h3>
-            <p style={{ opacity: 0.8 }}>Any content goes here.</p>
+        <CardGlowBorder width={420} height={260} radius={14} borderWidth={1} glowSize={520}>
+            <h3 style={{ margin: 0, padding: 24 }}>Hello world</h3>
         </CardGlowBorder>
         <article className={styles.hero}>
           <div className={styles.heroContent}>
