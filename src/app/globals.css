@@ -42,3 +42,42 @@ main {
   outline: 2px solid var(--color-accent);
   outline-offset: 4px;
 }
+
+/* Glow effect base: attach to ANY element that has [data-glow-card] */
+
+[data-glow-card] {
+  position: relative;
+  isolation: isolate;
+  /* defaults you can override per element */
+  --glow-color: 59, 248, 251;     /* rgb */
+  --glow-size: 520px;
+  --glow-falloff: 18%;            /* transparent stop */
+  --glow-opacity: 0;              /* JS toggles this */
+  --glow-x: 50%;
+  --glow-y: 50%;
+}
+
+/* The glow “border” layer */
+[data-glow-card]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--glow-opacity);
+  transition: opacity 180ms ease;
+
+  /* You can tweak these */
+  background: radial-gradient(
+    var(--glow-size) circle at var(--glow-x) var(--glow-y),
+    rgba(var(--glow-color), 0.75),
+    transparent var(--glow-falloff)
+  );
+}
+
+/* optional: inner panel to make it look like a border glow */
+[data-glow-card] > [data-glow-inner] {
+  position: relative;
+  z-index: 1;
+  border-radius: inherit;
+}
