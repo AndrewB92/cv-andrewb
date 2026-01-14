@@ -4,7 +4,8 @@ import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 
-import GlowCard from "@/components/GlowCard/GlowCard";
+// import GlowCard from "@/components/GlowCard/GlowCard";
+import GlowPointerProvider from "@/components/GlowPointerProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +17,8 @@ export default async function HomePage() {
 
   return (
     <main>
-      <GlowCard>
-        <article className={styles.hero}>
+      {/* <GlowCard> */}
+        <article data-glow-card className={styles.hero}>
           <div className={styles.heroContent}>
             <p aria-label="Tagline">{siteMetadata.tagline}</p>
             <h1>{profile.name}</h1>
@@ -44,7 +45,7 @@ export default async function HomePage() {
             </p>
           </div>
         </article>
-      </GlowCard>
+      {/* </GlowCard> */}
 
       <div className={styles.grid}>
         <Section
