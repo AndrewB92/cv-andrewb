@@ -26,9 +26,14 @@
 .heroMeta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 4px;
   color: var(--color-text-muted);
  
+}
+
+.heroContent .heroMeta p {
+  margin: 0 !important;
+  font-size: 14px;
 }
 
 .heroMetaPopover {
