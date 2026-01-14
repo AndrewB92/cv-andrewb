@@ -32,7 +32,9 @@
 }
 
 .heroMetaPopover {
-  position: relative;
+  position: absolute;
+  top: 0px;
+  right: 13px;
   display: inline-flex;
   align-items: center;
   margin-top: 14px; /* tweak placement */
