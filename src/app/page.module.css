@@ -48,7 +48,7 @@
   -ms-transition: opacity 320ms ease-in-out;
   -o-transition: opacity 320ms ease-in-out;
 }
-.heroMeta:hovver {
+.heroMeta:hover {
   opacity: 1;
 }
 
