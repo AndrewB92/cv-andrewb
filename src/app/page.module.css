@@ -108,16 +108,6 @@
   width: 3px;
   height: 100%;
   background: linear-gradient(180deg,#7c3aed 0%,#2563eb 100%);
-
-    /* reveal animation via transform scale */
-  transform-origin: top;
-  transform: scaleY(var(--reveal, 0));
-  transition: transform 900ms cubic-bezier(.2,.9,.2,1);
-  will-change: transform;
-
-  /* subtle glow */
-  filter: drop-shadow(0 0 14px rgba(124, 58, 237, 0.35))
-          drop-shadow(0 0 10px rgba(6, 182, 212, 0.25));
 }
 
 .experienceItem {
@@ -126,6 +116,7 @@
   /* padding-left: var(--space-lg); */
   padding-left: 20px;
   padding-bottom: 20px;
+  position: relative;
 }
 .experienceItem:last-child {
   padding-bottom: 0px;
