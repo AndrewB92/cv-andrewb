@@ -107,7 +107,17 @@
   left: 0;
   width: 3px;
   height: 100%;
-  background: var(--color-border);
+  background: linear-gradient(180deg,#7c3aed 0%,#2563eb 100%);
+
+    /* reveal animation via transform scale */
+  transform-origin: top;
+  transform: scaleY(var(--reveal, 0));
+  transition: transform 900ms cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+
+  /* subtle glow */
+  filter: drop-shadow(0 0 14px rgba(124, 58, 237, 0.35))
+          drop-shadow(0 0 10px rgba(6, 182, 212, 0.25));
 }
 
 .experienceItem {
@@ -119,6 +129,20 @@
 }
 .experienceItem:last-child {
   padding-bottom: 0px;
+}
+
+/* bullet dot */
+.experienceItem:before {
+  content: "";
+  position: absolute;
+  left: -30px;
+  top: 26px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(250,250,250,1);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.04);
 }
 
 .experienceHeader {
