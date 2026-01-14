@@ -46,6 +46,7 @@ export default async function HomePage() {
       <div className={styles.grid}>
         <Section
           id="skills"
+          className="glow-border"
           eyebrow="Toolkit"
           title="Skills & focus areas"
           description="Tools I keep close to ship resilient, maintainable interfaces."
