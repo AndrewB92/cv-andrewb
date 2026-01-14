@@ -126,7 +126,7 @@ export default async function HomePage() {
                     aria-expanded="false"
                     aria-controls={achievementsId}
                   >
-                    <span className={styles.expToggleText}>Show more</span>
+                    <span className={styles.expToggleText}>Show details</span>
 
                     <span className={styles.expToggleIcon} aria-hidden="true">
                       <svg viewBox="0 0 24 24" width="18" height="18">
@@ -159,7 +159,7 @@ export default async function HomePage() {
                   btn.setAttribute('aria-expanded', 'true');
 
                   const label = getLabelEl(btn);
-                  if (label) label.textContent = 'Show less';
+                  if (label) label.textContent = 'Hide details';
 
                   const icon = getIconEl(btn);
                   if (icon) icon.style.transform = 'rotate(180deg)';
@@ -173,7 +173,7 @@ export default async function HomePage() {
                   btn.setAttribute('aria-expanded', 'false');
 
                   const label = getLabelEl(btn);
-                  if (label) label.textContent = 'Show more';
+                  if (label) label.textContent = 'Show details';
 
                   const icon = getIconEl(btn);
                   if (icon) icon.style.transform = 'rotate(0deg)';
