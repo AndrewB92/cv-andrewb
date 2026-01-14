@@ -94,11 +94,12 @@ export default async function HomePage() {
                     id={achievementsId}
                     data-achievements
                     aria-hidden="true"
-                    style={{
-                      overflow: "hidden",
-                      maxHeight: 0,
-                      transition: "max-height 280ms ease",
-                    }}
+                    // style={{
+                    //   overflow: "hidden",
+                    //   maxHeight: 0,
+                    //   transition: "max-height 280ms ease",
+                    // }}
+                    className={styles.expPanel}
                   >
                     <ul className={styles.experienceAchievements} style={{ marginTop: 0 }}>
                       {experience.achievements.map((achievement, i) => (
@@ -107,7 +108,7 @@ export default async function HomePage() {
                     </ul>
                   </div>
 
-                  <button
+                  {/* <button
                     type="button"
                     data-exp-toggle
                     data-target={achievementsId}
@@ -115,7 +116,25 @@ export default async function HomePage() {
                     aria-controls={achievementsId}
                   >
                     Show more
+                  </button> */}
+
+                  <button
+                    type="button"
+                    className={styles.expToggle}
+                    data-exp-toggle
+                    data-target={achievementsId}
+                    aria-expanded="false"
+                    aria-controls={achievementsId}
+                  >
+                    <span className={styles.expToggleText}>Show more</span>
+
+                    <span className={styles.expToggleIcon} aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M7 10l5 5 5-5" />
+                      </svg>
+                    </span>
                   </button>
+
                 </li>
               );
             })}
