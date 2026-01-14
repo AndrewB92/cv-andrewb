@@ -89,23 +89,24 @@ export default async function HomePage() {
 
                   <p>{experience.role}</p>
 
-                  {/* Collapsed by default */}
+                  {/* Smooth expandable area (collapsed by default) */}
                   <div
                     id={achievementsId}
                     data-achievements
-                    hidden
                     aria-hidden="true"
+                    style={{
+                      overflow: "hidden",
+                      maxHeight: 0,
+                      transition: "max-height 280ms ease",
+                    }}
                   >
-                    <ul className={styles.experienceAchievements}>
+                    <ul className={styles.experienceAchievements} style={{ marginTop: 0 }}>
                       {experience.achievements.map((achievement, i) => (
-                        <li key={`${experience.company}-${index}-${i}`}>
-                          {achievement}
-                        </li>
+                        <li key={`${experience.company}-${index}-${i}`}>{achievement}</li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Toggle */}
                   <button
                     type="button"
                     data-exp-toggle
@@ -120,24 +121,44 @@ export default async function HomePage() {
             })}
           </ol>
 
-          {/* Small client-side behavior, no CSS required */}
-          <Script id="experience-toggle" strategy="afterInteractive">
+          <Script id="experience-toggle-smooth" strategy="afterInteractive">
             {`
               (() => {
                 const toggles = document.querySelectorAll('[data-exp-toggle]');
                 if (!toggles.length) return;
 
-                const setState = (btn, panel, open) => {
-                  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-                  panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+                const setOpen = (btn, panel) => {
+                  // Ensure we can measure
+                  panel.style.maxHeight = '0px';
+                  panel.setAttribute('aria-hidden', 'false');
 
-                  if (open) {
-                    panel.hidden = false;
-                    btn.textContent = 'Show less';
-                  } else {
-                    panel.hidden = true;
-                    btn.textContent = 'Show more';
-                  }
+                  // Force a reflow so the transition reliably triggers
+                  panel.getBoundingClientRect();
+
+                  const target = panel.scrollHeight;
+                  panel.style.maxHeight = target + 'px';
+
+                  btn.setAttribute('aria-expanded', 'true');
+                  btn.textContent = 'Show less';
+                };
+
+                const setClosed = (btn, panel) => {
+                  const current = panel.scrollHeight;
+                  // Start from the current height to animate to 0
+                  panel.style.maxHeight = current + 'px';
+                  panel.getBoundingClientRect();
+
+                  panel.style.maxHeight = '0px';
+                  btn.setAttribute('aria-expanded', 'false');
+                  btn.textContent = 'Show more';
+
+                  // After animation, mark as hidden for screen readers
+                  const onEnd = (e) => {
+                    if (e.propertyName !== 'max-height') return;
+                    panel.setAttribute('aria-hidden', 'true');
+                    panel.removeEventListener('transitionend', onEnd);
+                  };
+                  panel.addEventListener('transitionend', onEnd);
                 };
 
                 toggles.forEach((btn) => {
@@ -147,14 +168,38 @@ export default async function HomePage() {
                   const panel = document.getElementById(targetId);
                   if (!panel) return;
 
-                  // ensure closed on init
-                  setState(btn, panel, false);
+                  // Init: collapsed
+                  btn.setAttribute('aria-expanded', 'false');
+                  panel.setAttribute('aria-hidden', 'true');
+                  panel.style.maxHeight = '0px';
 
                   btn.addEventListener('click', () => {
                     const isOpen = btn.getAttribute('aria-expanded') === 'true';
-                    setState(btn, panel, !isOpen);
+                    if (isOpen) setClosed(btn, panel);
+                    else setOpen(btn, panel);
                   });
                 });
+
+                // Keep open panels correct on resize / font load changes
+                const refreshOpenHeights = () => {
+                  toggles.forEach((btn) => {
+                    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+                    if (!isOpen) return;
+
+                    const targetId = btn.getAttribute('data-target');
+                    const panel = targetId ? document.getElementById(targetId) : null;
+                    if (!panel) return;
+
+                    panel.style.maxHeight = panel.scrollHeight + 'px';
+                  });
+                };
+
+                window.addEventListener('resize', refreshOpenHeights);
+
+                // Also refresh after fonts load (best effort)
+                if (document.fonts && document.fonts.ready) {
+                  document.fonts.ready.then(refreshOpenHeights).catch(() => {});
+                }
               })();
             `}
           </Script>
