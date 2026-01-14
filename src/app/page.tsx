@@ -146,32 +146,38 @@ export default async function HomePage() {
                 const toggles = document.querySelectorAll('[data-exp-toggle]');
                 if (!toggles.length) return;
 
+                const getLabelEl = (btn) => btn.querySelector('[class*="expToggleText"]') || btn.querySelector('span');
+                const getIconEl  = (btn) => btn.querySelector('[class*="expToggleIcon"]');
+
                 const setOpen = (btn, panel) => {
-                  // Ensure we can measure
                   panel.style.maxHeight = '0px';
                   panel.setAttribute('aria-hidden', 'false');
+                  panel.getBoundingClientRect(); // reflow
 
-                  // Force a reflow so the transition reliably triggers
-                  panel.getBoundingClientRect();
-
-                  const target = panel.scrollHeight;
-                  panel.style.maxHeight = target + 'px';
+                  panel.style.maxHeight = panel.scrollHeight + 'px';
 
                   btn.setAttribute('aria-expanded', 'true');
-                  btn.textContent = 'Show less';
+
+                  const label = getLabelEl(btn);
+                  if (label) label.textContent = 'Show less';
+
+                  const icon = getIconEl(btn);
+                  if (icon) icon.style.transform = 'rotate(180deg)';
                 };
 
                 const setClosed = (btn, panel) => {
-                  const current = panel.scrollHeight;
-                  // Start from the current height to animate to 0
-                  panel.style.maxHeight = current + 'px';
-                  panel.getBoundingClientRect();
+                  panel.style.maxHeight = panel.scrollHeight + 'px';
+                  panel.getBoundingClientRect(); // reflow
 
                   panel.style.maxHeight = '0px';
                   btn.setAttribute('aria-expanded', 'false');
-                  btn.textContent = 'Show more';
 
-                  // After animation, mark as hidden for screen readers
+                  const label = getLabelEl(btn);
+                  if (label) label.textContent = 'Show more';
+
+                  const icon = getIconEl(btn);
+                  if (icon) icon.style.transform = 'rotate(0deg)';
+
                   const onEnd = (e) => {
                     if (e.propertyName !== 'max-height') return;
                     panel.setAttribute('aria-hidden', 'true');
@@ -192,6 +198,9 @@ export default async function HomePage() {
                   panel.setAttribute('aria-hidden', 'true');
                   panel.style.maxHeight = '0px';
 
+                  const icon = getIconEl(btn);
+                  if (icon) icon.style.transform = 'rotate(0deg)';
+
                   btn.addEventListener('click', () => {
                     const isOpen = btn.getAttribute('aria-expanded') === 'true';
                     if (isOpen) setClosed(btn, panel);
@@ -199,7 +208,6 @@ export default async function HomePage() {
                   });
                 });
 
-                // Keep open panels correct on resize / font load changes
                 const refreshOpenHeights = () => {
                   toggles.forEach((btn) => {
                     const isOpen = btn.getAttribute('aria-expanded') === 'true';
@@ -215,7 +223,6 @@ export default async function HomePage() {
 
                 window.addEventListener('resize', refreshOpenHeights);
 
-                // Also refresh after fonts load (best effort)
                 if (document.fonts && document.fonts.ready) {
                   document.fonts.ready.then(refreshOpenHeights).catch(() => {});
                 }
