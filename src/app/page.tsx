@@ -14,7 +14,8 @@ export default async function HomePage() {
 
   return (
     <main>
-      <article className={'${styles.hero} ${styles.glow-border}'}>
+      {/* <article className={styles.hero}> */}
+      <article className={`${styles.hero} glow-border`}>
         <div className={styles.heroContent}>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
           <h1>{profile.name}</h1>
