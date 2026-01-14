@@ -5,7 +5,8 @@ import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 
 // import GlowCard from "@/components/GlowCard/GlowCard";
-import GlowPointerProvider from "@/components/GlowPointerProvider";
+// import GlowPointerProvider from "@/components/GlowPointerProvider";
+import CardGlowBorder from "@/components/CardGlowBorder/CardGlowBorder";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,12 @@ export default async function HomePage() {
   return (
     <main>
       {/* <GlowCard> */}
+        <CardGlowBorder width={520} height={320}>
+          <div style={{ padding: 16, color: "#fff" }}>
+            <h3 style={{ margin: 0 }}>Glow Card</h3>
+            <p style={{ opacity: 0.8 }}>Any content goes here.</p>
+          </div>
+        </CardGlowBorder>
         <article className={styles.hero}>
           <div className={styles.heroContent}>
             <p aria-label="Tagline">{siteMetadata.tagline}</p>
