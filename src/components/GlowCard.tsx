@@ -6,7 +6,7 @@ type GlowCardProps = {
   children: React.ReactNode;
   className?: string;
 
-  radius?: number;
+  radius?: string;
   borderWidth?: number;
   glowSize?: number;
   glowColor?: string;
@@ -18,12 +18,12 @@ type GlowCardProps = {
 export default function GlowCard({
   children,
   className,
-  radius = 12,
+  radius = 'var(--radius-lg)',
   borderWidth = 1,
   glowSize = 420,
-  glowColor = 'rgba(255,255,255,0.9)',
-  background = 'rgb(20,20,20)',
-  borderColor = 'rgba(245,245,245,0.18)',
+  glowColor = 'rgba(186, 37, 209, 1)',
+  background = 'var(--color-surface-alt)',
+  borderColor = 'var(--color-border)',
   blur = 2,
 }: GlowCardProps) {
   const elRef = useRef<HTMLDivElement | null>(null);
