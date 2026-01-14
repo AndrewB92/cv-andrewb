@@ -53,7 +53,6 @@ export default async function HomePage() {
           eyebrow="Toolkit"
           title="Skills & focus areas"
           description="Tools I keep close to ship resilient, maintainable interfaces."
-          data-glow-card
         >
           {skills.map((group) => (
             <article key={group.title}>
