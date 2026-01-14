@@ -4,9 +4,7 @@ import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 
-// import GlowCard from "@/components/GlowCard/GlowCard";
-// import GlowPointerProvider from "@/components/GlowPointerProvider";
-import GlowCard from './GlowCard';
+import GlowCard from '@/components/GlowCard';
 
 export const dynamic = "force-dynamic";
 
@@ -18,38 +16,37 @@ export default async function HomePage() {
 
   return (
     <main>
-      {/* <GlowCard> */}
-        <GlowCard>
-            <h3 style={{ margin: 0, padding: 24 }}>Hello world</h3>
-        </GlowCard>
-        <article className={styles.hero}>
-          <div className={styles.heroContent}>
-            <p aria-label="Tagline">{siteMetadata.tagline}</p>
-            <h1>{profile.name}</h1>
-            <p>{profile.summary}</p>
-            <div className={styles.heroActions}>
-              <Link href="/projects" className={styles.primaryButton}>
-                Explore projects
-              </Link>
-              <Link href="/contact" className={styles.secondaryButton}>
-                Get in touch
-              </Link>
-            </div>
+      <GlowCard>
+          <h3 style={{ margin: 0, padding: 24 }}>Hello world</h3>
+      </GlowCard>
+
+      <article className={styles.hero}>
+        <div className={styles.heroContent}>
+          <p aria-label="Tagline">{siteMetadata.tagline}</p>
+          <h1>{profile.name}</h1>
+          <p>{profile.summary}</p>
+          <div className={styles.heroActions}>
+            <Link href="/projects" className={styles.primaryButton}>
+              Explore projects
+            </Link>
+            <Link href="/contact" className={styles.secondaryButton}>
+              Get in touch
+            </Link>
           </div>
-          <div className={styles.heroMeta}>
-            <p>
-              <strong>Role:</strong> {profile.title}
-            </p>
-            <p>
-              <strong>Location:</strong> {profile.location}
-            </p>
-            <p>
-              <strong>Email:</strong>{" "}
-              <a href={`mailto:${profile.email}`}>{profile.email}</a>
-            </p>
-          </div>
-        </article>
-      {/* </GlowCard> */}
+        </div>
+        <div className={styles.heroMeta}>
+          <p>
+            <strong>Role:</strong> {profile.title}
+          </p>
+          <p>
+            <strong>Location:</strong> {profile.location}
+          </p>
+          <p>
+            <strong>Email:</strong>{" "}
+            <a href={`mailto:${profile.email}`}>{profile.email}</a>
+          </p>
+        </div>
+      </article>
 
       <div className={styles.grid}>
         <Section

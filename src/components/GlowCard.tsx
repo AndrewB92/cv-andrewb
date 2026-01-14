@@ -6,14 +6,13 @@ type GlowCardProps = {
   children: React.ReactNode;
   className?: string;
 
-  /** Visual tuning */
-  radius?: number;        // px
-  borderWidth?: number;   // px
-  glowSize?: number;      // px
-  glowColor?: string;     // any CSS color
-  background?: string;    // card bg
-  borderColor?: string;   // base border
-  blur?: number;          // px
+  radius?: number;
+  borderWidth?: number;
+  glowSize?: number;
+  glowColor?: string;
+  background?: string;
+  borderColor?: string;
+  blur?: number;
 };
 
 export default function GlowCard({
@@ -31,7 +30,7 @@ export default function GlowCard({
   const rafRef = useRef<number | null>(null);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
-  const setCSSVars = useCallback(() => {
+  const applyVars = useCallback(() => {
     rafRef.current = null;
     const el = elRef.current;
     const pt = lastPointRef.current;
@@ -47,28 +46,19 @@ export default function GlowCard({
       if (!el) return;
 
       const rect = el.getBoundingClientRect();
-      lastPointRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
+      lastPointRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 
-      if (rafRef.current == null) {
-        rafRef.current = window.requestAnimationFrame(setCSSVars);
-      }
+      if (rafRef.current == null) rafRef.current = window.requestAnimationFrame(applyVars);
     },
-    [setCSSVars]
+    [applyVars]
   );
 
   const onPointerEnter = useCallback(() => {
-    const el = elRef.current;
-    if (!el) return;
-    el.style.setProperty('--glow-opacity', '1');
+    elRef.current?.style.setProperty('--glow-opacity', '1');
   }, []);
 
   const onPointerLeave = useCallback(() => {
-    const el = elRef.current;
-    if (!el) return;
-    el.style.setProperty('--glow-opacity', '0');
+    elRef.current?.style.setProperty('--glow-opacity', '0');
   }, []);
 
   return (
@@ -101,15 +91,10 @@ export default function GlowCard({
           border-radius: var(--r);
           background: var(--cardBg);
           border: var(--bw) solid var(--borderColor);
-
-          /* your layout/content styling */
           padding: 24px;
-
-          /* improves pointer UX on touch screens */
           touch-action: none;
         }
 
-        /* Border-only glow ring */
         .glowCard::before {
           content: '';
           position: absolute;
@@ -127,10 +112,9 @@ export default function GlowCard({
           transition: opacity 200ms ease;
           filter: blur(var(--blur));
 
-          /* Mask so ONLY the border ring is visible */
+          /* border-only mask */
           padding: var(--bw);
-          -webkit-mask: linear-gradient(#000 0 0) content-box,
-            linear-gradient(#000 0 0);
+          -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
         }
