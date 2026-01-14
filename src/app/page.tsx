@@ -4,7 +4,7 @@ import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 
-import GlowCard from '@/components/GlowCard';
+// import GlowCard from '@/components/GlowCard';
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +16,18 @@ export default async function HomePage() {
 
   return (
     <main>
-      <GlowCard>
+      {/* <GlowCard>
           <h3 style={{ margin: 0, padding: 24 }}>Hello world</h3>
-      </GlowCard>
+      </GlowCard> */}
+      <div
+        className="glow-border"
+        style={{
+          '--glowColor': 'rgba(186, 37, 209, 1)',
+          '--glowSize': '380px',
+        } as React.CSSProperties}
+      >
+        <h3>Hello world</h3>
+      </div>
 
       <article className={styles.hero}>
         <div className={styles.heroContent}>

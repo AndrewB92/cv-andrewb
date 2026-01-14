@@ -5,6 +5,9 @@ import styles from "./layout.module.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+import GlowBorderProvider from './GlowBorderProvider';
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -57,6 +60,7 @@ export default function RootLayout({
           </a>
           <Header />
           <div className={styles.mainContent} id="main-content">
+            <GlowBorderProvider />
             {children}
           </div>
           <Footer />
@@ -65,3 +69,4 @@ export default function RootLayout({
     </html>
   );
 }
+
