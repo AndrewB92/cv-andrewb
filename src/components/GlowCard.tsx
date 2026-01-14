@@ -71,7 +71,7 @@ export default function GlowCard({
         onPointerLeave={onPointerLeave}
         style={
           {
-            '--r': `${radius}px`,
+            '--r': `${radius}`,
             '--bw': `${borderWidth}px`,
             '--glowSize': `${glowSize}px`,
             '--glowColor': glowColor,
