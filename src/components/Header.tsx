@@ -17,7 +17,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} glow-border`}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand}>
           {/* {siteMetadata.siteName} */}

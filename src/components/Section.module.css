@@ -6,6 +6,10 @@
   box-shadow: var(--shadow-card);
 }
 
+#highlights.section{
+  margin-top: 48px;
+}
+
 .header {
   display: flex;
   flex-direction: column;
