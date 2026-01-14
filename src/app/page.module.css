@@ -52,6 +52,158 @@
   opacity: 1;
 }
 
+.heroMetaPopover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 14px; /* tweak placement */
+}
+
+/* the icon button */
+.heroMetaPopover [data-popover-trigger] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.heroMetaPopover [data-popover-trigger]:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.heroMetaPopover [data-popover-trigger]:active {
+  transform: scale(0.98);
+}
+
+.heroMetaPopover [data-popover-trigger]:focus-visible {
+  outline: 2px solid rgba(186, 37, 209, 0.8); /* fits your vibe */
+  outline-offset: 2px;
+}
+
+/* the popover panel */
+.heroMetaPopover [data-popover-panel] {
+  position: absolute;
+  z-index: 50;
+
+  top: calc(100% + 10px);
+  right: 0;
+
+  min-width: 260px;
+  max-width: min(360px, 80vw);
+
+  padding: 14px;
+  border-radius: 14px;
+
+  background: rgba(20, 20, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(10px);
+}
+
+/* little arrow */
+.heroMetaPopover [data-popover-panel]::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 14px;
+
+  width: 14px;
+  height: 14px;
+
+  background: rgba(20, 20, 24, 0.88);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+  transform: rotate(45deg);
+}
+.heroMetaPopover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 14px; /* tweak placement */
+}
+
+/* the icon button */
+.heroMetaPopover [data-popover-trigger] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.heroMetaPopover [data-popover-trigger]:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.heroMetaPopover [data-popover-trigger]:active {
+  transform: scale(0.98);
+}
+
+.heroMetaPopover [data-popover-trigger]:focus-visible {
+  outline: 2px solid rgba(186, 37, 209, 0.8); /* fits your vibe */
+  outline-offset: 2px;
+}
+
+/* the popover panel */
+.heroMetaPopover [data-popover-panel] {
+  position: absolute;
+  z-index: 50;
+
+  top: calc(100% + 10px);
+  right: 0;
+
+  min-width: 260px;
+  max-width: min(360px, 80vw);
+
+  padding: 14px;
+  border-radius: 14px;
+
+  background: rgba(20, 20, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(10px);
+}
+
+/* little arrow */
+.heroMetaPopover [data-popover-panel]::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 14px;
+
+  width: 14px;
+  height: 14px;
+
+  background: rgba(20, 20, 24, 0.88);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+  transform: rotate(45deg);
+}
+
+
 .heroActions {
   display: flex;
   flex-wrap: wrap;

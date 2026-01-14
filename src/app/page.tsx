@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
+import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 
 export const dynamic = "force-dynamic";
 
@@ -13,33 +14,38 @@ export default async function HomePage() {
 
   return (
     <main>
-      <article className={`${styles.hero} glow-border`}>
-        <div className={styles.heroContent}>
-          <p aria-label="Tagline">{siteMetadata.tagline}</p>
-          <h1>{profile.name}</h1>
-          <p>{profile.summary}</p>
-          <div className={styles.heroActions}>
-            <Link href="/projects" className={styles.primaryButton}>
-              Explore projects
-            </Link>
-            <Link href="/contact" className={styles.secondaryButton}>
-              Get in touch
-            </Link>
+    <article className={`${styles.hero} glow-border`}>
+      <div className={styles.heroContent}>
+        <p aria-label="Tagline">{siteMetadata.tagline}</p>
+        <h1>{profile.name}</h1>
+        <p>{profile.summary}</p>
+        <div className={styles.heroActions}>
+          <Link href="/projects" className={styles.primaryButton}>
+            Explore projects
+          </Link>
+          <Link href="/contact" className={styles.secondaryButton}>
+            Get in touch
+          </Link>
+        </div>
+
+        {/* Put the icon near your hero content/actions (you choose placement) */}
+        <HeroMetaPopover className={styles.heroMetaPopover}>
+          <div className={styles.heroMeta}>
+            <strong>Short facts:</strong>
+            <p>
+              <strong>Role:</strong> {profile.title}
+            </p>
+            <p>
+              <strong>Location:</strong> {profile.location}
+            </p>
+            <p>
+              <strong>Email:</strong>{" "}
+              <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            </p>
           </div>
-        </div>
-        <div className={styles.heroMeta}>
-          <p>
-            <strong>Role:</strong> {profile.title}
-          </p>
-          <p>
-            <strong>Location:</strong> {profile.location}
-          </p>
-          <p>
-            <strong>Email:</strong>{" "}
-            <a href={`mailto:${profile.email}`}>{profile.email}</a>
-          </p>
-        </div>
-      </article>
+        </HeroMetaPopover>
+      </div>
+    </article>
 
       <div className={styles.grid}>
         <Section
