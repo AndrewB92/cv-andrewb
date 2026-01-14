@@ -18,7 +18,7 @@ export default async function HomePage() {
   return (
     <main>
       {/* <GlowCard> */}
-        <article data-glow-card className={styles.hero}>
+        <article className={styles.hero}>
           <div className={styles.heroContent}>
             <p aria-label="Tagline">{siteMetadata.tagline}</p>
             <h1>{profile.name}</h1>
@@ -53,6 +53,7 @@ export default async function HomePage() {
           eyebrow="Toolkit"
           title="Skills & focus areas"
           description="Tools I keep close to ship resilient, maintainable interfaces."
+          data-glow-card
         >
           {skills.map((group) => (
             <article key={group.title}>
