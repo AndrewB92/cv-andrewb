@@ -233,6 +233,11 @@
   transition: background 180ms ease;
 }
 
+.expToggle:hover:before{
+  animation: loading 3s linear infinite;
+  -webkit-animation: loading 3s linear infinite;
+}
+
 .expToggleText {
   position: relative;
   color: var(--muted);
@@ -288,6 +293,15 @@
 .expToggle:focus-visible {
   outline: 2px solid rgba(6, 182, 212, 0.55);
   outline-offset: 3px;
+}
+
+@keyframes loading {
+  0% { 
+    transform: rotate(0); 
+  }
+  100% { 
+    transform: rotate(360deg);
+  }
 }
 
 
