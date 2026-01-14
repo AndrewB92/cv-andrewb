@@ -2,9 +2,13 @@
 
 import { useEffect } from 'react';
 
+function isHTMLElement(node: Element | null): node is HTMLElement {
+  return !!node && node instanceof HTMLElement;
+}
+
 export default function GlowBorderProvider() {
   useEffect(() => {
-    const targets = () =>
+    const getTargets = () =>
       Array.from(document.querySelectorAll<HTMLElement>('.glow-border'));
 
     let raf: number | null = null;
@@ -14,26 +18,29 @@ export default function GlowBorderProvider() {
       raf = null;
       if (!lastEvent) return;
 
-      for (const el of targets()) {
+      const { clientX, clientY } = lastEvent;
+      const els = getTargets();
+
+      for (const el of els) {
         const rect = el.getBoundingClientRect();
-        el.style.setProperty('--mouse-x', `${lastEvent.clientX - rect.left}px`);
-        el.style.setProperty('--mouse-y', `${lastEvent.clientY - rect.top}px`);
+        el.style.setProperty('--mouse-x', `${clientX - rect.left}px`);
+        el.style.setProperty('--mouse-y', `${clientY - rect.top}px`);
       }
     };
 
     const onMove = (e: PointerEvent) => {
       lastEvent = e;
-      if (!raf) raf = requestAnimationFrame(update);
+      if (raf == null) raf = requestAnimationFrame(update);
     };
 
     const onEnter = (e: PointerEvent) => {
-      const el = (e.target as HTMLElement).closest('.glow-border');
-      if (el) el.style.setProperty('--glow-opacity', '1');
+      const el = (e.target as Element | null)?.closest('.glow-border');
+      if (isHTMLElement(el)) el.style.setProperty('--glow-opacity', '1');
     };
 
     const onLeave = (e: PointerEvent) => {
-      const el = (e.target as HTMLElement).closest('.glow-border');
-      if (el) el.style.setProperty('--glow-opacity', '0');
+      const el = (e.target as Element | null)?.closest('.glow-border');
+      if (isHTMLElement(el)) el.style.setProperty('--glow-opacity', '0');
     };
 
     document.addEventListener('pointermove', onMove, { passive: true });
@@ -44,6 +51,7 @@ export default function GlowBorderProvider() {
       document.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerover', onEnter);
       document.removeEventListener('pointerout', onLeave);
+      if (raf != null) cancelAnimationFrame(raf);
     };
   }, []);
 
