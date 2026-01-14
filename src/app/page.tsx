@@ -6,7 +6,7 @@ import { siteMetadata } from "@/config/site";
 
 // import GlowCard from "@/components/GlowCard/GlowCard";
 // import GlowPointerProvider from "@/components/GlowPointerProvider";
-import CardGlowBorder from "@/components/CardGlowBorder/CardGlowBorder";
+import GlowCard from './GlowCard';
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +19,9 @@ export default async function HomePage() {
   return (
     <main>
       {/* <GlowCard> */}
-        <CardGlowBorder width={420} height={260} radius={14} borderWidth={1} glowSize={520}>
+        <GlowCard>
             <h3 style={{ margin: 0, padding: 24 }}>Hello world</h3>
-        </CardGlowBorder>
+        </GlowCard>
         <article className={styles.hero}>
           <div className={styles.heroContent}>
             <p aria-label="Tagline">{siteMetadata.tagline}</p>
