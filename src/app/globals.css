@@ -18,6 +18,7 @@ body {
   background: var(--color-surface);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  background-image: url(/public/vercel-bg.svg);
 }
 
 a {
