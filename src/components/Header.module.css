@@ -94,6 +94,25 @@
   -moz-transition: left .2s ease-in-out;
   -ms-transition: left .2s ease-in-out;
   -o-transition: left .2s ease-in-out;
+  animation: glow 1s infinite alternate;
+  -webkit-animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    transform: scale(1);
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+}
+  to {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+    -moz-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    -o-transform: scale(1.2);
+}
 }
 
 .cta {
