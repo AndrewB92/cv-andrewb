@@ -100,17 +100,18 @@
 .heroMetaPopover [data-popover-panel]::before {
   content: "";
   position: absolute;
-  top: -7px;
-  right: 14px;
 
   width: 14px;
   height: 14px;
 
-  background: rgba(20, 20, 24, 0.88);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 
   transform: rotate(45deg);
+
+  background: var(--color-surface-alt);
+  top: -7.5px;
+  right: 12px;
 }
 
 .heroActions {
