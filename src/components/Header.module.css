@@ -146,7 +146,7 @@
 .navIndicator {
   position: absolute;
   left: 0;
-  bottom: -26px;
+  bottom: -17px;
 
   width: var(--indicator-w);
   transform: translateX(var(--indicator-x));
