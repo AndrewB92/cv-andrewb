@@ -71,7 +71,7 @@ export default async function HomePage() {
           ))}
         </Section>
 
-  return <ExperienceSection experiences={experiences} />;
+        <ExperienceSection experiences={experiences} />;
       </div>
 
       <Section
