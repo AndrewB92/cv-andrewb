@@ -16,38 +16,38 @@ export default async function HomePage() {
 
   return (
     <main>
-    <article className={`${styles.hero} glow-border`}>
-      <div className={styles.heroContent}>
-        <p aria-label="Tagline">{siteMetadata.tagline}</p>
-        <h1>{profile.name}</h1>
-        <p>{profile.summary}</p>
-        <div className={styles.heroActions}>
-          <Link href="/projects" className={styles.primaryButton}>
-            Explore projects
-          </Link>
-          <Link href="/contact" className={styles.secondaryButton}>
-            Get in touch
-          </Link>
-        </div>
-
-        {/* Put the icon near your hero content/actions (you choose placement) */}
-        <HeroMetaPopover className={styles.heroMetaPopover}>
-          <div className={styles.heroMeta}>
-            <strong>Short facts:</strong>
-            <p>
-              <strong>Role:</strong> {profile.title}
-            </p>
-            <p>
-              <strong>Location:</strong> {profile.location}
-            </p>
-            <p>
-              <strong>Email:</strong>{" "}
-              <a href={`mailto:${profile.email}`}>{profile.email}</a>
-            </p>
+      <article className={`${styles.hero} glow-border`}>
+        <div className={styles.heroContent}>
+          <p aria-label="Tagline">{siteMetadata.tagline}</p>
+          <h1>{profile.name}</h1>
+          <p>{profile.summary}</p>
+          <div className={styles.heroActions}>
+            <Link href="/projects" className={styles.primaryButton}>
+              Explore projects
+            </Link>
+            <Link href="/contact" className={styles.secondaryButton}>
+              Get in touch
+            </Link>
           </div>
-        </HeroMetaPopover>
-      </div>
-    </article>
+
+          {/* Put the icon near your hero content/actions (you choose placement) */}
+          <HeroMetaPopover className={styles.heroMetaPopover}>
+            <div className={styles.heroMeta}>
+              <strong>Short facts:</strong>
+              <p>
+                <strong>Role:</strong> {profile.title}
+              </p>
+              <p>
+                <strong>Location:</strong> {profile.location}
+              </p>
+              <p>
+                <strong>Email:</strong>{" "}
+                <a href={`mailto:${profile.email}`}>{profile.email}</a>
+              </p>
+            </div>
+          </HeroMetaPopover>
+        </div>
+      </article>
 
       <div className={styles.grid}>
         <Section
@@ -71,7 +71,7 @@ export default async function HomePage() {
           ))}
         </Section>
 
-        <ExperienceSection experiences={experiences} />;
+        <ExperienceSection experiences={experiences} />
       </div>
 
       <Section
