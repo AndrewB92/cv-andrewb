@@ -19,7 +19,7 @@ export default async function HomePage() {
       <article className={`${styles.hero} glow-border`}>
         <canvas id="hero-canvas" className={styles.heroCanvas} />
         <div className={styles.heroContent}>
-          <div className={styles.heroBackgroundImage}></div>
+          <div className="styles.heroContentBG"></div>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
           <h1>{profile.name}</h1>
           <p>{profile.summary}</p>
