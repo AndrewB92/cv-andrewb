@@ -44,10 +44,21 @@ export function Header() {
       const linkRect = linkEl.getBoundingClientRect();
 
       // position relative to the <ul>
-      const x = linkRect.left - listRect.left;
-      const w = linkRect.width;
+      const MAX_WIDTH = 55;
 
-      setIndicator({ x, w, visible: true });
+      const linkX = linkRect.left - listRect.left;
+      const linkW = linkRect.width;
+
+      const indicatorW = Math.min(linkW, MAX_WIDTH);
+
+      // center the capped indicator under the link
+      const indicatorX = linkX + (linkW - indicatorW) / 2;
+
+      setIndicator({
+        x: indicatorX,
+        w: indicatorW,
+        visible: true,
+      });
     };
 
     update();
