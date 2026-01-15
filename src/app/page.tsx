@@ -6,6 +6,7 @@ import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
+import { StripeGradientCanvas } from "@/components/StripeGradientCanvas";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,12 @@ export default async function HomePage() {
   return (
     <main>
       <article className={`${styles.hero} glow-border`}>
-        <canvas id="hero-canvas" className={styles.heroCanvas} />
+        <StripeGradientCanvas
+          mode="cover"
+          colors={["#ba25d1", "#ff333d", "#90e0ff", "#ffcb57"]}
+          style={{ borderRadius: 24 }}
+        />
+        {/* <canvas id="hero-canvas" className={styles.heroCanvas} /> */}
         <div className={styles.heroContent}>
           <div className="styles.heroContentBG"></div>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
