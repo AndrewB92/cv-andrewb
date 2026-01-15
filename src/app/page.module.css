@@ -22,7 +22,7 @@
   padding: var(--space-xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
+  gap: var(--space-sm);
 }
 
 .heroContent h1 {
