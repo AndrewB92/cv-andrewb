@@ -357,7 +357,7 @@
 .expToggle:hover .expToggleIcon {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.16);
-  transform: translateY(1px);
+  /* transform: translateY(1px); */
 }
 
 .expToggle:hover .expToggleIcon svg path {
