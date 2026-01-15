@@ -17,7 +17,6 @@
   border: 1px solid var(--color-border-dark);
   border-radius: var(--radius-lg);
   top: 1rem;
-  overflow: hidden;
 }
 
 @media (prefers-color-scheme: dark) {
