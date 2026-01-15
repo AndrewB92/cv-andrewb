@@ -9,6 +9,13 @@
   /* padding: var(--space-xl); */
   background: var(--color-surface-alt);
   box-shadow: var(--shadow-card);
+
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2xl);
+  justify-content: flex-start;
+  align-items: stretch;
+  flex-wrap: nowrap;
 }
 
 .heroContent {
