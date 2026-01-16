@@ -307,7 +307,7 @@
 .btn .text {
     z-index: 2;
     /* background: linear-gradient(#fff 0%,#ffffffb3 100%); */
-    -webkit-text-fill-color: transparent;
+    /* -webkit-text-fill-color: transparent; */
     /* text-fill-color: transparent; */
     text-shadow: 0 2px 2px #00000040;
     -webkit-background-clip: text;
@@ -320,7 +320,7 @@
     justify-content: flex-start;
     gap: 12px;
     position: relative;
-    color: var(--muted);
+    color: #ffffffb3;
 }
 .btnIcon {
   position: relative;
