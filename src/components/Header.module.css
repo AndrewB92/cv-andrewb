@@ -192,9 +192,9 @@
   --btn-radius: 12;
   --animation-timing-function: linear;
   --transitions: --shadow-scale 120ms var(--animation-timing-function),
-    --halo-scale 210ms var(--animation-timing-function),
+    --halo-scale 160ms var(--animation-timing-function),
     --halo-offset 160ms var(--animation-timing-function),
-    transform 210ms var(--animation-timing-function);
+    transform 180ms var(--animation-timing-function);
   --color-a: hsl(249.8 100% 50%);
   --color-b: hsl(259.15 100% 40%);
   --color-c: hsl(281.28 100% 56.01%);
