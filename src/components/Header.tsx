@@ -132,13 +132,13 @@ export function Header() {
         </Link> */}
 
         <Link href="/contact" className={styles.btn}>
-          <span className={styles.outer}>
+          <div className={styles.outer}>
             <span className={styles.inner}>
               <span className={styles.particles} aria-hidden="true" />
               <span className={styles.text}>Let&apos;s talk →</span>
               <span className={styles.halo} aria-hidden="true" />
             </span>
-          </span>
+          </div>
         </Link>
 
       </div>
