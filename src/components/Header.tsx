@@ -132,7 +132,7 @@ export function Header() {
         </Link> */}
 
         <Link href="/contact" className={styles.btn}>
-          <div className={styles.outer}>
+          <div className={styles.outer} style={{ height: "var(--header-height)" }}>
             <span className={styles.inner}>
               <span className={styles.particles} aria-hidden="true" />
               <span className={styles.text}>Let&apos;s talk →</span>
