@@ -219,27 +219,37 @@
   max-height: 46px;
   font-size: 22px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: calc(var(--btn-radius) * 1px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  /*background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);*/ 
   position: relative;
+  border-radius: 22px;
+  -webkit-border-radius: 22px;
+  -moz-border-radius: 22px;
+  -ms-border-radius: 22px;
+  -o-border-radius: 22px;
   transition: var(--transitions);
+  -webkit-transition: var(--transitions);
+  -moz-transition: var(--transitions);
+  -ms-transition: var(--transitions);
+  -o-transition: var(--transitions);
+
+  min-height: 100% !important;
+  margin-right: -32px;
 }
-.btn > div {
+/* .btn > div {
   overflow: hidden;
   position: relative;
   border-radius: calc(var(--btn-radius) * 1px);
-}
+} */
 .btn .inner {
   display: block;
-  background: hsl(300deg, 0%, 13%);
+  background: transparent;
   position: relative;
-  width: calc(100% - 1px);
-  height: calc(100% - 1px);
-  top: 1px;
-  left: 1px;
-  border-radius: calc(var(--btn-radius) * 1px);
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
 }
-.btn .inner:before,
+/* .btn .inner:before,
 .btn .inner:after {
   content: "";
   display: block;
@@ -254,25 +264,34 @@
 }
 .btn .inner:before {
   mix-blend-mode: overlay;
-}
-.btn .inner:after {
+} */
+/* .btn .inner:after {
   top: calc(100% - 2px);
   opacity: var(--halo-scale);
   background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 100%);
   filter: brightness(200%) opacity(0.3);
-}
+} */
+
 .btn .particles {
   background-image: var(--svg-animation), var(--svg-animation);
   background-repeat: no-repeat, repeat;
   background-position: center, center top 100%;
   background-size: 100% 100%, 50%;
   -webkit-mask-image: linear-gradient(to top, transparent, black, transparent);
-  border-radius: calc(var(--btn-radius) * 1px);
   width: 100%;
   height: 100%;
   position: absolute;
   opacity: var(--halo-scale);
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
+  -o-border-radius: 0px;
   transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
 }
 
 .btn .particles:before {
@@ -303,14 +322,12 @@
   text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
 }
 .btn .halo {
-  border-radius: calc((var(--btn-radius) + 1) * 1px);
   overflow: hidden;
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: calc(var(--btn-radius) * 1px);
 }
 .btn .halo:before {
   content: "";
