@@ -132,17 +132,6 @@
   /* animation: glow 1s infinite alternate; */
 }
 
-/* @keyframes glow {
-  from {
-    opacity: 0.75;
-    transform: translateX(-50%) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) scale(1.03);
-  }
-} */
-
 @media (prefers-reduced-motion: reduce) {
   .navIndicator {
     transition: none;
@@ -176,5 +165,107 @@
 
   .brand {
     letter-spacing: 0.15em;
+  }
+}
+
+/* Button reset + base */
+.btn {
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+  color: inherit;
+}
+
+/* Outer “hit area” / layout */
+.btnOuter {
+  display: inline-flex;
+}
+
+/* Inner styling surface */
+.inner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* adjust these to match your original button sizing */
+  height: 54px;
+  padding: 0 18px;
+
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 0 1px rgba(186, 37, 209, 0.25) inset,
+    0 10px 30px rgba(186, 37, 209, 0.08);
+
+  overflow: hidden; /* important for particles/halo */
+  transform: translateZ(0); /* stabilize effects */
+}
+
+/* Text */
+.text {
+  position: relative;
+  z-index: 2;
+  font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: 0.2px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Halo glow */
+.halo {
+  position: absolute;
+  inset: -60%;
+  z-index: 1;
+  pointer-events: none;
+
+  background: radial-gradient(
+    closest-side,
+    rgba(186, 37, 209, 0.35),
+    rgba(186, 37, 209, 0) 65%
+  );
+
+  opacity: 0;
+  transform: translateX(-18%) scale(0.9);
+  transition: opacity 220ms ease, transform 220ms ease;
+  filter: blur(10px);
+}
+
+/* Particles container (you can implement particles however you like later) */
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+/* Hover / focus */
+.btn:hover .halo,
+.btn:focus-visible .halo {
+  opacity: 1;
+  transform: translateX(18%) scale(1);
+}
+
+.btn:hover .particles,
+.btn:focus-visible .particles {
+  opacity: 1;
+}
+
+/* Focus ring */
+.btn:focus-visible .inner {
+  outline: 2px solid rgba(186, 37, 209, 0.8);
+  outline-offset: 3px;
+}
+
+/* Optional: motion safety */
+@media (prefers-reduced-motion: reduce) {
+  .halo,
+  .particles {
+    transition: none;
   }
 }

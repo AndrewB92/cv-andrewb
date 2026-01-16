@@ -127,9 +127,20 @@ export function Header() {
           </ul>
         </nav>
 
-        <Link href="/contact" className={styles.cta}>
+        {/* <Link href="/contact" className={styles.cta}>
           Let&apos;s talk →
-        </Link>
+        </Link> */}
+
+        <button type="button" className={styles.btn} aria-label="Say Hello">
+          <span className={styles.btnOuter}>
+            <span className={styles.inner}>
+              <span className={styles.particles} aria-hidden="true" />
+              <span className={styles.text}>Say hello</span>
+              <span className={styles.halo} aria-hidden="true" />
+            </span>
+          </span>
+        </button>
+
       </div>
     </header>
   );
