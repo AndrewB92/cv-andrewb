@@ -131,15 +131,15 @@ export function Header() {
           Let&apos;s talk →
         </Link> */}
 
-        <button type="button" className={styles.btn} aria-label="Say Hello">
+        <Link href="/contact" className={styles.btn}>
           <span className={styles.outer}>
             <span className={styles.inner}>
               <span className={styles.particles} aria-hidden="true" />
-              <span className={styles.text}>Say hello</span>
+              <span className={styles.text}>Let&apos;s talk →</span>
               <span className={styles.halo} aria-hidden="true" />
             </span>
           </span>
-        </button>
+        </Link>
 
       </div>
     </header>
