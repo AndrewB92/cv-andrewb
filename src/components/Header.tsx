@@ -135,10 +135,16 @@ export function Header() {
           <div className={styles.outer} style={{ height: "var(--header-height)" }}>
             <span className={styles.inner}>
               <span className={styles.particles} aria-hidden="true" />
-              <span className={styles.text}>Let&apos;s talk 
-                <svg viewBox="0 0 24 24" width="18" height="18">
-                  <path d="M7 10l5 5 5-5" />
-                </svg>
+              <span className={styles.text}>Let&apos;s talk
+                <span
+                  className={styles.btnIcon}
+                  aria-hidden="true"
+                  style={{ transform: `rotate(${isOpen ? 180 : 0}deg)` }}
+                  >
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M7 10l5 5 5-5" />
+                  </svg>
+                </span>
               </span>
               <span className={styles.halo} aria-hidden="true" />
             </span>
