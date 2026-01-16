@@ -52,64 +52,6 @@
   color: #ba25d1;
 }
 
-/* .navList {
-  display: flex;
-  gap: var(--space-lg);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.navItem a {
-  font-size: 0.95rem;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-  transition: color 0.2s ease;
-  position: relative;
-  opacity: 0.8;
-  display: flex;
-  /* align-items: center; *//*
-  justify-content: center;
-}
-
-.navItem a[aria-current="page"],
-.navItem a:hover {
-  color: #ba25d1;
-  opacity: 1;
-}
-
-.navItem a[aria-current="page"]:before {
-  content: '';
-  display: block;
-  position: absolute;
-  background: #ba25d1;
-  bottom: -50px;
-  filter: blur(30px);
-  -webkit-filter: blur(30px);
-  height: 30px;
-  width: 39.5px;
-  z-index: 0;
-  transition: left .2s ease-in-out;
-  -webkit-transition: left .2s ease-in-out;
-  -moz-transition: left .2s ease-in-out;
-  -ms-transition: left .2s ease-in-out;
-  -o-transition: left .2s ease-in-out;
-  animation: glow 1s infinite alternate;
-  -webkit-animation: glow 1s infinite alternate;
-}
-
-.navItem a[aria-current=page]:after {
-    content: '';
-    display: block;
-    background: #ba25d1;
-    position: absolute;
-    border-radius: 500px;
-    bottom: -26px;
-    width: 100%;
-    max-width: 55px;
-    height: 3px;
-} */
-
 .navList {
   position: relative;
   display: flex;
@@ -131,15 +73,19 @@
 .navLink {
   position: relative;
   display: inline-flex;
-  padding: 8px 10px; /* optional */
+  padding: 8px 10px;
   text-decoration: none;
-  z-index: 1; /* above the glow */
+  z-index: 1;
 }
 
-/* Optional: remove your old pseudo-elements so they don't conflict */
-.navItem a[aria-current="page"]::before,
-.navItem a[aria-current="page"]::after {
-  content: none !important;
+.navLink {
+  opacity: 0.8;
+}
+
+.navLink[aria-current="page"],
+.navLink:hover {
+  color: #ba25d1;
+  opacity: 1;
 }
 
 /* The shared sliding underline + glow */
