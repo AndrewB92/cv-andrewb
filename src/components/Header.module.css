@@ -361,7 +361,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  opacity: .8;
+  opacity: .7;
   z-index: 0;
 }
 .btn .halo:before {
@@ -371,15 +371,16 @@
   height: 80%;
   position: absolute;
   top: 50%;
-  left: 104%;
+  left: 108%;
   background: linear-gradient(180deg, var(--color-a) 0%, var(--color-b) 39.33%, var(--color-c) 59%);
-  filter: blur(12px) saturate(1.2);
-  transform: 
-      translateY(-50%)
-      translateX(calc(var(--halo-offset) * 1%))
-      rotate(90deg)
-      scale(var(--halo-scale));
   will-change: filter;
+  filter: blur(22px) saturate(1.2);
+  -webkit-filter: blur(22px) saturate(1.2);
+  transform: translateY(-50%) translateX(calc(var(--halo-offset) * 1%)) rotate(90deg) scale(var(--halo-scale));
+  -webkit-transform: translateY(-50%) translateX(calc(var(--halo-offset) * 1%)) rotate(90deg) scale(var(--halo-scale));
+  -moz-transform: translateY(-50%) translateX(calc(var(--halo-offset) * 1%)) rotate(90deg) scale(var(--halo-scale));
+  -ms-transform: translateY(-50%) translateX(calc(var(--halo-offset) * 1%)) rotate(90deg) scale(var(--halo-scale));
+  -o-transform: translateY(-50%) translateX(calc(var(--halo-offset) * 1%)) rotate(90deg) scale(var(--halo-scale));
 }
 .btn:hover {
   --halo-scale: 1;
