@@ -181,12 +181,12 @@
 }
 
 /* Outer “hit area” / layout */
-.btnOuter {
+.btn .btnOuter {
   display: inline-flex;
 }
 
 /* Inner styling surface */
-.inner {
+.btn .inner {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -207,7 +207,7 @@
 }
 
 /* Text */
-.text {
+.btn .text {
   position: relative;
   z-index: 2;
   font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -216,7 +216,7 @@
 }
 
 /* Halo glow */
-.halo {
+.btn .halo {
   position: absolute;
   inset: -60%;
   z-index: 1;
@@ -235,7 +235,7 @@
 }
 
 /* Particles container (you can implement particles however you like later) */
-.particles {
+.btn .particles {
   position: absolute;
   inset: 0;
   z-index: 0;
