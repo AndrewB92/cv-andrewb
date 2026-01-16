@@ -183,10 +183,10 @@
   -webkit-filter: blur(30px);
   z-index: -1;
 
-  animation: glow 1s infinite alternate;
+  /* animation: glow 1s infinite alternate; */
 }
 
-@keyframes glow {
+/* @keyframes glow {
   from {
     opacity: 0.75;
     transform: translateX(-50%) scale(0.98);
@@ -195,7 +195,7 @@
     opacity: 1;
     transform: translateX(-50%) scale(1.03);
   }
-}
+} */
 
 @media (prefers-reduced-motion: reduce) {
   .navIndicator {
