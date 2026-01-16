@@ -191,10 +191,10 @@
   --svg-animation: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 122 116' color='%23ba25d1'%3E%3Cdefs%3E%3Cpath id='p1' d='M121 18C110 10 102 34 90 26C78 18 74 6 62 14C50 22 48 38 36 30C24 22 18 10 1 18'/%3E%3Cpath id='p2' d='M121 40C109 52 100 30 88 42C76 54 72 72 60 60C48 48 44 30 32 42C20 54 16 66 1 58'/%3E%3Cpath id='p3' d='M121 68C109 56 102 78 90 66C78 54 74 44 62 52C50 60 48 84 36 72C24 60 18 48 1 56'/%3E%3Cpath id='p4' d='M121 96C110 104 101 86 89 94C77 102 73 112 61 106C49 100 45 84 33 92C21 100 17 112 1 106'/%3E%3Ccircle id='a' r='1.5'/%3E%3Ccircle id='b' r='1'/%3E%3Ccircle id='c' r='.8'/%3E%3Ccircle id='d' r='.5'/%3E%3C/defs%3E%3Cg fill='currentColor'%3E%3Cuse href='%23a'%3E%3CanimateMotion dur='12s' repeatCount='indefinite'%3E%3Cmpath href='%23p1'/%3E%3C/animateMotion%3E%3C/use%3E%3Cuse href='%23b'%3E%3CanimateMotion dur='8s' repeatCount='indefinite' begin='-1.7s'%3E%3Cmpath href='%23p2'/%3E%3C/animateMotion%3E%3C/use%3E%3Cuse href='%23d'%3E%3CanimateMotion dur='10s' repeatCount='indefinite' begin='-3.2s'%3E%3Cmpath href='%23p3'/%3E%3C/animateMotion%3E%3C/use%3E%3Cuse href='%23c'%3E%3CanimateMotion dur='6s' repeatCount='indefinite' begin='-0.9s'%3E%3Cmpath href='%23p4'/%3E%3C/animateMotion%3E%3C/use%3E%3C/g%3E%3C/svg%3E%0A");
   --btn-radius: 12;
   --animation-timing-function: ease-in-out;
-  --transitions: --shadow-scale 0.3s var(--animation-timing-function),
-    --halo-scale 0.3s var(--animation-timing-function),
-    --halo-offset 0.3s var(--animation-timing-function),
-    transform 0.2s var(--animation-timing-function);
+  --transitions: --shadow-scale 0s var(--animation-timing-function),
+    --halo-scale 0s var(--animation-timing-function),
+    --halo-offset 0s var(--animation-timing-function),
+    transform 0s var(--animation-timing-function);
   --color-a: hsl(249.8 100% 50%);
   --color-b: hsl(259.15 100% 40%);
   --color-c: hsl(281.28 100% 56.01%);
