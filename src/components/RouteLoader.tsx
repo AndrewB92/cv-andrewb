@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./RouteLoader.module.css";
 
@@ -8,14 +8,24 @@ export default function RouteLoader() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
 
+  const delayRef = useRef<number | null>(null);
+  const hideRef = useRef<number | null>(null);
+
   useEffect(() => {
-    setLoading(true);
+    // Delay showing loader (prevents flash on fast routes)
+    delayRef.current = window.setTimeout(() => {
+      setLoading(true);
+    }, 120);
 
-    const timeout = setTimeout(() => {
+    // Hide loader after animation duration
+    hideRef.current = window.setTimeout(() => {
       setLoading(false);
-    }, 450); // duration matches animation
+    }, 450);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      if (delayRef.current) clearTimeout(delayRef.current);
+      if (hideRef.current) clearTimeout(hideRef.current);
+    };
   }, [pathname]);
 
   return (
