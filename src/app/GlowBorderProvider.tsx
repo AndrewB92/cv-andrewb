@@ -31,7 +31,6 @@ function px(v: string, fallback: number) {
 }
 
 function clampDpr(dpr: number) {
-  // cap DPR for perf, still sharp enough
   return Math.max(1, Math.min(2, dpr || 1));
 }
 
@@ -53,7 +52,7 @@ function roundRectPath(
   ctx.closePath();
 }
 
-export default function GlowBorderCanvasProvider() {
+export default function GlowBorderProvider() {
   useEffect(() => {
     const prefersReducedMotion =
       window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
@@ -79,11 +78,8 @@ export default function GlowBorderCanvasProvider() {
       canvas.style.transition = "opacity 200ms ease";
       canvas.style.zIndex = "1";
 
-      // Ensure overlay positioning works
       const cs = getComputedStyle(el);
       if (cs.position === "static") el.style.position = "relative";
-      // IMPORTANT: do NOT rely on overflow for clipping, the ring mask does it.
-      // Keep your layout intact; no need for overflow: hidden here.
 
       const ctx = canvas.getContext("2d", { alpha: true });
       if (!ctx) throw new Error("Canvas 2D context not available");
@@ -96,7 +92,7 @@ export default function GlowBorderCanvasProvider() {
         ctx,
         dpr: clampDpr(window.devicePixelRatio),
         rect: el.getBoundingClientRect(),
-        r: px(cssVar(el, "--r", "24px"), 24), // 1.5rem ~ 24px default
+        r: px(cssVar(el, "--r", "24px"), 24), // 1.5rem ~ 24px
         bw: px(cssVar(el, "--bw", "1px"), 1),
         glowSize: px(cssVar(el, "--glowSize", "420px"), 420),
         blur: px(cssVar(el, "--blur", "18px"), 18),
@@ -112,17 +108,16 @@ export default function GlowBorderCanvasProvider() {
       item.rect = item.el.getBoundingClientRect();
       item.dpr = clampDpr(window.devicePixelRatio);
 
-      // Use floats for CSS size; ceil for backing store to avoid missing edges
       const w = Math.max(1, item.rect.width);
       const h = Math.max(1, item.rect.height);
 
       item.canvas.style.width = `${w}px`;
       item.canvas.style.height = `${h}px`;
 
+      // ceil to avoid missing right/bottom edge pixels
       item.canvas.width = Math.ceil(w * item.dpr);
       item.canvas.height = Math.ceil(h * item.dpr);
 
-      // Map 1 unit in canvas space = 1 CSS px
       item.ctx.setTransform(item.dpr, 0, 0, item.dpr, 0, 0);
       item.ctx.clearRect(0, 0, w, h);
     };
@@ -140,7 +135,7 @@ export default function GlowBorderCanvasProvider() {
 
       ctx.clearRect(0, 0, w, h);
 
-      // 1) Draw blurred glow (no clip yet -> prevents corner cutoff)
+      // 1) Draw blurred glow first (no clip) so corners can glow
       ctx.save();
       ctx.filter = `blur(${blur}px)`;
       ctx.globalCompositeOperation = "source-over";
@@ -150,11 +145,10 @@ export default function GlowBorderCanvasProvider() {
       g.addColorStop(0.6, "rgba(0,0,0,0)");
       ctx.fillStyle = g;
 
-      // draw a box around the glow area
       ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
       ctx.restore();
 
-      // 2) Keep ONLY the outer rounded-rect area (destination-in)
+      // 2) Keep only the outer rounded rect
       ctx.save();
       ctx.globalCompositeOperation = "destination-in";
       ctx.fillStyle = "rgba(0,0,0,1)";
@@ -162,12 +156,12 @@ export default function GlowBorderCanvasProvider() {
       ctx.fill();
       ctx.restore();
 
-      // 3) Remove inner rounded rect to make it a ring (destination-out)
+      // 3) Punch out inner rounded rect to create a ring
       ctx.save();
       ctx.globalCompositeOperation = "destination-out";
       ctx.fillStyle = "rgba(0,0,0,1)";
 
-      const inset = bw; // ring thickness = bw
+      const inset = bw;
       roundRectPath(
         ctx,
         inset,
@@ -200,7 +194,9 @@ export default function GlowBorderCanvasProvider() {
 
       const item = ensure(el);
       active = item;
-      resize(item); // refresh rect on enter
+
+      // refresh rect on enter
+      resize(item);
       item.canvas.style.opacity = "1";
 
       if (e) {
@@ -229,7 +225,7 @@ export default function GlowBorderCanvasProvider() {
       const host = (e.target as Element).closest(".glow-border");
       if (!(host instanceof HTMLElement)) return;
 
-      // Ignore "outs" that are still inside the same host
+      // ignore outs that are still inside the same host
       const rel = e.relatedTarget as Element | null;
       if (rel && host.contains(rel)) return;
 
@@ -237,12 +233,16 @@ export default function GlowBorderCanvasProvider() {
     };
 
     let resizeRaf: number | null = null;
+
     const onResizeOrScroll = () => {
-      if (!active) return;
+      const item = active; // ✅ capture to satisfy TS + avoid null later
+      if (!item) return;
+
       if (resizeRaf != null) return;
+
       resizeRaf = requestAnimationFrame(() => {
         resizeRaf = null;
-        resize(active);
+        resize(item);
         if (raf == null) raf = requestAnimationFrame(tick);
       });
     };
@@ -255,8 +255,8 @@ export default function GlowBorderCanvasProvider() {
 
     return () => {
       document.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerover", onOver, true as any);
-      document.removeEventListener("pointerout", onOut, true as any);
+      document.removeEventListener("pointerover", onOver, true);
+      document.removeEventListener("pointerout", onOut, true);
       window.removeEventListener("resize", onResizeOrScroll);
       window.removeEventListener("scroll", onResizeOrScroll);
       if (raf != null) cancelAnimationFrame(raf);
