@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 function isElement(v: unknown): v is Element {
   return v instanceof Element;
@@ -8,46 +8,83 @@ function isElement(v: unknown): v is Element {
 
 export default function GlowBorderProvider() {
   useEffect(() => {
-    const getTargets = () =>
-      Array.from(document.querySelectorAll<HTMLElement>('.glow-border'));
+    let active: HTMLElement | null = null;
+    let activeRect: DOMRect | null = null;
 
     let raf: number | null = null;
-    let lastEvent: PointerEvent | null = null;
+    let lastX = 0;
+    let lastY = 0;
+
+    const updateRect = () => {
+      if (!active) return;
+      activeRect = active.getBoundingClientRect();
+    };
 
     const update = () => {
       raf = null;
-      if (!lastEvent) return;
+      if (!active || !activeRect) return;
 
-      const { clientX, clientY } = lastEvent;
-      for (const el of getTargets()) {
-        const rect = el.getBoundingClientRect();
-        el.style.setProperty('--mouse-x', `${clientX - rect.left}px`);
-        el.style.setProperty('--mouse-y', `${clientY - rect.top}px`);
-      }
+      active.style.setProperty("--mouse-x", `${lastX - activeRect.left}px`);
+      active.style.setProperty("--mouse-y", `${lastY - activeRect.top}px`);
     };
 
-    const onMove = (e: PointerEvent) => {
-      lastEvent = e;
+    const onPointerMove = (e: PointerEvent) => {
+      if (!active) return; // key: don't do anything unless hovering a glow element
+      lastX = e.clientX;
+      lastY = e.clientY;
+
       if (raf == null) raf = requestAnimationFrame(update);
     };
 
-    const setOpacityFromEventTarget = (e: PointerEvent, value: '0' | '1') => {
+    const onPointerEnter = (e: PointerEvent) => {
       if (!isElement(e.target)) return;
-      const host = e.target.closest('.glow-border');
-      if (host instanceof HTMLElement) host.style.setProperty('--glow-opacity', value);
+
+      const host = (e.target as Element).closest(".glow-border");
+      if (!(host instanceof HTMLElement)) return;
+
+      active = host;
+      active.style.setProperty("--glow-opacity", "1");
+      updateRect();
+
+      // Set initial position immediately (no 1-frame lag)
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (raf == null) raf = requestAnimationFrame(update);
     };
 
-    const onEnter = (e: PointerEvent) => setOpacityFromEventTarget(e, '1');
-    const onLeave = (e: PointerEvent) => setOpacityFromEventTarget(e, '0');
+    const onPointerLeave = (e: PointerEvent) => {
+      if (!isElement(e.target)) return;
 
-    document.addEventListener('pointermove', onMove, { passive: true });
-    document.addEventListener('pointerover', onEnter);
-    document.addEventListener('pointerout', onLeave);
+      const host = (e.target as Element).closest(".glow-border");
+      if (host instanceof HTMLElement) host.style.setProperty("--glow-opacity", "0");
+
+      // Only clear if we left the currently active one
+      if (active === host) {
+        active = null;
+        activeRect = null;
+      }
+    };
+
+    // Keep rect correct when page moves
+    const onScrollOrResize = () => {
+      if (!active) return;
+      updateRect();
+    };
+
+    // Use capturing so we catch enters/leaves even with nested elements
+    document.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("pointerover", onPointerEnter, { passive: true, capture: true });
+    document.addEventListener("pointerout", onPointerLeave, { passive: true, capture: true });
+
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize, { passive: true });
 
     return () => {
-      document.removeEventListener('pointermove', onMove);
-      document.removeEventListener('pointerover', onEnter);
-      document.removeEventListener('pointerout', onLeave);
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerover", onPointerEnter, true as any);
+      document.removeEventListener("pointerout", onPointerLeave, true as any);
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
       if (raf != null) cancelAnimationFrame(raf);
     };
   }, []);
