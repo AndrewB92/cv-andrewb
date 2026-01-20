@@ -17,7 +17,6 @@ export default async function HomePage() {
   return (
     <main>
       <article className={`${styles.hero} glow-border`}>
-        {/* <canvas id="hero-canvas" className={styles.heroCanvas} /> */}
         <div className={styles.heroContent}>
           <div className="styles.heroContentBG"></div>
           <p aria-label="Tagline">{siteMetadata.tagline}</p>
@@ -32,7 +31,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Put the icon near your hero content/actions (you choose placement) */}
           <HeroMetaPopover className={styles.heroMetaPopover}>
             <div className={styles.heroMeta}>
               <strong>Short facts:</strong>
