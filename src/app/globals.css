@@ -48,7 +48,7 @@ main {
   border-radius: var(--r, 1.5rem);
   border: var(--bw, 1px) solid var(--color-border);
   background: var(--cardBg, var(--color-surface-alt));
-  -glowSize: 540px;
+  --glowSize: 540px;
 }
 
 
