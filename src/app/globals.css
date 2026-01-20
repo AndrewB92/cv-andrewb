@@ -72,3 +72,36 @@ main {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
+
+/* Cursor hidint rules */
+html {
+  cursor: none;
+}
+
+a[href],
+button,
+input,
+select,
+textarea,
+label,
+summary,
+[role="button"],
+[role="link"],
+[tabindex]:not([tabindex="-1"]),
+[contenteditable="true"] {
+  cursor: auto;
+}
+
+a[href],
+button,
+summary,
+[role="button"],
+[role="link"] {
+  cursor: pointer;
+}
+
+@media (pointer: coarse) {
+  html {
+    cursor: auto;
+  }
+}
