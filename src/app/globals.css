@@ -45,11 +45,11 @@ main {
 
 .glow-border {
   position: relative;
-  border-radius: var(--r, var(--radius-lg));
+  border-radius: var(--r, 1.5rem);
   border: var(--bw, 1px) solid var(--color-border);
   background: var(--cardBg, var(--color-surface-alt));
-  overflow: hidden;
 }
+
 
 /* .glow-border {
   position: relative;
