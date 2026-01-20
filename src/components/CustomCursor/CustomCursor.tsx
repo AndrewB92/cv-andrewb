@@ -14,18 +14,47 @@ type Particle = {
   onIter?: () => void;
 };
 
+const INTERACTIVE_SELECTOR = [
+  "a[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "label",
+  "summary",
+  "[role='button']",
+  "[role='link']",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+
+function isInteractive(node: Element | null) {
+  if (!node) return false;
+  const el = node as HTMLElement;
+  return !!el.closest?.(INTERACTIVE_SELECTOR);
+}
+
+function isKeyframeEffect(v: AnimationEffect | null): v is KeyframeEffect {
+  return !!v && typeof (v as KeyframeEffect).setKeyframes === "function";
+}
+
+function randInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function randFloat(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
 export function CustomCursor({ particleCount = 7 }: Options) {
   const cursorRef = useRef<HTMLDivElement | null>(null);
   const dotRef = useRef<HTMLDivElement | null>(null);
   const particleContainerRef = useRef<HTMLSpanElement | null>(null);
 
-  const pos = useRef({ x: 0, y: 0 });
+  // store latest pointer coords without causing re-renders
+  const pos = useRef({ x: -9999, y: -9999 });
   const raf = useRef<number | null>(null);
 
   const particlesRef = useRef<Particle[]>([]);
   const containerSizeRef = useRef({ w: 30, h: 30 });
-  const reduceMotionRef = useRef(false);
-  const coarseRef = useRef(false);
 
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -33,51 +62,54 @@ export function CustomCursor({ particleCount = 7 }: Options) {
     const container = particleContainerRef.current;
     if (!cursor || !dot || !container) return;
 
-    coarseRef.current = !!window.matchMedia?.("(pointer: coarse)")?.matches;
-    if (coarseRef.current) return;
+    // Optional: hide custom cursor on touch devices / coarse pointers
+    const coarse = window.matchMedia?.("(pointer: coarse)")?.matches;
+    if (coarse) return;
 
-    reduceMotionRef.current = !!window.matchMedia?.(
+    const prefersReducedMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)"
     )?.matches;
 
     const readContainerSize = () => {
-      // no need to read every particle cycle; just cache on init/resize
       const rect = container.getBoundingClientRect();
-      // fallback if rect is 0 (rare)
       containerSizeRef.current.w = rect.width || container.clientWidth || 30;
       containerSizeRef.current.h = rect.height || container.clientHeight || 30;
     };
 
     readContainerSize();
 
+    // --- Cursor move (one listener + rAF) ---
     const apply = () => {
       raf.current = null;
+
       const { x, y } = pos.current;
 
-      // Keep CSS vars in sync for cases like .dotActive using var(--x/--y)
+      // Keep CSS vars in sync (used by .dotActive)
       cursor.style.setProperty("--x", `${x}px`);
       cursor.style.setProperty("--y", `${y}px`);
       dot.style.setProperty("--x", `${x}px`);
       dot.style.setProperty("--y", `${y}px`);
 
-      // transforms only (GPU-friendly)
       const t = `translate3d(${x}px, ${y}px, 0) translate3d(-50%, -50%, 0)`;
       cursor.style.transform = t;
       dot.style.transform = t;
 
-      // Hover detection without pointerover/out:
-      // do a cheap check at most once per frame
+      // Hover detection without pointerover/out
       const target = document.elementFromPoint(x, y);
-      if (target && isInteractive(target)) cursor.classList.add(styles.hover);
+      if (isInteractive(target)) cursor.classList.add(styles.hover);
       else cursor.classList.remove(styles.hover);
     };
 
     const onPointerMove = (e: PointerEvent) => {
       pos.current.x = e.clientX;
       pos.current.y = e.clientY;
-      if (raf.current == null) raf.current = requestAnimationFrame(apply);
+
+      if (raf.current == null) {
+        raf.current = window.requestAnimationFrame(apply);
+      }
     };
 
+    // Click states
     const onPointerDown = () => {
       cursor.classList.add(styles.click);
       dot.classList.add(styles.dotActive);
@@ -91,15 +123,15 @@ export function CustomCursor({ particleCount = 7 }: Options) {
     document.addEventListener("pointerdown", onPointerDown, { passive: true });
     document.addEventListener("pointerup", onPointerUp, { passive: true });
 
-    // --- Particles (optional) ---
-    if (!reduceMotionRef.current && particleCount > 0) {
+    // --- Particles ---
+    if (!prefersReducedMotion && particleCount > 0) {
       // Build particles once
       const built: Particle[] = [];
       for (let i = 0; i < particleCount; i++) {
         const el = document.createElement("div");
         el.className = styles.particle;
 
-        // known size: avoid offsetWidth reads forever
+        // known size: avoid offsetWidth reads
         const size = randInt(1, 3);
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
@@ -160,29 +192,32 @@ export function CustomCursor({ particleCount = 7 }: Options) {
         place(p);
 
         const startDelay = i * 120;
-        const { kf, totalMs } = makeKeyframes();
+        const first = makeKeyframes();
 
-        const anim = p.el.animate(kf, {
-          duration: totalMs,
+        const anim = p.el.animate(first.kf, {
+          duration: first.totalMs,
           delay: startDelay,
           easing: "ease-in-out",
           fill: "both",
           iterations: Infinity,
         });
 
-        // Re-randomize on each loop, without timeouts
         const onIter = () => {
-          // new placement + new path + new duration
           place(p);
           const next = makeKeyframes();
-          anim.effect?.setKeyframes(next.kf);
-          anim.updatePlaybackRate(1); // explicit; keeps it stable
-          anim.effect && (anim.effect as KeyframeEffect).updateTiming({ duration: next.totalMs });
+
+          const effect = anim.effect;
+          if (isKeyframeEffect(effect)) {
+            effect.setKeyframes(next.kf);
+            effect.updateTiming({ duration: next.totalMs });
+          }
         };
 
-        // WAAPI supports this event on Animation in modern browsers
-        // (if it isn't supported somewhere, particles still animate fine)
-        (anim as any).addEventListener?.("iteration", onIter);
+        // If supported, this avoids timers; otherwise it just keeps looping with same path.
+        (anim as unknown as { addEventListener?: Function }).addEventListener?.(
+          "iteration",
+          onIter
+        );
 
         p.anim = anim;
         p.onIter = onIter;
@@ -207,10 +242,10 @@ export function CustomCursor({ particleCount = 7 }: Options) {
         window.removeEventListener("resize", onResize);
         document.removeEventListener("visibilitychange", onVis);
 
-        // Remove particle animations + nodes
         particlesRef.current.forEach((p) => {
           try {
-            (p.anim as any)?.removeEventListener?.("iteration", p.onIter);
+            (p.anim as unknown as { removeEventListener?: Function })
+              .removeEventListener?.("iteration", p.onIter);
           } catch {}
           p.anim?.cancel();
         });
@@ -219,16 +254,19 @@ export function CustomCursor({ particleCount = 7 }: Options) {
       };
     }
 
-    return () => {};
-  }, [particleCount]);
+    return () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointerup", onPointerUp);
 
-  // main cleanup (always runs)
-  useEffect(() => {
-    const onCleanup = () => {
       if (raf.current != null) cancelAnimationFrame(raf.current);
+      raf.current = null;
+
+      // in case particles were disabled due to reduced motion after init
+      container.innerHTML = "";
+      particlesRef.current = [];
     };
-    return onCleanup;
-  }, []);
+  }, [particleCount]);
 
   return (
     <>
@@ -238,28 +276,4 @@ export function CustomCursor({ particleCount = 7 }: Options) {
       <div ref={dotRef} className={styles.cursorDot} aria-hidden="true" />
     </>
   );
-}
-
-const interactiveSelector = [
-  "a[href]",
-  "button",
-  "input",
-  "select",
-  "textarea",
-  "label",
-  "summary",
-  "[role='button']",
-  "[role='link']",
-  "[tabindex]:not([tabindex='-1'])",
-].join(",");
-
-function isInteractive(node: Element) {
-  return (node as HTMLElement).closest?.(interactiveSelector);
-}
-
-function randInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function randFloat(min: number, max: number) {
-  return Math.random() * (max - min) + min;
 }
