@@ -4,7 +4,7 @@ import "./globals.css";
 import styles from "./layout.module.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-// import { CustomCursor } from "@/components/CustomCursor/CustomCursor";
+import { CustomCursor } from "@/components/CustomCursor/CustomCursor";
 
 import GlowBorderProvider from './GlowBorderProvider';
 
@@ -60,6 +60,7 @@ export default function RootLayout({
           <a href="#main-content" className={styles.skipLink}>
             Skip to content
           </a>
+          <CustomCursor particleCount={7} />
           <Header />
           <div className={styles.mainContent} id="main-content">
             <GlowBorderProvider />

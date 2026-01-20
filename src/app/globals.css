@@ -51,39 +51,8 @@ main {
   --glowSize: 640px;
 }
 
-
-/* .glow-border {
-  position: relative;
-  border-radius: var(--r, var(--radius-lg));
-  border: var(--bw, 1px) solid var(--color-border);
-  background: var(--cardBg, var(--color-surface-alt));
-}
-
-.glow-border::before {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--bw, 1px));
-  border-radius: calc(var(--r, var(--radius-lg)) + var(--bw, 1px));
-  pointer-events: none;
-
-  background: radial-gradient(
-    var(--glowSize, 420px) circle at var(--mouse-x) var(--mouse-y),
-    var(--glowColor, rgba(186, 37, 209, 1)),
-    transparent 60%
-  );
-
-  opacity: var(--glow-opacity, 0);
-  transition: opacity 200ms ease;
-  filter: blur(var(--blur, 2px));
-
-  padding: var(--bw, 1px);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-} */
-
 /* Cursor hidint rules */
-/* html {
+html {
   cursor: none;
 }
 
@@ -113,4 +82,4 @@ summary,
   html {
     cursor: auto;
   }
-} */
+}
