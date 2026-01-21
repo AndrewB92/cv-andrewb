@@ -52,7 +52,7 @@ main {
 }
 
 /* Cursor hidint rules */
-html {
+/* html {
   cursor: none;
 }
 
@@ -82,4 +82,4 @@ summary,
   html {
     cursor: auto;
   }
-}
+} */
