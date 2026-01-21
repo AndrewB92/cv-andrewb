@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import styles from "./MagicText.module.css";
+import type { ReactNode } from "react";
 
 type MagicTextProps = {
-  children: string;          // the gradient text itself (e.g. "magic")
+  // children: string;          // the gradient text itself (e.g. "magic")
+  children: ReactNode;
   before?: string;           // optional plain text before
   stars?: number;            // default 3
   intervalMs?: number;       // default 1000
