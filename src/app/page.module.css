@@ -36,7 +36,8 @@
 }
 
 .heroContent p {
-  margin: 0 0 var(--space-lg);
+  /* margin: 0 0 var(--space-lg); */
+  margin: 0;
   color: var(--color-text-secondary);
   font-size: 1.1rem;
 }
