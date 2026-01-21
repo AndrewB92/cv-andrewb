@@ -21,11 +21,11 @@ export default async function HomePage() {
       <article className={`${styles.hero} glow-border`}>
         <div className={styles.heroContent}>
           <div className="styles.heroContentBG"></div>
-          <p aria-label="Tagline">Hello there and welkome to my website</p>
-          <h1 className={styles.title}>I&apos;m {profile.name}, a&nbsp;
+          <p aria-label="Tagline">Welcome to my website</p>
+          <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
             <MagicText stars={4} intervalMs={1600}>
               product focusded
-            </MagicText> web developer
+            </MagicText><br />web developer
           </h1>
 
           <p>{profile.summary}</p>
