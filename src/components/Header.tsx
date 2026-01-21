@@ -127,10 +127,6 @@ export function Header() {
           </ul>
         </nav>
 
-        {/* <Link href="/contact" className={styles.cta}>
-          Let&apos;s talk →
-        </Link> */}
-
         <Link href="/contact" className={styles.btn}>
           <div className={styles.outer} style={{ height: "var(--header-height)" }}>
             <span className={styles.inner}>

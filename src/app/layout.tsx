@@ -5,7 +5,7 @@ import styles from "./layout.module.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 // import { CustomCursor } from "@/components/CustomCursor/CustomCursor";
-import RouteLoader from "@/components/RouteLoader";
+// import RouteLoader from "@/components/RouteLoader";
 
 import GlowBorderProvider from './GlowBorderProvider';
 
@@ -57,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <RouteLoader />
+        {/* <RouteLoader /> */}
         <div className={styles.shell}>
           <a href="#main-content" className={styles.skipLink}>
             Skip to content
