@@ -42,10 +42,11 @@
 }
 
 :root{
-  --purple: rgb(123, 31, 162);
-  --violet: rgb(103, 58, 183);
-  --pink: rgb(244, 143, 177);
+  --purple: rgb(186, 37, 209);
+  --violet: rgb(37, 99, 235);
+  --pink: rgb(230, 81, 253);
 }
+
 /* animation frames for moving gradient */
 @keyframes background-pan{
   from {
