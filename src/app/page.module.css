@@ -42,6 +42,23 @@
   font-size: 1.1rem;
 }
 
+.heroContentBG {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: linear-gradient(45deg, var(--purple), var(--violet), var(--pink)); */
+}
+
+.heroContent .welcome {
+  margin: 0;
+  padding: 0;
+  font-size: 1.3rem;
+}
+
 :root{
   --purple: rgb(186, 37, 209);
   --violet: rgb(37, 99, 235);
