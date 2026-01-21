@@ -2,8 +2,22 @@
 
 import { useEffect, useRef } from "react";
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const randBetween = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+type TypedLogoProps = {
+  text?: string;
+  startDelay?: number;
+  baseSpeed?: number;
+  variance?: number;
+  blinkMs?: number;
+};
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+const randBetween = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+
+function isHTMLElement(v: Element | null): v is HTMLElement {
+  return v instanceof HTMLElement;
+}
 
 export default function TypedLogo({
   text = "andrew.dev",
@@ -11,8 +25,8 @@ export default function TypedLogo({
   baseSpeed = 120,
   variance = 35,
   blinkMs = 520,
-}) {
-  const rootRef = useRef(null);
+}: TypedLogoProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   // Prevent duplicate runs in React StrictMode (dev)
   const didRunRef = useRef(false);
@@ -25,26 +39,38 @@ export default function TypedLogo({
     if (didRunRef.current) return;
     didRunRef.current = true;
 
-    const prefix = root.querySelector(".cv-logo__prefix");
-    const typed = root.querySelector(".cv-logo__typed");
-    const suffix = root.querySelector(".cv-logo__suffix");
-    const cursor = root.querySelector(".cv-logo__cursor");
+    const prefixEl = root.querySelector(".cv-logo__prefix");
+    const typedEl = root.querySelector(".cv-logo__typed");
+    const suffixEl = root.querySelector(".cv-logo__suffix");
+    const cursorEl = root.querySelector(".cv-logo__cursor");
 
-    if (!prefix || !typed || !suffix || !cursor) return;
+    if (
+      !isHTMLElement(prefixEl) ||
+      !isHTMLElement(typedEl) ||
+      !isHTMLElement(suffixEl) ||
+      !isHTMLElement(cursorEl)
+    ) {
+      return;
+    }
+
+    const prefix = prefixEl;
+    const typed = typedEl;
+    const suffix = suffixEl;
+    const cursor = cursorEl;
 
     const reducedMotion =
       typeof window !== "undefined" &&
-      window.matchMedia &&
+      "matchMedia" in window &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let blinkTimer = null;
+    let blinkTimer: number | null = null;
     let cancelled = false;
 
     const placeCursorBetween = () => {
-      // Order: prefix, typed, cursor, suffix
+      // Ensure order: prefix, typed, cursor, suffix
       typed.after(cursor);
       cursor.after(suffix);
-      // Now move cursor before suffix:
+      // Now ensure cursor is before suffix:
       suffix.before(cursor);
     };
 
@@ -54,7 +80,7 @@ export default function TypedLogo({
     };
 
     const startBlink = () => {
-      if (blinkTimer) return;
+      if (blinkTimer !== null) return;
       cursor.style.opacity = "1";
       blinkTimer = window.setInterval(() => {
         cursor.style.opacity = cursor.style.opacity === "0" ? "1" : "0";
@@ -62,8 +88,8 @@ export default function TypedLogo({
     };
 
     const stopBlink = () => {
-      if (blinkTimer) {
-        clearInterval(blinkTimer);
+      if (blinkTimer !== null) {
+        window.clearInterval(blinkTimer);
         blinkTimer = null;
       }
       cursor.style.opacity = "1";
@@ -71,7 +97,7 @@ export default function TypedLogo({
 
     const reset = () => {
       stopBlink();
-      typed.textContent = ""; // renders as "</>" because middle is empty
+      typed.textContent = "";
       cursor.style.opacity = "1";
       placeCursorBetween();
     };
@@ -93,7 +119,7 @@ export default function TypedLogo({
       for (let i = 0; i < text.length; i++) {
         if (cancelled) return;
 
-        const ch = text[i];
+        const ch = text[i]!;
         typed.textContent += ch;
 
         const extraPause = ch === "." ? 140 : 0;
@@ -104,13 +130,12 @@ export default function TypedLogo({
 
       if (cancelled) return;
 
-      // After reveal: move cursor to the very end (after "/>")
       placeCursorAtEnd();
       cursor.style.opacity = "1";
-      // Keep blinking forever (as requested)
+      // Keep blinking forever
     };
 
-    play();
+    void play();
 
     return () => {
       cancelled = true;
@@ -123,7 +148,7 @@ export default function TypedLogo({
   return (
     <div className="cv-logo" ref={rootRef} aria-label="<andrew.dev/> logo">
       <span className="cv-logo__prefix">&lt;</span>
-      <span className="cv-logo__typed" aria-hidden="true"></span>
+      <span className="cv-logo__typed" aria-hidden="true" />
       <span className="cv-logo__suffix">/&gt;</span>
       <span className="cv-logo__cursor" aria-hidden="true">
         |

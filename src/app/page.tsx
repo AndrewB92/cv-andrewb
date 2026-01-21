@@ -24,8 +24,9 @@ export default async function HomePage() {
           <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
             <MagicText stars={3} intervalMs={2200}>
-              product focusded
-            </MagicText><br />web developer
+              product focused
+            </MagicText><br />
+            web developer
           </h1>
 
           <p>{profile.summary}</p>
