@@ -54,15 +54,29 @@
   }
 }
 
+
+/* Use a class for the heading (CSS Modules friendly) */
+.title {
+  color: #fff;
+  font-family: Rubik, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: clamp(2em, 4vw, 4em);
+  font-weight: 400;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
 /* animate the stars */
 @keyframes scale {
-  from, to {
+  from,
+  to {
     transform: scale(0);
   }
   50% {
     transform: scale(1);
   }
 }
+
 @keyframes rotate {
   from {
     transform: rotate(0deg);
@@ -71,69 +85,59 @@
     transform: rotate(180deg);
   }
 }
-body{
-  background-color: #1d1e22;
-  height: 100vh;
-  display: grid;
-  place-items: center;
-  margin: 0px;
-  overflow: hidden;
-}
-h1{
-  color: white;
-  font-family: Rubik;
-  font-size: clamp(2em, 4vw, 4em);
-  font-weight: 400;
-  margin: 0px;
-  padding: 20px;
-  text-align: center;
+
+/* (was referenced but missing in your snippet) */
+@keyframes background-pan {
+  from {
+    background-position: 0% center;
+  }
+  to {
+    background-position: -200% center;
+  }
 }
 
-h1 > .magic {
+.magic {
   display: inline-block;
   position: relative;
 }
 
-h1 > .magic > .magic-star {
+.magicStar {
   --size: clamp(20px, 1.5vw, 30px);
   display: block;
   height: var(--size);
-  left: var(--star-left);
-  position: absolute;
-  top: var(--star-top);
   width: var(--size);
-  
-  /* animate the stars */
+  position: absolute;
+  left: var(--star-left);
+  top: var(--star-top);
+
   animation: scale 700ms ease forwards;
 }
 
-h1 > .magic > .magic-star > svg {
-  /* animate the rotation of the stars */
+.magicStar svg {
   animation: rotate 1000ms linear infinite;
   display: block;
   opacity: 0.7;
 }
 
-h1 > .magic > .magic-star > svg > path {
+.magicStar svg path {
   fill: var(--violet);
 }
-h1 > .magic > .magic-text {
-  
+
+.magicText {
   background: linear-gradient(
-  to right,
-  var(--purple),
-  var(--violet),
-  var(--pink),
-  var(--purple)
+    to right,
+    var(--purple),
+    var(--violet),
+    var(--pink),
+    var(--purple)
   );
-  /* for animating the text color */
   animation: background-pan 3s linear infinite;
   background-size: 200%;
-  /* make the text have gradient color */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   white-space: nowrap;
 }
+
 
 
 
