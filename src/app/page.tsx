@@ -28,14 +28,15 @@ export default async function HomePage() {
               {/* product focused */}
               <TypedRotator
                 items={[
-                  "WordPress + JetEngine",
-                  "Next.js + TypeScript",
-                  "UI polish & performance",
+                  "product focused",
+                  "interacive frontend loved",
+                  "pixel perfect",
+                  "accessibility driven"
                 ]}
-                typeSpeed={70}
-                deleteSpeed={35}
-                holdDelay={1000}
-                betweenDelay={250}
+                typeSpeed={120}
+                deleteSpeed={65}
+                holdDelay={7000}
+                betweenDelay={350}
               />
             </MagicText><br />
             web developer
