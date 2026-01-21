@@ -7,7 +7,9 @@ import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
-// import TypedRotator from "@/components/TypedRotator";
+import TypedRotator from "@/components/TypedRotator";
+import { Terminal } from "@/components/Terminal/Terminal";
+
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,15 @@ export default async function HomePage() {
     <main>
 
       <article className={`${styles.hero} glow-border`}>
+        <Terminal path="~/projects/cv-andrewb/terminal">
+              <TypedRotator
+                items={["WordPress engineer", "Next.js builder", "UI polish nerd"]}
+                typeSpeed={70}
+                deleteSpeed={35}
+                holdDelay={1000}
+                betweenDelay={250}
+              />
+        </Terminal>
         <div className={styles.heroContent}>
           <div className={styles.heroContentBG}></div>
           <p className={styles.welcome}>Welcome to my website</p>
