@@ -7,7 +7,7 @@ import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
-import TypedRotator from "@/components/TypedRotator";
+// import TypedRotator from "@/components/TypedRotator";
 
 export const dynamic = "force-dynamic";
 
@@ -25,19 +25,7 @@ export default async function HomePage() {
           <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
             <MagicText stars={3} intervalMs={2200}>
-              {/* product focused */}
-              <TypedRotator
-                items={[
-                  "product focused",
-                  "interacive frontend loved",
-                  "pixel perfect",
-                  "accessibility driven"
-                ]}
-                typeSpeed={120}
-                deleteSpeed={65}
-                holdDelay={7000}
-                betweenDelay={350}
-              />
+              product focused
             </MagicText><br />
             web developer
           </h1>
