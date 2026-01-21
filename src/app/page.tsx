@@ -23,7 +23,7 @@ export default async function HomePage() {
           <div className="styles.heroContentBG"></div>
           <p aria-label="Tagline">Hello there and welkome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, a&nbsp;
-            <MagicText before="Hello" stars={3} intervalMs={1000}>
+            <MagicText stars={4} intervalMs={1600}>
               product focusded
             </MagicText> web developer
           </h1>
