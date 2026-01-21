@@ -62,16 +62,13 @@
 }
 
 .magicText {
-  background: linear-gradient(
-    to right,
-    var(--purple),
-    var(--violet),
-    var(--pink),
-    var(--purple)
-  );
-  animation: background-pan 3s linear infinite;
+  background: linear-gradient(    to right,    var(--purple),    var(--violet),    var(--pink),    var(--purple)  );
   background-size: 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  
   white-space: nowrap;
+
+  animation: background-pan 10s linear infinite;
+  -webkit-animation: background-pan 10s linear infinite;
 }
