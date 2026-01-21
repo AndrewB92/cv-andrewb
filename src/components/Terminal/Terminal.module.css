@@ -1,15 +1,19 @@
 .terminal {
-  font-size: 1em;
-  line-height: 1.2em;
-  width: 70vw;
-  min-height: 300px;
-  margin-top: 25px;
-  background-color: #0f3642;
-  color: #b4c4c6;
-  padding: 10px;
-  border-radius: 0 0 7px 7px;
-  position: relative;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 30px 1px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    background-color: #4d25eb45;
+    border-radius: 0 0 7px 7px;
+    left: -45px;
+    width: 35%;
+    height: clamp(220px, 30vh, 500px);
+    align-self: center;
+    padding: 10px;
+    font-size: 1em;
+    line-height: 1.2em;
+    position: relative;
+
+	box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+	transform: translatey(0px);
+	animation: float 6s ease-in-out infinite;
 }
 
 .terminal::before {
@@ -54,7 +58,23 @@
   margin: 0;
 }
 
-.terminal p::before {
+.terminal p::before,
+.terminal span span:first-child:before {
   color: #5ed7ff;
   content: "~$ ";
+}
+
+@keyframes float {
+    0% {
+        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+        transform: translatey(0px);
+    }
+    50% {
+        box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+        transform: translatey(-20px);
+    }
+    100% {
+        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+        transform: translatey(0px);
+    }
 }

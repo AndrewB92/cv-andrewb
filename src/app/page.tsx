@@ -24,11 +24,16 @@ export default async function HomePage() {
       <article className={`${styles.hero} glow-border`}>
         <Terminal path="~/projects/cv-andrewb/terminal">
               <TypedRotator
-                items={["WordPress engineer", "Next.js builder", "UI polish nerd"]}
-                typeSpeed={70}
-                deleteSpeed={35}
-                holdDelay={1000}
-                betweenDelay={250}
+                items={[
+                  "Building scalable interfaces",
+                  "Turning ideas into clean code",
+                  "Optimizing UX without overengineering",
+                  "Shipping stable, maintainable solutions",
+                ]}
+                typeSpeed={280}
+                deleteSpeed={65}
+                holdDelay={12000}
+                betweenDelay={350}
               />
         </Terminal>
         <div className={styles.heroContent}>
