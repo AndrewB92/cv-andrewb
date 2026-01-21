@@ -62,7 +62,7 @@ export function CustomCursor({ particleCount = 7 }: Options) {
     const container = particleContainerRef.current;
     if (!cursor || !dot || !container) return;
 
-    // Optional: hide custom cursor on touch devices / coarse pointers
+    // hide custom cursor on touch devices / coarse pointers
     const coarse = window.matchMedia?.("(pointer: coarse)")?.matches;
     if (coarse) return;
 
