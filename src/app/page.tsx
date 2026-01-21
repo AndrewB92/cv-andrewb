@@ -16,11 +16,12 @@ export default async function HomePage() {
 
   return (
     <main>
+
       <article className={`${styles.hero} glow-border`}>
         <div className={styles.heroContent}>
           <div className="styles.heroContentBG"></div>
-          <p aria-label="Tagline">{siteMetadata.tagline}</p>
-          <h1>{profile.name}</h1>
+          <p aria-label="Tagline">Hello there, I&apos;m</p>
+          <h1>{profile.name},<br />a {siteMetadata.tagline}</h1>
           <p>{profile.summary}</p>
           <div className={styles.heroActions}>
             <Link href="/projects" className={styles.primaryButton}>
