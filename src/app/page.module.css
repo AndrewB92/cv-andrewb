@@ -24,13 +24,13 @@
   flex-direction: column;
   gap: var(--space-sm);
   position: relative;
-  width: 65%;
+  width: 70%;
 }
 
 .heroContent h1 {
   margin: 0 0 var(--space-md);
   color: var(--color-text-primary);
-  font-size: clamp(2rem,3.8vw,4rem);
+  font-size: clamp(2rem,3.4vw,3.6rem);
   font-weight: 900;
   line-height: 96%;
   letter-spacing: -4px;
