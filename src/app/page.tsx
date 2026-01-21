@@ -20,8 +20,8 @@ export default async function HomePage() {
 
       <article className={`${styles.hero} glow-border`}>
         <div className={styles.heroContent}>
-          <div className="styles.heroContentBG"></div>
-          <p aria-label="Tagline">Welcome to my website</p>
+          <div className={styles.heroContentBG}></div>
+          <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
             <MagicText stars={3} intervalMs={2200}>
               product focusded

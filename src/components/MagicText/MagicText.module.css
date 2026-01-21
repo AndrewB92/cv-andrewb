@@ -47,8 +47,8 @@
 }
 
 /* restart animation without reflow */
-.magicStar[data-a="0"] { animation: scaleA 700ms ease forwards; }
-.magicStar[data-a="1"] { animation: scaleB 700ms ease forwards; }
+.magicStar[data-a="0"] { animation: scaleA 1200ms ease-in-out forwards;}
+.magicStar[data-a="1"] { animation: scaleB 700ms ease-in-out forwards;}
 
 .magicStar svg {
   animation: rotate 1000ms linear infinite;
