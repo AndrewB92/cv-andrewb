@@ -5,8 +5,10 @@ import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
+import (TypedRotator) from "@/components/TypedRotator";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
+import TypedRotator from "@/components/TypedRotator";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +26,18 @@ export default async function HomePage() {
           <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
             <MagicText stars={3} intervalMs={2200}>
-              product focused
+              {/* product focused */}
+              <TypedRotator
+                items={[
+                  "WordPress + JetEngine",
+                  "Next.js + TypeScript",
+                  "UI polish & performance",
+                ]}
+                typeSpeed={70}
+                deleteSpeed={35}
+                holdDelay={1000}
+                betweenDelay={250}
+              />
             </MagicText><br />
             web developer
           </h1>
