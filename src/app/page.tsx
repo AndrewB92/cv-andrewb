@@ -5,7 +5,6 @@ import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
-import (TypedRotator) from "@/components/TypedRotator";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
 import TypedRotator from "@/components/TypedRotator";
