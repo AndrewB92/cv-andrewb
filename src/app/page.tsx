@@ -22,7 +22,7 @@ export default async function HomePage() {
     <main>
 
       <article className={`${styles.hero} glow-border`}>
-        <Terminal path="~/projects/cv-andrewb/terminal">
+        <Terminal path="~/cv-andrewb/terminal">
               <TypedRotator
                 items={[
                   "Building scalable interfaces",
