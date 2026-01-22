@@ -40,7 +40,7 @@
   font-weight: 600;
   color: var(--color-text-primary);
   letter-spacing: 0.2em;
-  width: max-content;
+  min-width: 179.21px;
 }
 
 .brand :global(.cv-logo__prefix),
