@@ -173,8 +173,8 @@
   content: "";
   position: absolute;
 
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
 
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -182,8 +182,8 @@
   transform: rotate(45deg);
 
   background: rgba(20, 20, 24, 0.87);
-  top: -7.5px;
-  right: 12px;
+  top: -5.5px;
+  right: 10.5px;
 }
 
 .heroActions {
