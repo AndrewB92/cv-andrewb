@@ -2,13 +2,13 @@
 	color: #fff;
 	background-color: #4d25eb45;
 	border-radius: 0 0 7px 7px;
-	left: -45px;
+	left: -35px;
 	width: 30%;
 	/* height: clamp(220px, 30vh, 500px); */
     height: 260px;
 	align-self: center;
 	padding: 10px;
-	font-size: .8em;
+	font-size: .92em;
 	line-height: 1em;
 	position: relative;
 	box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
