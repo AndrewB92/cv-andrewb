@@ -8,8 +8,32 @@ import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
 import TypedRotator from "@/components/TypedRotator";
-import { Terminal } from "@/components/Terminal/Terminal";
+// import { Terminal } from "@/components/Terminal/Terminal";
+import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 
+const welcomeCode = `import { FC } from "react";
+
+type WelcomeProps = {
+  uses:
+    | "explore new tech"
+    | "display my skills"
+    | "find freelancing opportunities"
+    | "find a fulltime job";
+};
+
+export const Welcome: FC<WelcomeProps> = ({ uses }) => {
+  return (
+    <>
+      <h1>This is my little slice of the internet.</h1>
+      <p>
+        I use this site to <em>{uses}</em>.
+      </p>
+    </>
+  );
+};
+
+export default Welcome;
+`;
 
 export const dynamic = "force-dynamic";
 
@@ -22,19 +46,8 @@ export default async function HomePage() {
     <main>
 
       <article className={`${styles.hero} glow-border`}>
-        <Terminal path="~/cv-andrewb/terminal">
-              <TypedRotator
-                items={[
-                  "Building scalable interfaces",
-                  "Turning ideas into clean code",
-                  "Optimizing UX without overengineering",
-                  "Shipping stable, maintainable solutions",
-                ]}
-                typeSpeed={280}
-                deleteSpeed={65}
-                holdDelay={12000}
-                betweenDelay={350}
-              />
+        <Terminal path="~/andrew.dev/welcome.tsx">
+          <TerminalCode code={welcomeCode} language="tsx" />
         </Terminal>
         <div className={styles.heroContent}>
           <div className={styles.heroContentBG}></div>

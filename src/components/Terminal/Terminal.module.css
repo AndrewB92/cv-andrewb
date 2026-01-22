@@ -41,41 +41,103 @@
 .terminal::after {
   content: "";
   position: absolute;
-  top: -16px;
+  top: -18px;
   left: 10px;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background: #f95c5b;
   border-radius: 100%;
-  box-shadow:
-    0 0 0 1px #da3d42,
-    18px 0 0 0 #fabe3b,
-    18px 0 0 1px #ecb03e,
-    36px 0 0 0 #38cd46,
-    36px 0 0 1px #2eae32;
+  box-shadow: 0 0 0 1px #da3d42, 22px 0 0 0 #fabe3b, 22px 0 0 1px #ecb03e,
+    44px 0 0 0 #38cd46, 44px 0 0 1px #2eae32;
 }
 
-.terminal p {
+/* --- Code block layout (VS Code-ish) --- */
+
+.codeWrap {
+  position: relative;
+  margin-top: 6px;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 0 10px;
+  z-index: 1;
+}
+
+.copyBtn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+  color: #b4c4c6;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.copyBtn:hover {
+  background: rgba(0, 0, 0, 0.26);
+}
+.copyBtn:active {
+  transform: translateY(1px);
+}
+
+.pre {
   margin: 0;
+  overflow: auto;
+  padding: 6px 0 0;
 }
 
-.terminal p::before,
-.terminal span span:first-child:before {
-  color: #5ed7ff;
-  content: "~$ ";
+.code {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.95em;
 }
 
-@keyframes float {
-    0% {
-        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
-        transform: translatey(0px);
-    }
-    50% {
-        box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
-        transform: translatey(-20px);
-    }
-    100% {
-        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
-        transform: translatey(0px);
-    }
+/* Each line is a 2-col row: gutter + content */
+.line {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 1px 0;
+}
+
+.gutter {
+  text-align: right;
+  padding-right: 10px;
+  color: rgba(180, 196, 198, 0.45);
+  user-select: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.content {
+  white-space: pre; /* preserve spacing */
+}
+
+/* --- Syntax colors (subtle, readable on your bg) --- */
+.tok_comment {
+  color: rgba(180, 196, 198, 0.55);
+}
+.tok_string {
+  color: #a6e3a1;
+}
+.tok_number {
+  color: #f9e2af;
+}
+.tok_keyword {
+  color: #cba6f7;
+}
+.tok_type {
+  color: #74c7ec;
+}
+.tok_fn {
+  color: #89b4fa;
+}
+.tok_punct {
+  color: rgba(180, 196, 198, 0.9);
 }
