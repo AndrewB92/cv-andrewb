@@ -42,7 +42,7 @@ export default async function HomePage() {
         </Terminal>
         <div className={styles.heroContent}>
           <div className={styles.heroContentBG}>
-            <div className={styles.heroContentBGinner}></div>
+            {/* <div className={styles.heroContentBGinner}></div> */}
           </div>
           <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />

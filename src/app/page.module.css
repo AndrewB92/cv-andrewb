@@ -68,7 +68,7 @@
   opacity: .05;
 }
 
-.heroContent .heroContentBGinner{
+/* .heroContent .heroContentBGinner{
   content: '';
   display: block;
   position: absolute;
@@ -79,7 +79,7 @@
   z-index: 1;
   --cell-size: 3.5rem;
   background: radial-gradient(hsl(281, 39%, 22%),transparent 40%) no-repeat -170vw -55vh / 250vw 250vh,radial-gradient(closest-side,hsl(339, 39%, 22%),transparent) no-repeat calc(100% + var(--cell-size) * 6) calc(var(--cell-size) * -7) / calc(var(--cell-size) * 12) calc(var(--cell-size) * 19);
-}
+} */
 
 .heroContent .welcome {
   margin: 0;
