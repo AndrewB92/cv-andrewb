@@ -46,7 +46,7 @@ export default async function HomePage() {
           </div>
           <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
-            <MagicText stars={3} intervalMs={2200}>
+            <MagicText stars={0} intervalMs={2200}>
               product focused
             </MagicText><br />
             web developer
