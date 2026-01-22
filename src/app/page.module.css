@@ -68,6 +68,19 @@
   opacity: .05;
 }
 
+.heroContent .heroContentBGinner{
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  --cell-size: 3.5rem;
+  background: radial-gradient(var(--sl-color-purple-low),transparent 40%) no-repeat -170vw -55vh / 250vw 250vh,radial-gradient(closest-side,var(--sl-color-red-low),transparent) no-repeat calc(100% + var(--cell-size) * 6) calc(var(--cell-size) * -7) / calc(var(--cell-size) * 12) calc(var(--cell-size) * 19);
+}
+
 .heroContent .welcome {
   margin: 0;
   padding: 0;

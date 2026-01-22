@@ -41,7 +41,9 @@ export default async function HomePage() {
           <TerminalCode code={welcomeCode} language="tsx" />
         </Terminal>
         <div className={styles.heroContent}>
-          <div className={styles.heroContentBG}></div>
+          <div className={styles.heroContentBG}>
+            <div className={styles.heroContentBGinner}></div>
+          </div>
           <p className={styles.welcome}>Welcome to my website</p>
           <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
             <MagicText stars={3} intervalMs={2200}>
