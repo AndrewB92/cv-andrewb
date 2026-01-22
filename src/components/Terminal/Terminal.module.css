@@ -69,22 +69,41 @@
   z-index: 1;
 }
 
-.copyBtn {
+.iconBtn {
   appearance: none;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.18);
   color: #b4c4c6;
-  padding: 6px 10px;
+  width: 36px;
+  height: 32px;
   border-radius: 10px;
-  font: inherit;
+  display: inline-grid;
+  place-items: center;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
-.copyBtn:hover {
+
+.iconBtn:hover {
   background: rgba(0, 0, 0, 0.26);
+  border-color: rgba(255, 255, 255, 0.18);
 }
-.copyBtn:active {
+
+.iconBtn:active {
   transform: translateY(1px);
+}
+
+.iconBtn[aria-label="Copied"] {
+  transform: translateY(-0.5px);
+}
+
+.iconBtn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .pre {

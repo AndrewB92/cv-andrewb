@@ -132,16 +132,17 @@ export function TerminalCode({
     return lines.map((line) => highlightTs(line));
   }, [lines]);
 
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 900);
-    } catch {
-      // Fallback: do nothing (clipboard may be blocked)
-      setCopied(false);
-    }
+async function handleCopy() {
+  try {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+
+    window.clearTimeout((handleCopy as any)._t);
+    (handleCopy as any)._t = window.setTimeout(() => setCopied(false), 1100);
+  } catch {
+    setCopied(false);
   }
+}
 
   return (
     <div className={styles.codeWrap} data-lang={language}>
