@@ -4,7 +4,8 @@
 	border-radius: 0 0 7px 7px;
 	left: -45px;
 	width: 30%;
-	height: clamp(220px, 30vh, 500px);
+	/* height: clamp(220px, 30vh, 500px); */
+    height: 260px;
 	align-self: center;
 	padding: 10px;
 	font-size: .8em;
@@ -56,16 +57,18 @@
 .codeWrap {
   position: relative;
   /* margin-top: 6px; */
-  max-height: clamp(202px, 26vh, 490px);
+  /* max-height: clamp(202px, 26vh, 490px); */
+  height: 230px;
   overflow: scroll;
 }
 
 .toolbar {
-  position: sticky;
-  top: 0;
-  display: none;
+  position: fixed;
+  top: 6px;
+  right: 6px;
+  display: flex;
   justify-content: flex-end;
-  padding: 6px 0 10px;
+  padding: 0;
   z-index: 1;
 }
 
@@ -74,8 +77,8 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.18);
   color: #b4c4c6;
-  width: 36px;
-  height: 32px;
+  width: 30px;
+  height: 28px;
   border-radius: 10px;
   display: inline-grid;
   place-items: center;
@@ -97,8 +100,8 @@
 }
 
 .iconBtn svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
