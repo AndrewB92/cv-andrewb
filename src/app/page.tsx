@@ -11,8 +11,7 @@ import TypedRotator from "@/components/TypedRotator";
 // import { Terminal } from "@/components/Terminal/Terminal";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 
-const welcomeCode = `
-type UseCase =
+const welcomeCode = `type UseCase =
   | "explore new tech"
   | "show my skills"
   | "find freelance work"
@@ -25,8 +24,7 @@ export type Welcome = {
 
 export function formatWelcome({ title, uses }: Welcome): string {
   return \`\${title} — I use this site to \${uses}.\`;
-}
-`;
+}`;
 
 export const dynamic = "force-dynamic";
 

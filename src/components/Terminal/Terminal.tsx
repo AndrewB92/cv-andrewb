@@ -101,6 +101,23 @@ type TerminalCodeProps = {
   copyLabel?: string;
 };
 
+function CopyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M8 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2V7Z" />
+      <path d="M6 17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
 export function TerminalCode({
   code,
   language = "tsx",
@@ -129,13 +146,22 @@ export function TerminalCode({
   return (
     <div className={styles.codeWrap} data-lang={language}>
       <div className={styles.toolbar}>
-        <button
+        {/* <button
           type="button"
           className={styles.copyBtn}
           onClick={handleCopy}
           aria-label="Copy terminal content"
         >
           {copied ? "Copied" : copyLabel}
+        </button> */}
+        <button
+            type="button"
+            className={styles.iconBtn}
+            onClick={handleCopy}
+            aria-label={copied ? "Copied" : "Copy terminal content"}
+            title={copied ? "Copied" : "Copy"}
+            >
+            {copied ? <CheckIcon /> : <CopyIcon />}
         </button>
       </div>
 
