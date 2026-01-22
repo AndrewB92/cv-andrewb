@@ -11,28 +11,21 @@ import TypedRotator from "@/components/TypedRotator";
 // import { Terminal } from "@/components/Terminal/Terminal";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 
-const welcomeCode = `import { FC } from "react";
+const welcomeCode = `
+type UseCase =
+  | "explore new tech"
+  | "show my skills"
+  | "find freelance work"
+  | "land a full-time role";
 
-type WelcomeProps = {
-  uses:
-    | "explore new tech"
-    | "display my skills"
-    | "find freelancing opportunities"
-    | "find a fulltime job";
+export type Welcome = {
+  title: string;
+  uses: UseCase;
 };
 
-export const Welcome: FC<WelcomeProps> = ({ uses }) => {
-  return (
-    <>
-      <h1>This is my little slice of the internet.</h1>
-      <p>
-        I use this site to <em>{uses}</em>.
-      </p>
-    </>
-  );
-};
-
-export default Welcome;
+export function formatWelcome({ title, uses }: Welcome): string {
+  return \`\${title} — I use this site to \${uses}.\`;
+}
 `;
 
 export const dynamic = "force-dynamic";

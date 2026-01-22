@@ -55,15 +55,15 @@
 
 .codeWrap {
   position: relative;
-  margin-top: 6px;
-  max-height: 196px;
+  /* margin-top: 6px; */
+  max-height: clamp(196px, 26vh, 490px);
   overflow: scroll;
 }
 
 .toolbar {
   position: sticky;
   top: 0;
-  display: flex;
+  display: none;
   justify-content: flex-end;
   padding: 6px 0 10px;
   z-index: 1;
@@ -91,6 +91,10 @@
   margin: 0;
   overflow: auto;
   padding: 6px 0 0;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .code {
@@ -103,7 +107,7 @@
 /* Each line is a 2-col row: gutter + content */
 .line {
   display: grid;
-  grid-template-columns: 52px 1fr;
+  grid-template-columns: 22px 1fr;
   align-items: start;
   gap: 10px;
   padding: 1px 0;
@@ -118,7 +122,12 @@
 }
 
 .content {
-  white-space: pre; /* preserve spacing */
+  /* white-space: pre; */
+
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* --- Syntax colors (subtle, readable on your bg) --- */
