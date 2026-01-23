@@ -33,7 +33,7 @@
 .bg {
   position: absolute;
   inset: -1px;
-  z-index: 0;
+  z-index: 0 !important;
   border-radius: var(--radius-md);
   background: linear-gradient(    90deg,    #e651fd 0%,    #ba25d1 30.43%,    #2563eb 68.23%,    #ba25d1 100%  );
   background-size: 600% 600%;
