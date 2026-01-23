@@ -6,12 +6,7 @@ import styles from "./RainbowGlowLink.module.css";
 
 function ArrowIcon() {
   return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
       <path
         d="M7 4l6 6-6 6"
         stroke="currentColor"
@@ -22,6 +17,7 @@ function ArrowIcon() {
     </svg>
   );
 }
+
 type RainbowGlowLinkProps = {
   href: string;
   children: ReactNode;
@@ -34,8 +30,13 @@ type RainbowGlowLinkProps = {
   glow?: boolean; // default true (unless flat)
   blob?: boolean; // default true (unless flat)
 
-  /** optional icon (svg/react node) */
-  icon?: ReactNode;
+  /**
+   * optional icon:
+   * - omit => defaults to ArrowIcon
+   * - pass ReactNode => custom icon
+   * - pass false => disable icon
+   */
+  icon?: ReactNode | false;
   iconPosition?: "start" | "end";
   iconAriaLabel?: string; // if icon is meaningful
 };
@@ -55,13 +56,21 @@ export function RainbowGlowLink({
 
   const flags = useMemo(() => {
     const isFlat = variant === "flat";
+    const enableGlow = glow ?? !isFlat;
+    const enableBlob = blob ?? !isFlat;
+
+    const resolvedIcon =
+      icon === false ? null : (icon ?? <ArrowIcon />);
+
     return {
-      glow: glow ?? !isFlat,
-      blob: blob ?? !isFlat,
-      hasIcon: Boolean(icon),
+      glow: enableGlow,
+      blob: enableBlob,
+      icon: resolvedIcon,
+      hasIcon: Boolean(resolvedIcon),
       iconPosition,
+      iconAriaLabel,
     };
-  }, [variant, glow, blob, icon, iconPosition]);
+  }, [variant, glow, blob, icon, iconPosition, iconAriaLabel]);
 
   useEffect(() => {
     // If blob disabled, don't attach listeners at all (cheapest)
@@ -73,8 +82,10 @@ export function RainbowGlowLink({
     let rect: DOMRect | null = null;
     let raf = 0;
 
-    let tx = 0, ty = 0;
-    let x = 0, y = 0;
+    let tx = 0,
+      ty = 0;
+    let x = 0,
+      y = 0;
 
     const SMOOTH = 0.22;
 
@@ -146,7 +157,9 @@ export function RainbowGlowLink({
     el.addEventListener("pointermove", onMove, { passive: true });
     el.addEventListener("pointerleave", onLeave, { passive: true });
 
-    const onResize = () => { rect = null; };
+    const onResize = () => {
+      rect = null;
+    };
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
@@ -163,7 +176,9 @@ export function RainbowGlowLink({
     flags.glow ? styles.withGlow : styles.noGlow,
     flags.blob ? styles.withBlob : styles.noBlob,
     flags.hasIcon ? styles.withIcon : "",
-    flags.hasIcon && flags.iconPosition === "start" ? styles.iconStart : styles.iconEnd,
+    flags.hasIcon && flags.iconPosition === "start"
+      ? styles.iconStart
+      : styles.iconEnd,
     className,
   ]
     .filter(Boolean)
@@ -173,16 +188,16 @@ export function RainbowGlowLink({
     <span ref={wrapRef} className={wrapperClass}>
       <Link href={href} className={styles.link}>
         {flags.hasIcon && flags.iconPosition === "start" ? (
-          <span className={styles.icon} aria-label={iconAriaLabel}>
-            {icon}
+          <span className={styles.icon} aria-label={flags.iconAriaLabel}>
+            {flags.icon}
           </span>
         ) : null}
 
         <span className={styles.text}>{children}</span>
 
         {flags.hasIcon && flags.iconPosition === "end" ? (
-          <span className={styles.icon} aria-label={iconAriaLabel}>
-            {icon}
+          <span className={styles.icon} aria-label={flags.iconAriaLabel}>
+            {flags.icon}
           </span>
         ) : null}
       </Link>
