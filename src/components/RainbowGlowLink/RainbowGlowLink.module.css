@@ -1,26 +1,37 @@
 .wrapper {
   position: relative;
   display: inline-block;
-  /* isolation: isolate; */
-  /* border-radius: 999px; */
+
+  /* pointer position (JS updates these) */
+  --px: 50%;
+  --py: 50%;
+
+  /* circular reveal radius */
+  --r: 0%;
+  --r-max: 140%;
 }
 
 /* clickable surface */
 .link {
   position: relative;
-  z-index: 2 !important;
+  z-index: 3;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-sm)var(--space-xl);
+
+  padding: var(--space-sm) var(--space-xl);
   border-radius: var(--radius-md);
-  /* background: var(--color-surface-alt); */
+
   color: var(--color-text-primary);
   text-decoration: none;
-  font-size: .95rem;
+
+  font-size: 0.95rem;
   font-weight: 600;
+
   cursor: pointer;
   user-select: none;
+
   transition: transform 120ms linear;
 }
 
@@ -28,54 +39,85 @@
   transform: scale(0.97);
 }
 
+/* solid surface that disappears via circular reveal */
 .bg {
   position: absolute;
   inset: -1px;
-  z-index: 1 !important;
+  z-index: 2;
+
   border-radius: var(--radius-md);
   background: var(--color-surface-alt);
-  opacity: 1;
-  transform: translateZ(0);
-  transition: opacity 250ms linear;
+
+  /* animated mask (hole grows & shrinks smoothly) */
+  -webkit-mask-image: radial-gradient(
+    circle at var(--px) var(--py),
+    #000 0%,
+    #000 calc(var(--r) - 8%),
+    transparent var(--r)
+  );
+          mask-image: radial-gradient(
+    circle at var(--px) var(--py),
+    #000 0%,
+    #000 calc(var(--r) - 8%),
+    transparent var(--r)
+  );
+
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+
+  transition:
+    --r 560ms cubic-bezier(.25,.9,.25,1);
 }
 
-/* animated gradient border / glow */
+/* hover in + hover out both animate */
+.wrapper:hover .bg {
+  --r: var(--r-max);
+}
+
+/* animated gradient glow */
 .glow {
   position: absolute;
   inset: -1px;
-  z-index: 0 !important;
+  z-index: 1;
+
   border-radius: var(--radius-md);
-  background: linear-gradient(90deg,#e651fd 0%,#ba25d1 30.43%,#2563eb 68.23%,#ba25d1 100%) 0 0/600% 600%;
+
+  background: linear-gradient(
+    90deg,
+    #e651fd 0%,
+    #ba25d1 30.43%,
+    #2563eb 68.23%,
+    #ba25d1 100%
+  );
   background-size: 600% 600%;
+
   animation: glowShift 8s ease infinite;
+
   transform: translateZ(0);
-  transition: filter 250ms linear;
-  
   filter: blur(10px);
+  transition: filter 250ms linear;
 }
 
-.wrapper:hover .bg {
-  opacity: 0;
-}
-
-/* hover glow blur */
 .wrapper:hover .glow {
   filter: blur(0px);
 }
 
-/* animation */
+/* gradient motion */
 @keyframes glowShift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* reduced motion */
+/* accessibility */
 @media (prefers-reduced-motion: reduce) {
   .glow {
     animation: none;
   }
-  .link {
+
+  .bg {
     transition: none;
+    -webkit-mask-image: none;
+            mask-image: none;
   }
 }
