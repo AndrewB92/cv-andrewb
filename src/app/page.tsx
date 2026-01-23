@@ -55,12 +55,12 @@ export default async function HomePage() {
 
           <p>{profile.summary}</p>
           <div className={styles.heroActions}>
-            <Link href="/projects" className={styles.primaryButton}>
+            {/* <Link href="/projects" className={styles.primaryButton}>
               Explore projects
             </Link>
             <Link href="/contact" className={styles.secondaryButton}>
               Get in touch
-            </Link>
+            </Link> */}
             <RainbowGlowLink href="/projects">
               View projects
             </RainbowGlowLink>

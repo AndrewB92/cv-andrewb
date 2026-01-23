@@ -39,11 +39,23 @@
   animation: glowShift 8s ease infinite;
   transform: translateZ(0);
   transition: filter 250ms linear;
+  
+  filter: blur(12px);
+}
+
+.wrapper .link,
+.wrapper .glow {
+  opacity: .8;
+}
+
+.wrapper:hover .link,
+.wrapper:hover .glow {
+  opacity: 1;
 }
 
 /* hover glow blur */
 .wrapper:hover .glow {
-  filter: blur(10px);
+  filter: blur(8px);
 }
 
 /* animation */
