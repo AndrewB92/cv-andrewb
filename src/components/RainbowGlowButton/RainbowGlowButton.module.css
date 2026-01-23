@@ -1,34 +1,28 @@
 .wrapper {
   position: relative;
   display: inline-block;
-  isolation: isolate;
-  border-radius: 50px;
+  /* isolation: isolate;
+  border-radius: 50px; */
 }
 
 /* Button itself */
 .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 24px;
-  line-height: 32px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-
-  padding: 16px 32px;
-  border: 0;
-  border-radius: 50px;
-
-  background: #000;
-  color: #fff;
-  cursor: pointer;
-
-  position: relative;
-  z-index: 1;
-
-  transition: transform 180ms ease;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    z-index: 1 !important;
+    background: var(--color-surface-alt);
+    border: none;
+    border-radius: var(--radius-md);
+    justify-content: center;
+    align-items: center;
+    padding: 15px 32px;
+    font-family: var(--font-geist-mono);
+    font-size: .95rem;
+    font-weight: 600;
+    line-height: 20px;
+    transition: transform .18s;
+    display: inline-flex;
+    position: relative;
 }
 
 .button:active {
@@ -39,19 +33,11 @@
 .bg {
   position: absolute;
   inset: -1px;
-  border-radius: 50px;
   z-index: 0;
-
-  background: linear-gradient(
-    90deg,
-    #ff8038 0%,
-    #ff0099 30.43%,
-    #00ebeb 68.23%,
-    #db00ff 100%
-  );
+  border-radius: var(--radius-md);
+  background: linear-gradient(    90deg,    #e651fd 0%,    #ba25d1 30.43%,    #2563eb 68.23%,    #ba25d1 100%  );
   background-size: 600% 600%;
   animation: animateBorder 8s ease infinite;
-
   transform: translateZ(0);
   transition: filter 300ms ease-in;
 }
