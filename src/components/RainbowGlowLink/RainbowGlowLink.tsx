@@ -67,6 +67,9 @@ export function RainbowGlowLink({ href, children, className = "" }: RainbowGlowL
       const nx = e.clientX - rect.left;
       const ny = e.clientY - rect.top;
 
+      const mix = tx / rect.width;
+      el.style.setProperty("--blob-mix", mix.toFixed(3));
+
       // clamp
       tx = nx < 0 ? 0 : nx > rect.width ? rect.width : nx;
       ty = ny < 0 ? 0 : ny > rect.height ? rect.height : ny;

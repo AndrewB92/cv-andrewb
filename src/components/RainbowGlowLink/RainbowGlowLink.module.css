@@ -8,6 +8,7 @@
   --pointer-y: 0px;
   --spot-opacity: 0;
   --spot: rgba(255, 255, 255, 0.18); /* tweak */
+  --blob-mix: 0;
 }
 
 /* clickable surface */
@@ -55,12 +56,25 @@
   height: 40px;
   border-radius: 12px;
   transform: translate(var(--pointer-x), var(--pointer-y)) translateZ(0);
-  background: var(--spot);
+  
+  /*background: var(--spot);*/
+  
+  background: linear-gradient(
+    90deg,
+    #ba25d1,
+    #2563eb
+  );
+  background-size: 200% 100%;
+  background-position: calc(var(--blob-mix) * 100%) 50%;
+  
   opacity: var(--spot-opacity);
+  
   filter: blur(14px);
   
   /*cheapopacitytransition(movementisviatransformvarupdates)*/
+  
   transition: opacity 160ms linear;
+  
   pointer-events: none;
 }
 
