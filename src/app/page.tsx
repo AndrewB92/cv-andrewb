@@ -61,7 +61,7 @@ export default async function HomePage() {
             <Link href="/contact" className={styles.secondaryButton}>
               Get in touch
             </Link> */}
-            <RainbowGlowLink href="/contact">
+            <RainbowGlowLink href="/contact" className={styles.primaryButton}>
               Let&apos;s talk
             </RainbowGlowLink>
             <Link href="/contact" className={styles.secondaryButton}>
