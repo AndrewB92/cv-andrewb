@@ -11,6 +11,7 @@ import TypedRotator from "@/components/TypedRotator";
 // import { Terminal } from "@/components/Terminal/Terminal";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
+import { CalPopup } from "@/components/CalPopup/CalPopup";
 
 
 const welcomeCode = `type UseCase =
@@ -63,7 +64,7 @@ export default async function HomePage() {
               Get in touch
             </Link> */}
 
-            <RainbowGlowLink href="/contact" glow blob iconPosition="end" iconName="mail" iconDirection="up">
+            <RainbowGlowLink href="/contact?meet=hour-meeting" glow blob iconPosition="end" iconName="mail" iconDirection="up">
               Let&apos;s talk
             </RainbowGlowLink>
 
@@ -154,6 +155,14 @@ export default async function HomePage() {
           View all projects →
         </Link>
       </Section>
+      <CalPopup
+        paramKey="meet"
+        linksByKey={{
+          "hour-meeting": "andrew-bielous-iyuwdo/hour-meeting",
+          // add more if you want:
+          // "quick-chat": "andrew-bielous-iyuwdo/quick-chat",
+        }}
+      />
     </main>
   );
 }
