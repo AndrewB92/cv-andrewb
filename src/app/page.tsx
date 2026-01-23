@@ -61,9 +61,12 @@ export default async function HomePage() {
             <Link href="/contact" className={styles.secondaryButton}>
               Get in touch
             </Link> */}
-            <RainbowGlowLink href="/projects">
-              View projects
+            <RainbowGlowLink href="/contact">
+              Let&apos;s talk
             </RainbowGlowLink>
+            <Link href="/contact" className={styles.secondaryButton}>
+              Check my CV
+            </Link>
           </div>
 
           <HeroMetaPopover className={styles.heroMetaPopover}>
