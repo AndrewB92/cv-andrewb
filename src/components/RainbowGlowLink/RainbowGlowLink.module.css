@@ -173,10 +173,10 @@
 
 .wrapper.noGlow:hover .bg {
   opacity: 1;
-  height: inherit;
-  width: inherit;
-  top: inherit;
-  left: inherit;
+  height: initial;
+  width: initial;
+  top: initial;
+  left: initial;
   border-radius: var(--radius-md);
 }
 
