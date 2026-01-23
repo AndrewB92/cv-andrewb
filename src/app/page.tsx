@@ -10,6 +10,7 @@ import { ExperienceSection } from "./ExperienceSection";
 import TypedRotator from "@/components/TypedRotator";
 // import { Terminal } from "@/components/Terminal/Terminal";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
+import { RainbowGlowButton } from "@/components/RainbowGlowButton/RainbowGlowButton";
 
 const welcomeCode = `type UseCase =
   | "explore new tech"
@@ -60,6 +61,9 @@ export default async function HomePage() {
             <Link href="/contact" className={styles.secondaryButton}>
               Get in touch
             </Link>
+            <RainbowGlowButton onClick={() => alert("hi")}>
+              Hover me
+            </RainbowGlowButton>
           </div>
 
           <HeroMetaPopover className={styles.heroMetaPopover}>
