@@ -31,6 +31,11 @@ type CalPopupProps = {
    * Cal origin (usually https://app.cal.eu)
    */
   origin?: string;
+
+  /**
+   * Optional label for aria
+   */
+  ariaLabel?: string;
 };
 
 declare global {
@@ -41,20 +46,31 @@ declare global {
 
 const CAL_SCRIPT_SRC = "https://app.cal.eu/embed/embed.js";
 
+type CalCommand = unknown[];
+
 function loadScriptOnce(src: string): Promise<void> {
   if (typeof document === "undefined") return Promise.resolve();
 
   const existing = document.querySelector<HTMLScriptElement>(
     `script[src="${src}"]`
   );
+
+  // If script already exists and loaded, done.
+  if (existing && (existing as any).__loaded) return Promise.resolve();
+
+  // If script exists but not marked loaded, attach listeners.
   if (existing) {
-    if ((existing as any).__loaded) return Promise.resolve();
     return new Promise((resolve, reject) => {
       existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener("error", () => reject(new Error("Cal script failed to load")), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error("Cal script failed to load")),
+        { once: true }
+      );
     });
   }
 
+  // Create script
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = src;
@@ -80,51 +96,27 @@ function loadScriptOnce(src: string): Promise<void> {
   });
 }
 
-function ensureCalBootstrapped(origin: string) {
-  // If Cal is already there and looks initialized, do nothing.
+/**
+ * Provide a typed queueing stub for window.Cal so calls are safe
+ * before embed.js finishes loading. embed.js will replace Cal and
+ * drain Cal.q in most embed implementations.
+ */
+function ensureCalQueue() {
+  if (typeof window === "undefined") return;
   if (window.Cal) return;
 
-  // Cal's recommended bootstrap wrapper:
-  (function (C: any, A: string, L: string) {
-    let p = function (a: any, ar: any) {
-      a.q.push(ar);
-    };
-    let d = C.document;
-    C.Cal =
-      C.Cal ||
-      function () {
-        let cal = C.Cal;
-        let ar = arguments;
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q || [];
-          d.head.appendChild(d.createElement("script")).src = A;
-          cal.loaded = true;
-        }
-        if (ar[0] === L) {
-          const api = function () {
-            p(api, arguments);
-          };
-          const namespace = ar[1];
-          api.q = api.q || [];
-          if (typeof namespace === "string") {
-            cal.ns[namespace] = cal.ns[namespace] || api;
-            p(cal.ns[namespace], ar);
-            p(cal, ["initNamespace", namespace]);
-          } else p(cal, ar);
-          return;
-        }
-        p(cal, ar);
-      };
-  })(window, CAL_SCRIPT_SRC, "init");
+  const q: CalCommand[] = [];
+  const Cal = (...args: unknown[]) => {
+    q.push(args);
+  };
 
-  // Optional: keep origin consistent
-  // (we pass origin later too, but harmless here)
-  // window.Cal("init", "global", { origin });
+  (Cal as any).q = q;
+  window.Cal = Cal as any;
 }
 
 function lockBodyScroll(lock: boolean) {
   const html = document.documentElement;
+
   if (lock) {
     const scrollBarCompensation = window.innerWidth - html.clientWidth;
     html.style.overflow = "hidden";
@@ -137,12 +129,18 @@ function lockBodyScroll(lock: boolean) {
   }
 }
 
+function safeSetInnerHTML(el: HTMLElement | null, html: string) {
+  if (!el) return;
+  el.innerHTML = html;
+}
+
 export function CalPopup({
   paramKey = "meet",
   linksByKey,
   defaultConfig = { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
   ui = { hideEventTypeDetails: false, layout: "month_view" },
   origin = "https://app.cal.eu",
+  ariaLabel = "Schedule a meeting",
 }: CalPopupProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -150,8 +148,11 @@ export function CalPopup({
 
   const [open, setOpen] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const modalRef = useRef<HTMLDivElement | null>(null);
+
+  // Stable mount id per component instance
   const mountId = useMemo(
     () => `cal-inline-${Math.random().toString(16).slice(2)}`,
     []
@@ -163,7 +164,7 @@ export function CalPopup({
     setOpen(false);
     setActiveKey(null);
 
-    // remove param from URL (without hard reload)
+    // Remove param from URL (no hard reload)
     const sp = new URLSearchParams(searchParams?.toString());
     sp.delete(paramKey);
     const next = sp.toString();
@@ -173,10 +174,11 @@ export function CalPopup({
   const openWithKey = useCallback(
     (key: string) => {
       if (!linksByKey[key]) return;
+
       setActiveKey(key);
       setOpen(true);
 
-      // keep URL in sync (nice for shareable links)
+      // Keep URL in sync (shareable deep links)
       const sp = new URLSearchParams(searchParams?.toString());
       sp.set(paramKey, key);
       router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
@@ -187,19 +189,22 @@ export function CalPopup({
   // 1) Open from URL param
   useEffect(() => {
     const key = searchParams?.get(paramKey);
+
     if (key && linksByKey[key]) {
       setActiveKey(key);
       setOpen(true);
       return;
     }
-    // if param removed externally
+
+    // If param removed externally, close.
     if (!key) {
       setOpen(false);
       setActiveKey(null);
     }
   }, [linksByKey, paramKey, searchParams]);
 
-  // 2) Open from special links/buttons: .js-cal-open[data-cal-key="hour-meeting"]
+  // 2) Open from special links/buttons:
+  // <a className="js-cal-open" data-cal-key="hour-meeting" href="/contact?meet=hour-meeting">
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
@@ -228,12 +233,16 @@ export function CalPopup({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
+
     document.addEventListener("keydown", onKeyDown);
 
-    // focus modal for accessibility-ish baseline
-    setTimeout(() => modalRef.current?.focus(), 0);
+    // focus modal for keyboard users
+    const t = window.setTimeout(() => {
+      modalRef.current?.focus();
+    }, 0);
 
     return () => {
+      window.clearTimeout(t);
       lockBodyScroll(false);
       document.removeEventListener("keydown", onKeyDown);
     };
@@ -247,15 +256,26 @@ export function CalPopup({
     let cancelled = false;
 
     const run = async () => {
-      // Ensure Cal global exists + script is ready
-      ensureCalBootstrapped(origin);
+      setIsLoading(true);
+
+      // Make calls safe before embed.js loads
+      ensureCalQueue();
+
+      // Load embed script once
       await loadScriptOnce(CAL_SCRIPT_SRC);
       if (cancelled) return;
 
-      // wipe mount node first (important when switching keys)
+      // Ensure mount exists and empty it (important when switching keys)
       const mountEl = document.getElementById(mountId);
       if (!mountEl) return;
-      mountEl.innerHTML = "";
+
+      safeSetInnerHTML(mountEl, "");
+
+      // If embed.js hasn't populated window.Cal namespaces yet, wait a microtask.
+      // This helps in edge cases where the script "load" fires but the library
+      // hasn't finished setting up ns.
+      await Promise.resolve();
+      if (cancelled) return;
 
       // init namespace for this key
       window.Cal("init", activeKey, { origin });
@@ -269,17 +289,19 @@ export function CalPopup({
 
       // UI options
       window.Cal.ns[activeKey]("ui", ui);
+
+      setIsLoading(false);
     };
 
     run().catch(() => {
-      // If needed, you can surface a toast/error state here
+      if (!cancelled) setIsLoading(false);
+      // Optional: show an error state
     });
 
     return () => {
       cancelled = true;
-      // we intentionally don't remove the script; we just unmount the container
       const mountEl = document.getElementById(mountId);
-      if (mountEl) mountEl.innerHTML = "";
+      safeSetInnerHTML(mountEl, "");
     };
   }, [open, activeKey, activeCalLink, defaultConfig, ui, origin, mountId]);
 
@@ -290,28 +312,32 @@ export function CalPopup({
       className={styles.overlay}
       role="dialog"
       aria-modal="true"
-      aria-label="Schedule a meeting"
+      aria-label={ariaLabel}
       onMouseDown={(e) => {
         // close only if clicking the backdrop (not inside panel)
         if (e.target === e.currentTarget) close();
       }}
     >
-      <div
-        className={styles.panel}
-        ref={modalRef}
-        tabIndex={-1}
-      >
+      <div className={styles.panel} ref={modalRef} tabIndex={-1}>
         <div className={styles.header}>
-          <div className={styles.title}>
-            {activeKey === "hour-meeting" ? "Schedule a call" : "Schedule"}
-          </div>
+          <div className={styles.title}>Schedule</div>
 
-          <button type="button" className={styles.close} onClick={close} aria-label="Close">
+          <button
+            type="button"
+            className={styles.close}
+            onClick={close}
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
 
         <div className={styles.body}>
+          {isLoading ? (
+            <div className={styles.loading} aria-live="polite">
+              Loading…
+            </div>
+          ) : null}
           <div className={styles.calWrap} id={mountId} />
         </div>
       </div>
