@@ -29,6 +29,14 @@
 
 .text { display: inline-block; }
 
+.wrapper .text {
+  opacity: .8;
+  transition: opacity 120ms linear;
+}
+.wrapper:hover .text {
+  opacity: 1;
+} 
+
 /* icon */
 .icon {
   /* display: inline-flex;
