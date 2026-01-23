@@ -67,6 +67,7 @@
   width: calc(100% - 2px);
   top: 1px;
   left: 1px;
+  border-radius: .9rem;
 }
 
 /* hover glow blur */
