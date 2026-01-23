@@ -127,7 +127,7 @@ export function Header() {
           </ul>
         </nav>
 
-        <Link href="/contact" className={styles.btn}>
+        <Link href="/?meet=hour-meeting" className={styles.btn}>
           <div className={styles.outer} style={{ height: "var(--header-height)" }}>
             <span className={styles.inner}>
               <span className={styles.particles} aria-hidden="true" />

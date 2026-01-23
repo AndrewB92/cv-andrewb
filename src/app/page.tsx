@@ -57,18 +57,10 @@ export default async function HomePage() {
 
           <p>{profile.summary}</p>
           <div className={styles.heroActions}>
-            {/* <Link href="/projects" className={styles.primaryButton}>
-              Explore projects
-            </Link>
-            <Link href="/contact" className={styles.secondaryButton}>
-              Get in touch
-            </Link> */}
-
             <RainbowGlowLink href="/?meet=hour-meeting" glow blob iconPosition="end" iconName="mail" iconDirection="up">
               Let&apos;s talk
             </RainbowGlowLink>
-
-            <RainbowGlowLink href="/contact" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="download" iconDirection="up">
+            <RainbowGlowLink href="#" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="download" iconDirection="up">
               Check my CV
             </RainbowGlowLink>
           </div>
