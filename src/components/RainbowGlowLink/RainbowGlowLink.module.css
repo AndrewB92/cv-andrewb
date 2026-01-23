@@ -8,13 +8,13 @@
 /* clickable surface */
 .link {
   position: relative;
-  z-index: 1 !important;
+  z-index: 2 !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-sm)var(--space-xl);
   border-radius: var(--radius-md);
-  background: var(--color-surface-alt);
+  /* background: var(--color-surface-alt); */
   color: var(--color-text-primary);
   text-decoration: none;
   font-size: .95rem;
@@ -26,6 +26,17 @@
 
 .link:active {
   transform: scale(0.97);
+}
+
+.bg {
+  position: absolute;
+  inset: -1px;
+  z-index: 1 !important;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  opacity: 1;
+  transform: translateZ(0);
+  transition: opacity 250ms linear;
 }
 
 /* animated gradient border / glow */
@@ -40,21 +51,16 @@
   transform: translateZ(0);
   transition: filter 250ms linear;
   
-  filter: blur(12px);
+  filter: blur(10px);
 }
 
-.wrapper .glow {
-  opacity: .8;
-  transition: opacity 250ms linear;
-}
-
-.wrapper:hover .glow {
-  opacity: 1;
+.wrapper:hover .bg {
+  opacity: 0;
 }
 
 /* hover glow blur */
 .wrapper:hover .glow {
-  filter: blur(10px);
+  filter: blur(0px);
 }
 
 /* animation */

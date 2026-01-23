@@ -18,6 +18,7 @@ export function RainbowGlowLink({
       <Link href={href} className={styles.link}>
         {children}
       </Link>
+      <span className={styles.bg} aria-hidden="true" />
       <span className={styles.glow} aria-hidden="true" />
     </span>
   );
