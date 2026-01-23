@@ -63,11 +63,11 @@ export default async function HomePage() {
               Get in touch
             </Link> */}
 
-            <RainbowGlowLink href="/contact" glow blob iconPosition="end" iconName="mail">
+            <RainbowGlowLink href="/contact" glow blob iconPosition="end" iconName="mail" iconDirection="up">
               Let&apos;s talk
             </RainbowGlowLink>
 
-            <RainbowGlowLink href="/contact" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="download">
+            <RainbowGlowLink href="/contact" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="download" iconDirection="up">
               Check my CV
             </RainbowGlowLink>
           </div>
