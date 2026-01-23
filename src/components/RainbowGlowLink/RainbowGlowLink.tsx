@@ -4,6 +4,24 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import styles from "./RainbowGlowLink.module.css";
 
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M7 4l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 type RainbowGlowLinkProps = {
   href: string;
   children: ReactNode;
@@ -172,24 +190,5 @@ export function RainbowGlowLink({
       <span className={styles.bg} aria-hidden="true" />
       {flags.glow ? <span className={styles.glow} aria-hidden="true" /> : null}
     </span>
-  );
-}
-
-function ArrowIcon() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        d="M7 4l6 6-6 6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

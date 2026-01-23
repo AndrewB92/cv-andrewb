@@ -136,6 +136,10 @@
   width: 100%;
 }
 
+.flatButton :global(a) {
+  border: 1px solid var(--color-border);
+}
+
 @keyframes glowShift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }

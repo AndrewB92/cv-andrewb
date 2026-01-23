@@ -11,7 +11,6 @@ import TypedRotator from "@/components/TypedRotator";
 // import { Terminal } from "@/components/Terminal/Terminal";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
-import { ArrowRightIcon } from "@/components/RainbowGlowLink/RainbowGlowLink";
 
 
 const welcomeCode = `type UseCase =
@@ -64,11 +63,11 @@ export default async function HomePage() {
               Get in touch
             </Link> */}
 
-            <RainbowGlowLink href="/contact" glow blob iconPosition="end" icon={<ArrowRightIcon />}>
+            <RainbowGlowLink href="/contact" glow blob iconPosition="end" icon={<ArrowIcon />}>
               Let&apos;s talk
             </RainbowGlowLink>
 
-            <RainbowGlowLink href="/contact" blob iconPosition="end" icon={<ArrowRightIcon />}>
+            <RainbowGlowLink href="/contact" blob variant="flat" className={styles.flatButton} iconPosition="end" icon={<ArrowIcon />}>
               Check my CV
             </RainbowGlowLink>
           </div>
