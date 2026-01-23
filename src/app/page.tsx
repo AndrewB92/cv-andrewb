@@ -61,7 +61,7 @@ export default async function HomePage() {
             <Link href="/contact" className={styles.secondaryButton}>
               Get in touch
             </Link>
-            <RainbowGlowButton onClick={() => alert("hi")}>
+            <RainbowGlowButton>
               Hover me
             </RainbowGlowButton>
           </div>
