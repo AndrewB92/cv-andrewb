@@ -12,19 +12,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 32px;
-  border-radius: 20px;
+  padding: var(--space-sm)var(--space-xl);
+  border-radius: var(--radius-md);
   background: var(--color-surface-alt);
-  color: #fff;
+  color: var(--color-text-primary);
   text-decoration: none;
   font-size: .95rem;
-  /*line-height: 32px;
-  */font-weight: 600;
-  /*letter-spacing: 2px;
-  *//*text-transform: uppercase;
-  */cursor: pointer;
+  font-weight: 600;
+  cursor: pointer;
   user-select: none;
-  transition: transform 180ms ease;
+  transition: transform 120ms linear;
 }
 
 .link:active {
@@ -36,12 +33,12 @@
   position: absolute;
   inset: -1px;
   z-index: 0 !important;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   background: linear-gradient(90deg,#e651fd 0%,#ba25d1 30.43%,#2563eb 68.23%,#ba25d1 100%) 0 0/600% 600%;
   background-size: 600% 600%;
   animation: glowShift 8s ease infinite;
   transform: translateZ(0);
-  transition: filter 300ms ease-in;
+  transition: filter 250ms linear;
 }
 
 /* hover glow blur */
