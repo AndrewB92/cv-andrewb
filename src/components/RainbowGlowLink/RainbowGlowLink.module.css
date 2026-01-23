@@ -1,23 +1,21 @@
-/* wrapper holds pointer vars */
 .wrapper {
   position: relative;
   display: inline-block;
 
-  /* defaults */
   --pointer-x: 0px;
   --pointer-y: 0px;
   --spot-opacity: 0;
-  --spot: rgba(255, 255, 255, 0.18); /* tweak */
-  --blob-mix: 0;
+  --blob-mix: 0.5;
 }
 
-/* clickable surface */
+/* Keep !important */
 .link {
   position: relative;
   z-index: 2 !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 10px; /* nice spacing for icon */
   padding: var(--space-sm) var(--space-xl);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
@@ -29,11 +27,23 @@
   transition: transform 120ms linear;
 }
 
-.link:active {
-  transform: scale(0.97);
+.text { display: inline-block; }
+
+/* icon */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+.icon :is(svg) {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
-/* base background layer */
+/* background layer (same) */
 .bg {
   position: absolute;
   inset: -1px;
@@ -45,62 +55,53 @@
   overflow: hidden;
 }
 
-/* THIS is the only new effect: "rectangle/blob under cursor" */
+/* blob (only active when wrapper has .withBlob) */
 .bg::before {
   content: "";
   position: absolute;
   left: -20px;
   top: -20px;
-  /*rectangle-ishspot*/
   width: 56px;
   height: 40px;
   border-radius: 12px;
+
   transform: translate(var(--pointer-x), var(--pointer-y)) translateZ(0);
-  
-  /*background: var(--spot);*/
-  
-  background: linear-gradient(
-    90deg,
-    #ba25d1,
-    #2563eb
-  );
+
+  background: linear-gradient(90deg, #ba25d1, #2563eb);
   background-size: 200% 100%;
   background-position: calc(var(--blob-mix) * 100%) 50%;
-  
+
   opacity: var(--spot-opacity);
-  
   filter: blur(14px);
-  
-  /*cheapopacitytransition(movementisviatransformvarupdates)*/
-  
   transition: opacity 160ms linear;
-  
   pointer-events: none;
 }
 
-/* show spot on hover/focus */
-.wrapper:hover {
-  --spot-opacity: 1;
+/* enable/disable blob without JS hacks */
+.noBlob .bg::before {
+  display: none;
 }
-.wrapper:focus-within {
+
+/* show spot only when blob enabled */
+.withBlob:hover,
+.withBlob:focus-within {
   --spot-opacity: 1;
 }
 
-/* keep your glow exactly as you have it */
+/* glow layer (your current one) */
 .glow {
   position: absolute;
   inset: -1px;
   z-index: 0 !important;
   border-radius: var(--radius-md);
-  /* background: linear-gradient(90deg,#e651fd 0%,#ba25d1 30.43%,#2563eb 68.23%,#ba25d1 100%) 0 0/600% 600%; */
   background: linear-gradient(
-  90deg,
-  #ff2cdf 0%,
-  #b026ff 25%,
-  #5b6cff 50%,
-  #00c6ff 75%,
-  #ff2cdf 100%
-) 0 0 / 600% 600%;
+    90deg,
+    #ff2cdf 0%,
+    #b026ff 25%,
+    #5b6cff 50%,
+    #00c6ff 75%,
+    #ff2cdf 100%
+  ) 0 0 / 600% 600%;
   background-size: 600% 600%;
   animation: glowShift 8s ease infinite;
   transition: filter 150ms linear;
@@ -113,6 +114,12 @@
   width: 90%;
 }
 
+/* disable glow layer cleanly */
+.noGlow .glow {
+  display: none;
+}
+
+/* keep your hover behavior */
 .wrapper:hover .bg {
   opacity: 1;
   height: calc(100% - 2px);

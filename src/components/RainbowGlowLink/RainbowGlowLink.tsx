@@ -1,19 +1,54 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import styles from "./RainbowGlowLink.module.css";
 
 type RainbowGlowLinkProps = {
   href: string;
   children: ReactNode;
   className?: string;
+
+  /** quick preset */
+  variant?: "glow" | "flat";
+
+  /** layers */
+  glow?: boolean; // default true (unless flat)
+  blob?: boolean; // default true (unless flat)
+
+  /** optional icon (svg/react node) */
+  icon?: ReactNode;
+  iconPosition?: "start" | "end";
+  iconAriaLabel?: string; // if icon is meaningful
 };
 
-export function RainbowGlowLink({ href, children, className = "" }: RainbowGlowLinkProps) {
+export function RainbowGlowLink({
+  href,
+  children,
+  className = "",
+  variant = "glow",
+  glow,
+  blob,
+  icon,
+  iconPosition = "end",
+  iconAriaLabel,
+}: RainbowGlowLinkProps) {
   const wrapRef = useRef<HTMLSpanElement | null>(null);
 
+  const flags = useMemo(() => {
+    const isFlat = variant === "flat";
+    return {
+      glow: glow ?? !isFlat,
+      blob: blob ?? !isFlat,
+      hasIcon: Boolean(icon),
+      iconPosition,
+    };
+  }, [variant, glow, blob, icon, iconPosition]);
+
   useEffect(() => {
+    // If blob disabled, don't attach listeners at all (cheapest)
+    if (!flags.blob) return;
+
     const el = wrapRef.current;
     if (!el) return;
 
@@ -23,31 +58,34 @@ export function RainbowGlowLink({ href, children, className = "" }: RainbowGlowL
     let tx = 0, ty = 0;
     let x = 0, y = 0;
 
-    // Lower = snappier, higher = smoother
     const SMOOTH = 0.22;
 
     const recache = () => {
       rect = el.getBoundingClientRect();
-      // start centered so it looks nice on enter
       tx = rect.width * 0.5;
       ty = rect.height * 0.5;
-      x = tx; y = ty;
+      x = tx;
+      y = ty;
+
       el.style.setProperty("--pointer-x", `${x.toFixed(2)}px`);
       el.style.setProperty("--pointer-y", `${y.toFixed(2)}px`);
+      el.style.setProperty("--blob-mix", "0.5");
     };
 
     const loop = () => {
       raf = 0;
 
-      // smooth
       x += (tx - x) * SMOOTH;
       y += (ty - y) * SMOOTH;
 
-      el.style.setProperty("--pointer-x", `${x.toFixed(2)}px`);
-      el.style.setProperty("--pointer-y", `${y.toFixed(2)}px`);
+      // quantize a bit to reduce style churn
+      const qx = Math.round(x);
+      const qy = Math.round(y);
 
-      // keep animating until close to target
-      if (Math.abs(tx - x) > 0.2 || Math.abs(ty - y) > 0.2) {
+      el.style.setProperty("--pointer-x", `${qx}px`);
+      el.style.setProperty("--pointer-y", `${qy}px`);
+
+      if (Math.abs(tx - x) > 0.6 || Math.abs(ty - y) > 0.6) {
         raf = requestAnimationFrame(loop);
       }
     };
@@ -67,12 +105,13 @@ export function RainbowGlowLink({ href, children, className = "" }: RainbowGlowL
       const nx = e.clientX - rect.left;
       const ny = e.clientY - rect.top;
 
-      const mix = tx / rect.width;
-      el.style.setProperty("--blob-mix", mix.toFixed(3));
-
-      // clamp
+      // clamp first
       tx = nx < 0 ? 0 : nx > rect.width ? rect.width : nx;
       ty = ny < 0 ? 0 : ny > rect.height ? rect.height : ny;
+
+      // mix based on X ratio (purple->blue)
+      const mix = rect.width ? tx / rect.width : 0.5;
+      el.style.setProperty("--blob-mix", mix.toFixed(3));
 
       requestLoop();
     };
@@ -81,15 +120,14 @@ export function RainbowGlowLink({ href, children, className = "" }: RainbowGlowL
       if (!rect) return;
       tx = rect.width * 0.5;
       ty = rect.height * 0.5;
+      el.style.setProperty("--blob-mix", "0.5");
       requestLoop();
     };
 
-    // Events
     el.addEventListener("pointerenter", onEnter, { passive: true });
     el.addEventListener("pointermove", onMove, { passive: true });
     el.addEventListener("pointerleave", onLeave, { passive: true });
 
-    // Resize: recache next enter, but also handle active hover resizes
     const onResize = () => { rect = null; };
     window.addEventListener("resize", onResize, { passive: true });
 
@@ -100,15 +138,58 @@ export function RainbowGlowLink({ href, children, className = "" }: RainbowGlowL
       window.removeEventListener("resize", onResize);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [flags.blob]);
+
+  const wrapperClass = [
+    styles.wrapper,
+    flags.glow ? styles.withGlow : styles.noGlow,
+    flags.blob ? styles.withBlob : styles.noBlob,
+    flags.hasIcon ? styles.withIcon : "",
+    flags.hasIcon && flags.iconPosition === "start" ? styles.iconStart : styles.iconEnd,
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <span ref={wrapRef} className={`${styles.wrapper} ${className}`}>
+    <span ref={wrapRef} className={wrapperClass}>
       <Link href={href} className={styles.link}>
-        {children}
+        {flags.hasIcon && flags.iconPosition === "start" ? (
+          <span className={styles.icon} aria-label={iconAriaLabel}>
+            {icon}
+          </span>
+        ) : null}
+
+        <span className={styles.text}>{children}</span>
+
+        {flags.hasIcon && flags.iconPosition === "end" ? (
+          <span className={styles.icon} aria-label={iconAriaLabel}>
+            {icon}
+          </span>
+        ) : null}
       </Link>
+
       <span className={styles.bg} aria-hidden="true" />
-      <span className={styles.glow} aria-hidden="true" />
+      {flags.glow ? <span className={styles.glow} aria-hidden="true" /> : null}
     </span>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M7 4l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
