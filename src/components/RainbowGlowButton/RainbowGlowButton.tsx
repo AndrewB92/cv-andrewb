@@ -1,19 +1,25 @@
+"use client";
+
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import styles from "./RainbowGlowButton.module.css";
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> & {
   children: ReactNode;
   className?: string;
 };
 
 export function RainbowGlowButton({
   children,
-  className = "",
+  className,
   type = "button",
   ...rest
 }: Props) {
+  const wrapperClass = className
+    ? `${styles.wrapper} ${className}`
+    : styles.wrapper;
+
   return (
-    <span className={`${styles.wrapper} ${className}`}>
+    <span className={wrapperClass}>
       <button type={type} className={styles.button} {...rest}>
         {children}
       </button>
