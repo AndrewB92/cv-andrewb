@@ -5,36 +5,22 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import styles from "./CalPopup.module.css";
 
 type CalPopupProps = {
-  /**
-   * URL param that triggers the modal.
-   * Example: ?meet=hour-meeting
-   */
+  /** URL param that triggers the modal. Example: ?meet=hour-meeting */
   paramKey?: string;
 
-  /**
-   * Map param value -> calLink
-   * Example: { "hour-meeting": "andrew-bielous-iyuwdo/hour-meeting" }
-   */
+  /** Map param value -> calLink */
   linksByKey: Record<string, string>;
 
-  /**
-   * Optional default config passed to Cal inline embed
-   */
+  /** Default inline config */
   defaultConfig?: Record<string, unknown>;
 
-  /**
-   * Optional ui options
-   */
+  /** Default UI config */
   ui?: Record<string, unknown>;
 
-  /**
-   * Cal origin (usually https://app.cal.eu)
-   */
+  /** Cal origin */
   origin?: string;
 
-  /**
-   * Optional label for aria
-   */
+  /** Optional label for aria */
   ariaLabel?: string;
 };
 
@@ -46,72 +32,83 @@ declare global {
 
 const CAL_SCRIPT_SRC = "https://app.cal.eu/embed/embed.js";
 
-type CalCommand = unknown[];
+/**
+ * Type-safe Cal bootstrap.
+ * This mirrors Cal’s embed snippet behavior, but avoids TS self-referential `api.q` issues.
+ * It also avoids re-bootstrapping if already done.
+ */
+function ensureCalBootstrapped() {
+  if (typeof window === "undefined") return;
 
-function loadScriptOnce(src: string): Promise<void> {
-  if (typeof document === "undefined") return Promise.resolve();
+  const w = window as any;
 
-  const existing = document.querySelector<HTMLScriptElement>(
-    `script[src="${src}"]`
-  );
+  // If already bootstrapped (or embed.js already set it up), do nothing.
+  if (w.Cal && w.Cal.loaded) return;
 
-  // If script already exists and loaded, done.
-  if (existing && (existing as any).__loaded) return Promise.resolve();
+  (function bootstrap(C: any, A: string, L: string) {
+    const d: Document = C.document;
 
-  // If script exists but not marked loaded, attach listeners.
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener(
-        "error",
-        () => reject(new Error("Cal script failed to load")),
-        { once: true }
-      );
-    });
-  }
+    const push = (fn: any, args: IArguments | unknown[]) => {
+      fn.q = fn.q || [];
+      fn.q.push(args);
+    };
 
-  // Create script
-  return new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = src;
-    s.async = true;
-    (s as any).__loaded = false;
+    C.Cal =
+      C.Cal ||
+      function calFn() {
+        const cal = C.Cal;
+        const ar = arguments;
 
-    s.addEventListener(
-      "load",
-      () => {
-        (s as any).__loaded = true;
-        resolve();
-      },
-      { once: true }
-    );
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
 
-    s.addEventListener(
-      "error",
-      () => reject(new Error("Cal script failed to load")),
-      { once: true }
-    );
+          const s = d.createElement("script");
+          s.src = A;
+          s.async = true;
+          d.head.appendChild(s);
 
-    document.head.appendChild(s);
-  });
+          cal.loaded = true;
+        }
+
+        if (ar[0] === L) {
+          // namespace init
+          const api: any = function apiFn() {
+            push(api, arguments);
+          };
+
+          const namespace = ar[1];
+
+          // TS-safe: avoid `api.q = api.q || []` on itself
+          if (!api.q) api.q = [];
+
+          if (typeof namespace === "string") {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            push(cal.ns[namespace], ar);
+            push(cal, ["initNamespace", namespace]);
+          } else {
+            push(cal, ar);
+          }
+          return;
+        }
+
+        push(cal, ar);
+      };
+  })(w, CAL_SCRIPT_SRC, "init");
 }
 
-/**
- * Provide a typed queueing stub for window.Cal so calls are safe
- * before embed.js finishes loading. embed.js will replace Cal and
- * drain Cal.q in most embed implementations.
- */
-function ensureCalQueue() {
-  if (typeof window === "undefined") return;
-  if (window.Cal) return;
+/** Wait until Cal namespace exists (embed.js might take a tick to attach ns/api). */
+async function waitForNamespace(key: string, timeoutMs = 8000): Promise<void> {
+  const start = performance.now();
 
-  const q: CalCommand[] = [];
-  const Cal = (...args: unknown[]) => {
-    q.push(args);
-  };
+  while (performance.now() - start < timeoutMs) {
+    const Cal: any = window.Cal;
+    if (Cal?.ns && Cal.ns[key]) return;
 
-  (Cal as any).q = q;
-  window.Cal = Cal as any;
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+  }
+
+  throw new Error(`Cal namespace "${key}" not ready after ${timeoutMs}ms`);
 }
 
 function lockBodyScroll(lock: boolean) {
@@ -127,11 +124,6 @@ function lockBodyScroll(lock: boolean) {
     html.style.overflow = "";
     html.style.paddingRight = "";
   }
-}
-
-function safeSetInnerHTML(el: HTMLElement | null, html: string) {
-  if (!el) return;
-  el.innerHTML = html;
 }
 
 export function CalPopup({
@@ -152,7 +144,7 @@ export function CalPopup({
 
   const modalRef = useRef<HTMLDivElement | null>(null);
 
-  // Stable mount id per component instance
+  // stable mount id per component instance
   const mountId = useMemo(
     () => `cal-inline-${Math.random().toString(16).slice(2)}`,
     []
@@ -164,7 +156,6 @@ export function CalPopup({
     setOpen(false);
     setActiveKey(null);
 
-    // Remove param from URL (no hard reload)
     const sp = new URLSearchParams(searchParams?.toString());
     sp.delete(paramKey);
     const next = sp.toString();
@@ -178,7 +169,6 @@ export function CalPopup({
       setActiveKey(key);
       setOpen(true);
 
-      // Keep URL in sync (shareable deep links)
       const sp = new URLSearchParams(searchParams?.toString());
       sp.set(paramKey, key);
       router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
@@ -186,7 +176,7 @@ export function CalPopup({
     [linksByKey, paramKey, pathname, router, searchParams]
   );
 
-  // 1) Open from URL param
+  // Open from URL param
   useEffect(() => {
     const key = searchParams?.get(paramKey);
 
@@ -196,14 +186,13 @@ export function CalPopup({
       return;
     }
 
-    // If param removed externally, close.
     if (!key) {
       setOpen(false);
       setActiveKey(null);
     }
   }, [linksByKey, paramKey, searchParams]);
 
-  // 2) Open from special links/buttons:
+  // Open from special links/buttons:
   // <a className="js-cal-open" data-cal-key="hour-meeting" href="/contact?meet=hour-meeting">
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -224,7 +213,7 @@ export function CalPopup({
     return () => document.removeEventListener("click", onClick);
   }, [openWithKey]);
 
-  // 3) ESC to close + body scroll lock
+  // ESC + scroll lock
   useEffect(() => {
     if (!open) return;
 
@@ -236,7 +225,6 @@ export function CalPopup({
 
     document.addEventListener("keydown", onKeyDown);
 
-    // focus modal for keyboard users
     const t = window.setTimeout(() => {
       modalRef.current?.focus();
     }, 0);
@@ -248,7 +236,7 @@ export function CalPopup({
     };
   }, [open, close]);
 
-  // 4) Mount Cal inline embed when open + have a calLink
+  // Mount Cal inline when open
   useEffect(() => {
     if (!open || !activeKey || !activeCalLink) return;
     if (typeof window === "undefined") return;
@@ -258,27 +246,21 @@ export function CalPopup({
     const run = async () => {
       setIsLoading(true);
 
-      // Make calls safe before embed.js loads
-      ensureCalQueue();
+      // Official bootstrap (loads embed.js once and sets up Cal.ns/queue)
+      ensureCalBootstrapped();
 
-      // Load embed script once
-      await loadScriptOnce(CAL_SCRIPT_SRC);
+      // init namespace
+      window.Cal("init", activeKey, { origin });
+
+      // Wait until namespace api exists
+      await waitForNamespace(activeKey);
       if (cancelled) return;
 
-      // Ensure mount exists and empty it (important when switching keys)
       const mountEl = document.getElementById(mountId);
       if (!mountEl) return;
 
-      safeSetInnerHTML(mountEl, "");
-
-      // If embed.js hasn't populated window.Cal namespaces yet, wait a microtask.
-      // This helps in edge cases where the script "load" fires but the library
-      // hasn't finished setting up ns.
-      await Promise.resolve();
-      if (cancelled) return;
-
-      // init namespace for this key
-      window.Cal("init", activeKey, { origin });
+      // reset mount (important when switching keys)
+      mountEl.innerHTML = "";
 
       // inline embed
       window.Cal.ns[activeKey]("inline", {
@@ -295,13 +277,12 @@ export function CalPopup({
 
     run().catch(() => {
       if (!cancelled) setIsLoading(false);
-      // Optional: show an error state
     });
 
     return () => {
       cancelled = true;
       const mountEl = document.getElementById(mountId);
-      safeSetInnerHTML(mountEl, "");
+      if (mountEl) mountEl.innerHTML = "";
     };
   }, [open, activeKey, activeCalLink, defaultConfig, ui, origin, mountId]);
 
@@ -314,7 +295,6 @@ export function CalPopup({
       aria-modal="true"
       aria-label={ariaLabel}
       onMouseDown={(e) => {
-        // close only if clicking the backdrop (not inside panel)
         if (e.target === e.currentTarget) close();
       }}
     >
@@ -338,6 +318,7 @@ export function CalPopup({
               Loading…
             </div>
           ) : null}
+
           <div className={styles.calWrap} id={mountId} />
         </div>
       </div>
