@@ -230,10 +230,10 @@
   color: var(--color-text-primary);
 }
 
-.primaryButton:hover,
+/* .primaryButton:hover,
 .secondaryButton:hover {
   transform: translateY(-2px);
-}
+} */
 
 .grid {
   margin-top: var(--space-2xl);
