@@ -43,6 +43,24 @@
   display: block;
 }
 
+
+.icon svg {
+  transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+}
+
+.icon svg path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.78);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 180ms ease;
+}
+
 /* background layer (same) */
 .bg {
   position: absolute;
