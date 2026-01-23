@@ -43,19 +43,18 @@
   filter: blur(12px);
 }
 
-.wrapper .link,
 .wrapper .glow {
   opacity: .8;
+  transition: opacity 250ms linear;
 }
 
-.wrapper:hover .link,
 .wrapper:hover .glow {
   opacity: 1;
 }
 
 /* hover glow blur */
 .wrapper:hover .glow {
-  filter: blur(8px);
+  filter: blur(10px);
 }
 
 /* animation */
