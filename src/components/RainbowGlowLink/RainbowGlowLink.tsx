@@ -4,35 +4,100 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import styles from "./RainbowGlowLink.module.css";
 
+/* ---------- Icons ---------- */
+
+type IconName = "arrow" | "download" | "mail" | "phone";
+type ArrowDirection = "up" | "right" | "down" | "left";
+
 function ArrowIcon() {
+  // base arrow points "down"
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
       <path d="M7 10l5 5 5-5" />
     </svg>
   );
 }
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <path d="M12 3v10" />
+      <path d="M8 11l4 4 4-4" />
+      <path d="M5 21h14" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <path d="M4 6h16v12H4z" />
+      <path d="M4 7l8 6 8-6" />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <path d="M6.5 3.5l3.2 3.2-1.7 2.1c1.4 2.6 3.5 4.7 6.1 6.1l2.1-1.7 3.2 3.2-1.6 2.2c-.5.7-1.4 1.1-2.3.9-7.3-1.5-13-7.2-14.5-14.5-.2-.9.2-1.8.9-2.3z" />
+    </svg>
+  );
+}
+
+function IconGlyph({ name }: { name: IconName }) {
+  switch (name) {
+    case "download":
+      return <DownloadIcon />;
+    case "mail":
+      return <MailIcon />;
+    case "phone":
+      return <PhoneIcon />;
+    case "arrow":
+    default:
+      return <ArrowIcon />;
+  }
+}
+
+function directionToDeg(dir: ArrowDirection): number {
+  // our base arrow points DOWN (0deg)
+  switch (dir) {
+    case "down":
+      return 0;
+    case "left":
+      return 90;
+    case "up":
+      return 180;
+    case "right":
+      return -90;
+    default:
+      return 0;
+  }
+}
+
+/* ---------- Component ---------- */
 
 type RainbowGlowLinkProps = {
   href: string;
   children: ReactNode;
   className?: string;
 
-  /** quick preset */
   variant?: "glow" | "flat";
 
-  /** layers */
-  glow?: boolean; // default true (unless flat)
-  blob?: boolean; // default true (unless flat)
+  glow?: boolean;
+  blob?: boolean;
 
   /**
-   * optional icon:
-   * - omit => defaults to ArrowIcon
-   * - pass ReactNode => custom icon
-   * - pass false => disable icon
+   * icon options:
+   * - icon (ReactNode) overrides everything
+   * - icon === false disables icon
+   * - iconName chooses built-in icon set
    */
   icon?: ReactNode | false;
+  iconName?: IconName; // default "arrow"
+  iconDirection?: ArrowDirection; // only for arrow
   iconPosition?: "start" | "end";
-  iconAriaLabel?: string; // if icon is meaningful
+  iconAriaLabel?: string;
 };
 
 export function RainbowGlowLink({
@@ -42,7 +107,11 @@ export function RainbowGlowLink({
   variant = "glow",
   glow,
   blob,
+
   icon,
+  iconName = "arrow",
+  iconDirection = "right",
+
   iconPosition = "end",
   iconAriaLabel,
 }: RainbowGlowLinkProps) {
@@ -54,7 +123,10 @@ export function RainbowGlowLink({
     const enableBlob = blob ?? !isFlat;
 
     const resolvedIcon =
-      icon === false ? null : (icon ?? <ArrowIcon />);
+      icon === false ? null : (icon ?? <IconGlyph name={iconName} />);
+
+    const iconRotate =
+      iconName === "arrow" ? directionToDeg(iconDirection) : 0;
 
     return {
       glow: enableGlow,
@@ -63,11 +135,21 @@ export function RainbowGlowLink({
       hasIcon: Boolean(resolvedIcon),
       iconPosition,
       iconAriaLabel,
+      iconRotate,
+      iconName,
     };
-  }, [variant, glow, blob, icon, iconPosition, iconAriaLabel]);
+  }, [
+    variant,
+    glow,
+    blob,
+    icon,
+    iconName,
+    iconDirection,
+    iconPosition,
+    iconAriaLabel,
+  ]);
 
   useEffect(() => {
-    // If blob disabled, don't attach listeners at all (cheapest)
     if (!flags.blob) return;
 
     const el = wrapRef.current;
@@ -76,10 +158,8 @@ export function RainbowGlowLink({
     let rect: DOMRect | null = null;
     let raf = 0;
 
-    let tx = 0,
-      ty = 0;
-    let x = 0,
-      y = 0;
+    let tx = 0, ty = 0;
+    let x = 0, y = 0;
 
     const SMOOTH = 0.22;
 
@@ -101,7 +181,6 @@ export function RainbowGlowLink({
       x += (tx - x) * SMOOTH;
       y += (ty - y) * SMOOTH;
 
-      // quantize a bit to reduce style churn
       const qx = Math.round(x);
       const qy = Math.round(y);
 
@@ -128,11 +207,9 @@ export function RainbowGlowLink({
       const nx = e.clientX - rect.left;
       const ny = e.clientY - rect.top;
 
-      // clamp first
       tx = nx < 0 ? 0 : nx > rect.width ? rect.width : nx;
       ty = ny < 0 ? 0 : ny > rect.height ? rect.height : ny;
 
-      // mix based on X ratio (purple->blue)
       const mix = rect.width ? tx / rect.width : 0.5;
       el.style.setProperty("--blob-mix", mix.toFixed(3));
 
@@ -151,9 +228,7 @@ export function RainbowGlowLink({
     el.addEventListener("pointermove", onMove, { passive: true });
     el.addEventListener("pointerleave", onLeave, { passive: true });
 
-    const onResize = () => {
-      rect = null;
-    };
+    const onResize = () => { rect = null; };
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
@@ -182,7 +257,15 @@ export function RainbowGlowLink({
     <span ref={wrapRef} className={wrapperClass}>
       <Link href={href} className={styles.link}>
         {flags.hasIcon && flags.iconPosition === "start" ? (
-          <span className={styles.icon} aria-label={flags.iconAriaLabel}>
+          <span
+            className={styles.icon}
+            aria-label={flags.iconAriaLabel}
+            style={
+              flags.iconName === "arrow"
+                ? ({ ["--icon-rotate" as any]: `${flags.iconRotate}deg` } as React.CSSProperties)
+                : undefined
+            }
+          >
             {flags.icon}
           </span>
         ) : null}
@@ -190,7 +273,15 @@ export function RainbowGlowLink({
         <span className={styles.text}>{children}</span>
 
         {flags.hasIcon && flags.iconPosition === "end" ? (
-          <span className={styles.icon} aria-label={flags.iconAriaLabel}>
+          <span
+            className={styles.icon}
+            aria-label={flags.iconAriaLabel}
+            style={
+              flags.iconName === "arrow"
+                ? ({ ["--icon-rotate" as any]: `${flags.iconRotate}deg` } as React.CSSProperties)
+                : undefined
+            }
+          >
             {flags.icon}
           </span>
         ) : null}
