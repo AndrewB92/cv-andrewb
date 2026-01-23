@@ -48,7 +48,7 @@ const PROJECT_COLLECTIONS = ["_portfolio", "portfolio", "projects"];
 const PROJECT_DOC_IDS = ["projects", "_projects"];
 
 const fallbackProfile: Profile = {
-  name: "Andrew B.",
+  name: "Andrew Bielous",
   title: "Full-Stack Engineer",
   summary:
     "I enjoy building resilient, accessible web experiences that stay fast even when product requirements grow. My current focus is on React, TypeScript, and serverless backends.",
