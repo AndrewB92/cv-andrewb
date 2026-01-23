@@ -48,10 +48,12 @@
   background: linear-gradient(90deg,#e651fd 0%,#ba25d1 30.43%,#2563eb 68.23%,#ba25d1 100%) 0 0/600% 600%;
   background-size: 600% 600%;
   animation: glowShift 8s ease infinite;
-  /* transform: translateZ(0); */
-  transition: filter 250ms linear;
   
+  /*transform: translateZ(0);*/
+  
+  transition: filter 150ms linear;
   filter: blur(12px);
+  
   transform: translateZ(0) translateX(-50%) translateY(-50%);
   top: 50%;
   left: 50%;
@@ -68,9 +70,6 @@
   filter: blur(0px);
   height: 100%;
   width: 100%;
-  transform: translateZ(0) translateX(0%) translateY(0%);
-  top: 0%;
-  left: 0%;
 }
 
 /* animation */
