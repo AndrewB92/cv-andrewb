@@ -48,10 +48,15 @@
   background: linear-gradient(90deg,#e651fd 0%,#ba25d1 30.43%,#2563eb 68.23%,#ba25d1 100%) 0 0/600% 600%;
   background-size: 600% 600%;
   animation: glowShift 8s ease infinite;
-  transform: translateZ(0);
+  /* transform: translateZ(0); */
   transition: filter 250ms linear;
   
-  filter: blur(10px);
+  filter: blur(12px);
+  transform: translateZ(0) translateX(-50%) translateY(-50%);
+  top: 50%;
+  left: 50%;
+  height: 70%;
+  width: 90%;
 }
 
 .wrapper:hover .bg {
@@ -61,6 +66,11 @@
 /* hover glow blur */
 .wrapper:hover .glow {
   filter: blur(0px);
+  height: 100%;
+  width: 100%;
+  transform: translateZ(0) translateX(0%) translateY(0%);
+  top: 0%;
+  left: 0%;
 }
 
 /* animation */
