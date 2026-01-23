@@ -119,6 +119,10 @@
   display: none;
 }
 
+.noGlow .bg {
+  border: 1px solid var(--color-border);
+}
+
 /* keep your hover behavior */
 .wrapper:hover .bg {
   opacity: 1;
