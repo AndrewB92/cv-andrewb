@@ -61,12 +61,12 @@ export default async function HomePage() {
             <Link href="/contact" className={styles.secondaryButton}>
               Get in touch
             </Link> */}
-            <RainbowGlowLink href="/contact" className={styles.primaryButton}>
+            <RainbowGlowLink href="/contact" className={styles.rainbowEnable}>
               Let&apos;s talk
             </RainbowGlowLink>
-            <Link href="/contact" className={styles.secondaryButton}>
+            <RainbowGlowLink href="/contact" className={styles.rainbowDisable}>
               Check my CV
-            </Link>
+            </RainbowGlowLink>
           </div>
 
           <HeroMetaPopover className={styles.heroMetaPopover}>

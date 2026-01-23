@@ -238,6 +238,17 @@
   opacity: 1;
 }
 
+.rainbowEnable{
+
+}
+
+.rainbowDisable span{
+  border: 1px solid var(--color-border);
+}
+.rainbowDisable span:last-child{
+  display: none;
+}
+
 .grid {
   margin-top: var(--space-2xl);
   display: grid;
