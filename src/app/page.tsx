@@ -64,7 +64,7 @@ export default async function HomePage() {
               Get in touch
             </Link> */}
 
-            <RainbowGlowLink href="/contact?meet=hour-meeting" glow blob iconPosition="end" iconName="mail" iconDirection="up">
+            <RainbowGlowLink href="/?meet=hour-meeting" glow blob iconPosition="end" iconName="mail" iconDirection="up">
               Let&apos;s talk
             </RainbowGlowLink>
 
