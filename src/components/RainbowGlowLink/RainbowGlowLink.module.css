@@ -41,6 +41,7 @@
   background: var(--color-surface-alt);
   transform: translateZ(0);
   transition: opacity 250ms linear;
+  overflow: hidden;
 }
 
 /* THIS is the only new effect: "rectangle/blob under cursor" */
