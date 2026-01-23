@@ -62,7 +62,11 @@
 }
 
 .wrapper:hover .bg {
-  opacity: 0;
+  opacity: 1;
+  height: calc(100% - 2px);
+  width: calc(100% - 2px);
+  top: 1px;
+  left: 1px;
 }
 
 /* hover glow blur */
