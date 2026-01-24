@@ -37,6 +37,11 @@
   opacity: 1;
 } 
 
+.wrapper[data-paused="1"] .glow {
+  animation-play-state: paused !important;
+}
+
+
 /* icon */
 .icon {
   /* display: inline-flex;
