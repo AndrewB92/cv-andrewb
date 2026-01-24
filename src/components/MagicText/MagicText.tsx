@@ -1,21 +1,30 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./MagicText.module.css";
 import type { ReactNode } from "react";
 
 type MagicTextProps = {
-  // children: string;          // the gradient text itself (e.g. "magic")
   children: ReactNode;
-  before?: string;           // optional plain text before
-  stars?: number;            // default 3
-  intervalMs?: number;       // default 1000
-  staggerMs?: number;        // default interval/3
-  className?: string;        // optional wrapper class
+  before?: string;
+  stars?: number;
+  intervalMs?: number;
+  staggerMs?: number;
+  className?: string;
+
+  /** Optional: how much of the element should be visible before we animate */
+  threshold?: number;
+  /** Optional: start animating slightly before it enters view */
+  rootMargin?: string;
 };
 
 const randInt = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
+
+function prefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+}
 
 export function MagicText({
   children,
@@ -24,30 +33,64 @@ export function MagicText({
   intervalMs = 1000,
   staggerMs,
   className = "",
+  threshold = 0.15,
+  rootMargin = "120px",
 }: MagicTextProps) {
+  const wrapRef = useRef<HTMLSpanElement | null>(null);
   const starElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const dueAtRef = useRef<number[]>([]);
   const rafRef = useRef<number | null>(null);
 
+  const [inView, setInView] = useState(true); // default true to avoid “dead” on first paint
+  const reduceMotionRef = useRef(false);
+
   const svgStars = useMemo(() => Array.from({ length: stars }, (_, i) => i), [stars]);
   const perStarStagger = staggerMs ?? Math.max(0, Math.floor(intervalMs / 3));
 
+  // Observe visibility
   useEffect(() => {
+    reduceMotionRef.current = prefersReducedMotion();
+
+    const el = wrapRef.current;
+    if (!el) return;
+
+    // If reduced motion: don’t animate at all.
+    if (reduceMotionRef.current) {
+      setInView(false);
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setInView(!!entry?.isIntersecting);
+      },
+      { threshold, rootMargin }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, [rootMargin, threshold]);
+
+  // Star loop: only run when inView
+  useEffect(() => {
+    if (!inView) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      return;
+    }
+
     const starsEls = starElsRef.current.filter(Boolean) as HTMLSpanElement[];
     if (!starsEls.length) return;
-
-    const now = performance.now();
-    dueAtRef.current = starsEls.map((_, i) => now + i * perStarStagger);
 
     const animateStar = (star: HTMLSpanElement) => {
       star.style.setProperty("--star-left", `${randInt(-10, 100)}%`);
       star.style.setProperty("--star-top", `${randInt(-40, 80)}%`);
-
-      // restart CSS animation without forcing reflow:
-      // toggle a data-attr so the animation-name changes
-      const next = star.dataset.a === "1" ? "0" : "1";
-      star.dataset.a = next;
+      star.dataset.a = star.dataset.a === "1" ? "0" : "1";
     };
+
+    const now = performance.now();
+    dueAtRef.current = starsEls.map((_, i) => now + i * perStarStagger);
 
     const tick = (t: number) => {
       const dueAt = dueAtRef.current;
@@ -55,24 +98,27 @@ export function MagicText({
       for (let i = 0; i < starsEls.length; i++) {
         if (t >= dueAt[i]) {
           animateStar(starsEls[i]);
-          dueAt[i] = t + intervalMs; // schedule next run
+          dueAt[i] = t + intervalMs;
         }
       }
 
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    // start loop
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [intervalMs, perStarStagger, stars]);
+  }, [inView, intervalMs, perStarStagger, stars]);
 
   return (
-    <span className={`${styles.magicWrap} ${className}`.trim()}>
+    <span
+      ref={wrapRef}
+      className={`${styles.magicWrap} ${className}`.trim()}
+      data-paused={inView ? "0" : "1"}
+    >
       {before ? <span className={styles.before}>{before} </span> : null}
 
       <span className={styles.magic}>

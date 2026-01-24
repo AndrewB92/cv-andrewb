@@ -69,6 +69,23 @@
   
   white-space: nowrap;
 
-  animation: background-pan 10s linear infinite;
-  -webkit-animation: background-pan 10s linear infinite;
+  /* animation: background-pan 10s linear infinite;
+  -webkit-animation: background-pan 10s linear infinite; */
+}
+
+/* Pause everything when not visible */
+.magicWrap[data-paused="1"] .magicText,
+.magicWrap[data-paused="1"] .magicStar,
+.magicWrap[data-paused="1"] .magicStar svg {
+  animation-play-state: paused !important;
+}
+
+/* Optional: slow down the gradient to reduce churn */
+.magicText {
+  animation: background-pan 16s linear infinite;
+}
+
+/* Optional: reduce painting cost a bit */
+.magicStar {
+  contain: layout paint;
 }

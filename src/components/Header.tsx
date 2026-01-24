@@ -131,7 +131,7 @@ export function Header() {
           <div className={styles.outer} style={{ height: "var(--header-height)" }}>
             <span className={styles.inner}>
               <span className={styles.particles} aria-hidden="true" />
-              <span className={styles.text}>Let&apos;s talk
+              <span className={styles.text}>Schedule a meeting
                 <span className={styles.btnIcon}>
                   <svg viewBox="0 0 24 24" width="18" height="18">
                     <path d="M7 10l5 5 5-5" />

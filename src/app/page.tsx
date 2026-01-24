@@ -58,7 +58,7 @@ export default async function HomePage() {
           <p>{profile.summary}</p>
           <div className={styles.heroActions}>
             <RainbowGlowLink href="/?meet=hour-meeting" glow blob iconPosition="end" iconName="mail" iconDirection="up">
-              Let&apos;s talk
+              Write a message
             </RainbowGlowLink>
             <RainbowGlowLink href="#" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="download" iconDirection="up">
               Check my CV
