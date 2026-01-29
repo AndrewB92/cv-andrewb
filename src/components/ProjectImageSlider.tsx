@@ -79,16 +79,27 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
 
         {slides.length > 1 && (
           <div className={styles.dots} role="tablist" aria-label="Screenshots">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`${styles.dot} ${i === index ? styles.dotActive : ""}`}
-                onClick={() => setIndex(i)}
-                aria-label={`Go to screenshot ${i + 1}`}
-                aria-pressed={i === index}
-              />
-            ))}
+            {slides.map((slide, i) => {
+              const label =
+                slide.name === "featured"
+                  ? "Featured"
+                  : slide.name === "secondary"
+                  ? "Secondary"
+                  : slide.name;
+
+              return (
+                <button
+                  key={slide.name}
+                  type="button"
+                  className={`${styles.dot} ${i === index ? styles.dotActive : ""}`}
+                  onClick={() => setIndex(i)}
+                  aria-label={`Show ${label} image`}
+                  aria-pressed={i === index}
+                >
+                  <span className={styles.dotLabel}>{label}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

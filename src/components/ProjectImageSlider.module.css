@@ -67,10 +67,8 @@
 }
 
 .dot {
-  max-width: 8px;
-  min-width: unset !important;
-  width: 8px !important;
-  height: 8px;
+  width: fit-content;
+  height: auto;
   border-radius: 999px;
   border: 0;
   background: rgba(255,255,255,.35);
@@ -78,3 +76,28 @@
 }
 
 .dotActive { background: rgba(255,255,255,.85); }
+
+.dotLabel {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+
+  background: rgba(0,0,0,.6);
+  color: white;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.dot:hover .dotLabel,
+.dotActive .dotLabel {
+  opacity: 1;
+}
