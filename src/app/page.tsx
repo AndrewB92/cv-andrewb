@@ -119,7 +119,7 @@ export default async function HomePage() {
           {featuredProjects.map((project) => (
             <article key={project.name} className={styles.projectCard}>
               <img
-                src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(project.link)}?w=1280`}
+                src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(project.link)}%2F?w=1280`}
                 alt={`${project.name} preview`}
                 loading="lazy"
               />
