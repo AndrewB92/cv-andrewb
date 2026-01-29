@@ -116,16 +116,28 @@ export default async function HomePage() {
         description="Several samplings of recent launches. If you want to see them all - browse the full archive on the projects page."
       >
         <div className={styles.projectsPreview}>
-          {featuredProjects.map((project) => {const featuredImg =
-              project.img?.find((i) => i.name === "featured")?.url ||
-              project.img?.[0]?.url; // optional fallback
+          {featuredProjects.map((project) => {
+            const featuredImg =
+              project.img?.find((i) => i.name === "featured")?.url;
+            
+            const secondaryImg = project.img?.find(
+              (i) => i.name === "secondary"
+            )?.url;
 
             return (
               <article key={project.name} className={styles.projectCard}>
                 {featuredImg && (
                   <img
                     src={featuredImg}
-                    alt={`${project.name} preview`}
+                    alt={`${project.name} featured preview`}
+                    loading="lazy"
+                  />
+                )}
+
+                {secondaryImg && (
+                  <img
+                    src={secondaryImg}
+                    alt={`${project.name} secondary preview`}
                     loading="lazy"
                   />
                 )}
