@@ -2,13 +2,11 @@
 
 .frame {
   position: relative;
-  aspect-ratio: 16 / 9;
-  border-radius: 14px;
+  /* aspect-ratio: 16 / 9; */
+  /* border-radius: 14px; */
   overflow: hidden;
   background: #ffffff08;
-
-  /* prevents “drag highlight” feel in the slider area */
-  user-select: none;
+  /* user-select: none; */
 }
 
 .track {
@@ -33,11 +31,10 @@
   object-fit: cover;
   display: block;
 
-  /* disable native image dragging/selection across browsers */
-  -webkit-user-drag: none;
+  /* -webkit-user-drag: none;
   user-drag: none;
   user-select: none;
-  pointer-events: none; /* image won’t capture drag; clicks go “through” */
+  pointer-events: none; */
 }
 
 .nav {
@@ -70,7 +67,9 @@
 }
 
 .dot {
-  width: 8px;
+  max-width: 8px;
+  min-width: unset !important;
+  width: 8px !important;
   height: 8px;
   border-radius: 999px;
   border: 0;
