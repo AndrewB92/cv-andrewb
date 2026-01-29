@@ -78,21 +78,13 @@
 .dotActive { background: rgba(255,255,255,.85); }
 
 .dotLabel {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
+  position: relative;
   white-space: nowrap;
-
   font-size: 11px;
   line-height: 1;
-  padding: 4px 6px;
-  border-radius: 6px;
-
   background: rgba(0,0,0,.6);
   color: white;
-
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
   transition: opacity 120ms ease;
 }
