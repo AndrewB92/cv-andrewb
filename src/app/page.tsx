@@ -12,6 +12,7 @@ import TypedRotator from "@/components/TypedRotator";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
+import { ProjectImageSlider } from "@/components/ProjectImageSlider";
 
 
 const welcomeCode = `type UseCase =
@@ -126,7 +127,14 @@ export default async function HomePage() {
 
             return (
               <article key={project.name} className={styles.projectCard}>
-                {featuredImg && (
+                {!!project.img?.length && (
+                  <ProjectImageSlider
+                    images={project.img}
+                    altBase={project.name}
+                    showArrows={false}
+                  />
+                )}
+                {/* {featuredImg && (
                   <img
                     src={featuredImg}
                     alt={`${project.name} featured preview`}
@@ -140,7 +148,7 @@ export default async function HomePage() {
                     alt={`${project.name} secondary preview`}
                     loading="lazy"
                   />
-                )}
+                )} */}
 
               {/* <img
                 src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(project.link)}%2F?w=1280`}
