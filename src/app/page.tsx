@@ -116,37 +116,50 @@ export default async function HomePage() {
         description="Several samplings of recent launches. If you want to see them all - browse the full archive on the projects page."
       >
         <div className={styles.projectsPreview}>
-          {featuredProjects.map((project) => (
-            <article key={project.name} className={styles.projectCard}>
-              <img
+          {featuredProjects.map((project) => {const featuredImg =
+              project.img?.find((i) => i.name === "featured")?.url ||
+              project.img?.[0]?.url; // optional fallback
+
+            return (
+              <article key={project.name} className={styles.projectCard}>
+                {featuredImg && (
+                  <img
+                    src={featuredImg}
+                    alt={`${project.name} preview`}
+                    loading="lazy"
+                  />
+                )}
+
+              {/* <img
                 src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(project.link)}%2F?w=1280`}
                 alt={`${project.name} preview`}
                 loading="lazy"
-              />
-              <div>
-                <h3>{project.name}</h3>
-                <p>{project.description}</p>
-              </div>
-              <div className={styles.projectStack}>
-                {project.stack.map((item) => (
-                  <span
-                    key={`${project.name}-${item}`}
-                    className={styles.stackTag}
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-              <a
-                href={project.link}
-                className={styles.sectionLink}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Visit project →
-              </a>
-            </article>
-          ))}
+              /> */}
+
+                <div>
+                  <h3>{project.name}</h3>
+                  <p>{project.description}</p>
+                </div>
+
+                <div className={styles.projectStack}>
+                  {project.stack.map((item) => (
+                    <span key={`${project.name}-${item}`} className={styles.stackTag}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <a
+                  href={project.link}
+                  className={styles.sectionLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit project →
+                </a>
+              </article>
+            );
+          })}
         </div>
         <Link href="/projects" className={styles.sectionLink}>
           View all projects →

@@ -14,11 +14,17 @@ export type Experience = {
   achievements: string[];
 };
 
+export type ProjectImage = {
+  name: string; // e.g. "featured", "secondary"
+  url: string;
+};
+
 export type Project = {
   name: string;
   description: string;
   stack: string[];
   link: string;
+  img?: ProjectImage[];
 };
 
 export type SocialLink = {
@@ -125,6 +131,21 @@ const fallbackProjects: Project[] = [
   },
 ];
 
+const sanitizeProjectImages = (value: unknown): ProjectImage[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter(isRecord)
+    .map((item) => {
+      const name = typeof item.name === "string" ? item.name.trim() : "";
+      const url = typeof item.url === "string" ? item.url.trim() : "";
+
+      if (!name || !url) return undefined;
+      return { name, url };
+    })
+    .filter((img): img is ProjectImage => Boolean(img));
+};
+
 const sanitizeStringArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
 
@@ -209,11 +230,14 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
     typeof payload.description === "string" ? payload.description : "";
   const stack = sanitizeStringArray(payload.stack);
 
+  const img = sanitizeProjectImages(payload.img);
+
   return {
     name,
     description,
     stack,
     link,
+    ...(img.length ? { img } : {}),
   };
 };
 
