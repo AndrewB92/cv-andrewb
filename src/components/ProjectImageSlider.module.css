@@ -71,15 +71,11 @@
   height: auto;
   border-radius: 999px;
   border: 1px solid var(--color-border);
-  border: 0;
-  background: #ffffff0a;
+  background: #192133;
   cursor: pointer;
-  opacity: .95;
+  opacity: .8;
+  
   transition: all 350ms linear;
-  -webkit-transition: all 350ms linear;
-  -moz-transition: all 350ms linear;
-  -ms-transition: all 350ms linear;
-  -o-transition: all 350ms linear;
 }
 
 .dotActive {
@@ -90,9 +86,9 @@
 .dotLabel {
   position: relative;
   white-space: nowrap;
-  font-size: 11px;
-  line-height: 1;
-  background: rgba(0,0,0,.6);
+  font-size: 12px;
+  line-height: 100%;
+  background: transparent;
   color: white;
   opacity: 1;
   pointer-events: none;
