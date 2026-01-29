@@ -70,12 +70,22 @@
   width: fit-content;
   height: auto;
   border-radius: 999px;
+  border: 1px solid var(--color-border);
   border: 0;
-  background: rgba(255,255,255,.35);
+  background: #ffffff0a;
   cursor: pointer;
+  opacity: .95;
+  transition: all 350ms linear;
+  -webkit-transition: all 350ms linear;
+  -moz-transition: all 350ms linear;
+  -ms-transition: all 350ms linear;
+  -o-transition: all 350ms linear;
 }
 
-.dotActive { background: rgba(255,255,255,.85); }
+.dotActive {
+  opacity: 1;
+  border: 1px solid #ba25d1;
+}
 
 .dotLabel {
   position: relative;
