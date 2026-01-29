@@ -123,6 +123,13 @@ export default async function HomePage() {
                 alt={`${project.name} preview`}
                 loading="lazy"
               />
+              <img
+                src={`https://api.microlink.io/screenshot?url=${encodeURIComponent(
+                  project.link
+                )}&viewport.width=1280&viewport.height=720&colorScheme=dark`}
+                alt={`${project.name} preview`}
+                loading="lazy"
+              />
               <div>
                 <h3>{project.name}</h3>
                 <p>{project.description}</p>
