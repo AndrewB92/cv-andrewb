@@ -74,13 +74,14 @@
   background: #192133;
   cursor: pointer;
   opacity: .8;
-  
+  padding: 4px 16px;
+
   transition: all 350ms linear;
 }
 
 .dotActive {
   opacity: 1;
-  border: 1px solid #ba25d1;
+  border: 1px solid #ba25d1bd;
 }
 
 .dotLabel {
