@@ -156,7 +156,7 @@ export default async function HomePage() {
                 loading="lazy"
               /> */}
 
-                <div>
+                <div className={styles.projectTitle}>
                   <h3>{project.name}</h3>
                   <p>{project.description}</p>
                 </div>
