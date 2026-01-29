@@ -112,12 +112,17 @@ export default async function HomePage() {
         id="highlights"
         className="glow-border"
         eyebrow="Highlights"
-        title="Selected collaborations"
-        description="A sampling of recent launches. Browse the full archive on the projects page."
+        title="My last works"
+        description="Several samplings of recent launches. If you want to see them all - browse the full archive on the projects page."
       >
         <div className={styles.projectsPreview}>
           {featuredProjects.map((project) => (
             <article key={project.name} className={styles.projectCard}>
+              <img
+                src={`https://s.wordpress.com/mshots/v1/${encodeURIComponent(project.link)}?w=1280`}
+                alt={`${project.name} preview`}
+                loading="lazy"
+              />
               <div>
                 <h3>{project.name}</h3>
                 <p>{project.description}</p>
