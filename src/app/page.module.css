@@ -476,9 +476,9 @@
 
 .projectCard {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  /* padding: var(--space-lg); */
+  border-radius: .6rem;
   background: var(--color-surface);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
