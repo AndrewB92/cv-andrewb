@@ -1,0 +1,66 @@
+.badge {
+  --status-color: #2ecc71;
+
+  background: rgba(25, 30, 42, 0.85);
+  padding: 1.25rem 1.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(50, 60, 80, 0.6);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(70, 80, 100, 0.5);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.text {
+  color: #c5cddc;
+  font-weight: 500;
+}
+
+.dotWrap {
+  position: relative;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-right: 0.625rem;
+  flex-shrink: 0;
+}
+
+.dot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--status-color);
+}
+
+.ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--status-color);
+  opacity: 0.75;
+  animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Motion safety */
+@media (prefers-reduced-motion: reduce) {
+  .ping {
+    animation: none;
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

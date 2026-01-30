@@ -12,6 +12,7 @@ import TypedRotator from "@/components/TypedRotator";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
+import { StatusBadge } from "@/components/StatusBadge";
 import { ProjectImageSlider } from "@/components/ProjectImageSlider";
 
 
@@ -81,6 +82,11 @@ export default async function HomePage() {
               </p>
             </div>
           </HeroMetaPopover>
+
+          <StatusBadge
+            text="All systems operational"
+            color="#2ecc71"
+          />
         </div>
       </article>
 
@@ -134,27 +140,6 @@ export default async function HomePage() {
                     showArrows={false}
                   />
                 )}
-                {/* {featuredImg && (
-                  <img
-                    src={featuredImg}
-                    alt={`${project.name} featured preview`}
-                    loading="lazy"
-                  />
-                )}
-
-                {secondaryImg && (
-                  <img
-                    src={secondaryImg}
-                    alt={`${project.name} secondary preview`}
-                    loading="lazy"
-                  />
-                )} */}
-
-              {/* <img
-                src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(project.link)}%2F?w=1280`}
-                alt={`${project.name} preview`}
-                loading="lazy"
-              /> */}
 
                 <div className={styles.projectTitle}>
                   <h3>{project.name}</h3>
