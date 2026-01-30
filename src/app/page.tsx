@@ -151,6 +151,10 @@ export default async function HomePage() {
                   />
                 )}
 
+                <div className={styles.projectTitle}>
+                  <h3>{project.name}</h3>
+                </div>
+
                 <div className={styles.projectStack}>
                   {project.stack.map((item) => (
                     <span key={`${project.name}-${item}`} className={styles.stackTag}>
@@ -159,8 +163,7 @@ export default async function HomePage() {
                   ))}
                 </div>
 
-                <div className={styles.projectTitle}>
-                  <h3>{project.name}</h3>
+                <div className={styles.projectDescription}>
                   <p>{project.description}</p>
                 </div>
 
