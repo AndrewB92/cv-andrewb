@@ -109,26 +109,29 @@ const fallbackExperiences: Experience[] = [
 ];
 
 const fallbackProjects: Project[] = [
-  {
-    name: "Creator Portfolio",
+ {
+    name: "Project Alpha",
     description:
-      "Dynamic Next.js site that syncs case studies, writing, and talks from a Firebase collection. Includes admin tooling to publish drafts from mobile.",
-    stack: ["Next.js", "Firebase", "Vercel", "Tailwind CSS"],
-    link: "https://example.com/portfolio",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    stack: ["Framework A", "Service B", "Platform C"],
+    link: "https://example.com/project-alpha",
+    year: 1999,
   },
   {
-    name: "Climate Impact Tracker",
+    name: "Project Beta",
     description:
-      "Serverless dashboard that aggregates IoT sensor data, highlights anomalies, and sends alerts through Firebase Cloud Messaging.",
-    stack: ["Next.js", "Cloud Functions", "Firestore"],
-    link: "https://example.com/climate",
+      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    stack: ["Library X", "Backend Y", "Database Z"],
+    link: "https://example.com/project-beta",
+    year: 1999,
   },
   {
-    name: "Design System Starter",
+    name: "Project Gamma",
     description:
-      "Documented UI kit built on Radix primitives and Tailwind. Ships with linting, Storybook, and CI recipes developers can copy-paste.",
-    stack: ["React", "Radix UI", "Storybook"],
-    link: "https://example.com/design-system",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    stack: ["Tool One", "Tool Two", "Tool Three"],
+    link: "https://example.com/project-gamma",
+    year: 1999,
   },
 ];
 
