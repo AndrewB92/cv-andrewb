@@ -521,13 +521,18 @@
 }
 
 .sectionLink {
-  margin-top: var(--space-lg);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  color: var(--color-accent);
-  font-weight: 600;
-  padding: 0 10px;
+  display: block;
+  color: #ffffff;
+  opacity: 0.6;
+  
+  transition: opacity 250ms ease-in-out;
+}
+.sectionLink:hover {
+  opacity: 1;
+}
+
+.sectionLink svg path{
+  fill: #ffffff;
 }
 
 .projectsPreview:has(.projectCard:hover) .projectCard {
@@ -543,6 +548,16 @@
     /* opacity: 0;
     visibility: hidden;
     max-height: 0px; */
+}
+
+.projectLink{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-lg);
+  padding: 0 10px;
 }
 
 

@@ -164,13 +164,13 @@ export default async function HomePage() {
                   ))}
                 </div>
 
+                <div className={styles.projectLink}>
                 <a
                   href={project.link}
                   className={styles.sectionLink}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {/* Visit project → */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -189,6 +189,7 @@ export default async function HomePage() {
                     <path d="M19 14v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
                   </svg>
                 </a>
+                </div>
               </article>
             );
           })}
