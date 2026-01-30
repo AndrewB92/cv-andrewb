@@ -71,10 +71,20 @@ export default async function HomePage() {
             <div className={styles.heroMeta}>
               <strong>Short facts:</strong>
               <p>
-                <strong>Role:</strong> {profile.title}
+                {/* <strong>Role:</strong> {profile.title} */}
+                <strong>Preferred roles:</strong> Frontend / WordPress / Web developer
               </p>
               <p>
-                <strong>Location:</strong> {profile.location}
+                <strong>Current Location:</strong> {profile.location}
+              </p>
+              <p>
+                <strong>Languages:</strong> English, Ukrainian, Russian
+              </p>
+              <p>
+                <strong>Engagement:</strong> Remote • Full-time or Contract • Project-based OK
+              </p>
+              <p>
+                <strong>Timezone:</strong> EET (UTC+2)
               </p>
               <p>
                 <strong>Email:</strong>{" "}
@@ -84,7 +94,7 @@ export default async function HomePage() {
           </HeroMetaPopover>
 
           <StatusBadge
-            text="Opned for work"
+            text="Opned to work"
             color="#2ecc71"
           />
         </div>
