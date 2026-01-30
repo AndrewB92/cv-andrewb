@@ -164,7 +164,7 @@ export default async function HomePage() {
                       ))}
                     </div>
 
-                    <span className={styles.projectDividerUp}>Open Description</span>
+                    <a className={styles.projectDividerUp}>Open Description</a>
                     <div className={styles.projectDescription}>
                       <p>{project.description}</p>
                     </div>
