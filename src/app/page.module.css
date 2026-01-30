@@ -533,9 +533,16 @@
 .projectsPreview:has(.projectCard:hover) .projectCard {
   opacity: 0.5;
 }
-
 .projectsPreview:has(.projectCard:hover) .projectCard:hover {
   opacity: 1;
+}
+
+.page-module___8aEwW__projectTitle p,
+.page-module___8aEwW__projectStack,
+.page-module___8aEwW__sectionLink {
+    /* opacity: 0;
+    visibility: hidden;
+    max-height: 0px; */
 }
 
 

@@ -172,6 +172,9 @@ export default async function HomePage() {
                 >
                   Visit project →
                 </a>
+                <RainbowGlowLink href={project.link} blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="arrow" iconDirection="right">
+                  View project
+                </RainbowGlowLink>
               </article>
             );
           })}
