@@ -536,7 +536,8 @@
   font-size: 10px;
   opacity: .8;
   transition: opacity 250ms linear;
-  pointer-events: none;
+  cursor: default;
+  
 }
 .projectStack .stackTag:hover {
   opacity: 1;
