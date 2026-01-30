@@ -524,7 +524,7 @@
   display: block;
   color: #ffffff;
   opacity: 0.6;
-  
+
   transition: opacity 250ms ease-in-out;
 }
 .sectionLink:hover {
@@ -532,7 +532,7 @@
 }
 
 .sectionLink svg path{
-  fill: #ffffff;
+  stroke: #ffffff;
 }
 
 .projectsPreview:has(.projectCard:hover) .projectCard {
