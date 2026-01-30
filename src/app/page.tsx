@@ -168,6 +168,9 @@ export default async function HomePage() {
                 </div>
 
                 <div className={styles.projectLink}>
+                {project.year && (
+                  <span className={styles.projectYear}>{project.year}</span>
+                )}
                 <a
                   href={project.link}
                   className={styles.sectionLink}

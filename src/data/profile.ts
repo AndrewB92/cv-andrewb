@@ -21,6 +21,7 @@ export type ProjectImage = {
 
 export type Project = {
   name: string;
+  year?: number;
   description: string;
   stack: string[];
   link: string;
@@ -221,6 +222,12 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
       : typeof payload.url === "string"
         ? payload.url
         : undefined;
+  const year =
+    typeof payload.year === "number"
+      ? payload.year
+      : typeof payload.year === "string"
+        ? Number(payload.year)
+        : undefined;
 
   if (!name || !link) {
     return undefined;
@@ -234,6 +241,7 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
 
   return {
     name,
+    ...(Number.isFinite(year) ? { year } : {}),
     description,
     stack,
     link,
