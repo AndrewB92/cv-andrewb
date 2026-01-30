@@ -170,11 +170,25 @@ export default async function HomePage() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Visit project →
+                  {/* Visit project → */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M14 5h5v5" />
+                    <path d="M10 14L19 5" />
+                    <path d="M19 14v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
+                  </svg>
                 </a>
-                <RainbowGlowLink href={project.link} blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="arrow" iconDirection="right">
-                  View project
-                </RainbowGlowLink>
               </article>
             );
           })}
