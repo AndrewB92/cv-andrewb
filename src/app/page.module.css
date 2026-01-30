@@ -529,6 +529,15 @@
   padding: 0 10px;
 }
 
+.projectsPreview:has(.projectCard:hover) .projectCard {
+  opacity: 0.5;
+}
+
+.projectsPreview:has(.projectCard:hover) .projectCard:hover {
+  opacity: 1;
+}
+
+
 @media (max-width: 768px) {
   .hero {
     padding: var(--space-xl);
