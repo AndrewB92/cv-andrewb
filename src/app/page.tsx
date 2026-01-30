@@ -151,50 +151,53 @@ export default async function HomePage() {
                   />
                 )}
 
-                <div className={styles.projectTitle}>
-                  <h3>{project.name}</h3>
-                </div>
+                  <div className={styles.projectContent}>
+                    <div className={styles.projectTitle}>
+                      <h3>{project.name}</h3>
+                    </div>
 
-                <div className={styles.projectStack}>
-                  {project.stack.map((item) => (
-                    <span key={`${project.name}-${item}`} className={styles.stackTag}>
-                      {item}
-                    </span>
-                  ))}
-                </div>
+                    <div className={styles.projectStack}>
+                      {project.stack.map((item) => (
+                        <span key={`${project.name}-${item}`} className={styles.stackTag}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
 
-                <div className={styles.projectDescription}>
-                  <p>{project.description}</p>
-                </div>
+                    <span className={styles.projectDividerUp}>Open Description</span>
+                    <div className={styles.projectDescription}>
+                      <p>{project.description}</p>
+                    </div>
 
-                <div className={styles.projectLink}>
-                {project.year && (
-                  <span className={styles.projectYear}>{project.year}</span>
-                )}
-                <a
-                  href={project.link}
-                  className={styles.sectionLink}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M14 5h5v5" />
-                    <path d="M10 14L19 5" />
-                    <path d="M19 14v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
-                  </svg>
-                </a>
+                    <div className={styles.projectLink}>
+                    {project.year && (
+                      <span className={styles.projectYear}>{project.year}</span>
+                    )}
+                    <a
+                      href={project.link}
+                      className={styles.sectionLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
+                        <path d="M14 5h5v5" />
+                        <path d="M10 14L19 5" />
+                        <path d="M19 14v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </article>
             );
