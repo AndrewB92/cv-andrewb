@@ -84,7 +84,7 @@ export default async function HomePage() {
           </HeroMetaPopover>
 
           <StatusBadge
-            text="All systems operational"
+            text="Opned for work"
             color="#2ecc71"
           />
         </div>

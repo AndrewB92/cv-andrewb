@@ -1,17 +1,16 @@
 .badge {
-  --status-color: #2ecc71;
-
-  background: rgba(25, 30, 42, 0.85);
-  padding: 1.25rem 1.75rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(50, 60, 80, 0.6);
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(70, 80, 100, 0.5);
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+    --status-color: #2ecc71;
+    background: #ffffff08;
+    border: 1px solid #ffffff14;
+    border-radius: .75rem;
+    
+    padding: 2px 10px;
+    
+    box-shadow: 0 10px 30px #0006,0 0 0 1px #46506480;
+    
+    position: absolute;
+    top: 15px;
+    right: 64px;
 }
 
 .indicator {
