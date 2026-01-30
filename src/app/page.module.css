@@ -520,7 +520,7 @@
   color: var(--color-text-secondary);
 }
 
-#highlights .stackTag {
+.projectStack .stackTag {
   padding: 4px 6px;
   border-radius: 4px;
   background: var(--color-border);
@@ -529,7 +529,7 @@
   opacity: .8;
   transition: opacity 250ms linear;
 }
-#highlights .stackTag:hover {
+.projectStack .stackTag:hover {
   opacity: 1;
 }
 
