@@ -94,7 +94,7 @@ export default async function HomePage() {
           </HeroMetaPopover>
 
           <StatusBadge
-            text="Opned to work"
+            text="Available"
             color="#2ecc71"
           />
         </div>
