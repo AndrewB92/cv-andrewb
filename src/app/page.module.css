@@ -520,6 +520,19 @@
   color: var(--color-text-secondary);
 }
 
+#highlights .stackTag {
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  opacity: .8;
+  transition: opacity 250ms linear;
+}
+#highlights .stackTag:hover {
+  opacity: 1;
+}
+
 .sectionLink {
   display: block;
   color: #ffffff;
