@@ -151,17 +151,17 @@ export default async function HomePage() {
                   />
                 )}
 
-                <div className={styles.projectTitle}>
-                  <h3>{project.name}</h3>
-                  <p>{project.description}</p>
-                </div>
-
                 <div className={styles.projectStack}>
                   {project.stack.map((item) => (
                     <span key={`${project.name}-${item}`} className={styles.stackTag}>
                       {item}
                     </span>
                   ))}
+                </div>
+
+                <div className={styles.projectTitle}>
+                  <h3>{project.name}</h3>
+                  <p>{project.description}</p>
                 </div>
 
                 <div className={styles.projectLink}>
