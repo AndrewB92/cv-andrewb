@@ -490,17 +490,16 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  background: linear-gradient(0deg, rgba(2, 6, 23, 1) 40%, rgba(2, 6, 23, 0.5) 100%);
   padding: 0pz 10px 2px;
-
+  
   transition: all 350ms linear;
+  backdrop-filter: blur(40px);
   z-index: 5;
 }
 
 .projectCard:global(.open) .projectContent {
     margin-top: -182px;
-    background: linear-gradient(
-0deg, rgba(2, 6, 23, 1) 40%, rgba(2, 6, 23, 0.5) 100%);
-    backdrop-filter: blur(40px);
 }
 
 .projectTitle {
