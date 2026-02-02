@@ -66,7 +66,7 @@ export function DescriptionToggle({
   }, [open, targetName]);
 
   return (
-    <div className="style.projectDescriptionWrapper" ref={rootRef}>
+    <div className="projectDescriptionWrapper" ref={rootRef}>
       <div
         id={panelId}
         className={panelClassName ?? "projectDescription"}
