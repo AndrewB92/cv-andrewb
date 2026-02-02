@@ -170,7 +170,11 @@ export default async function HomePage() {
                       <p>{project.description}</p>
                     </div> */}
 
-                    <DescriptionToggle className={styles.projectCard}>
+                    <DescriptionToggle
+                      targetName={styles.projectCard}
+                      buttonClassName={styles.projectDescriptionButton}
+                      panelClassName={styles.projectDescription}
+                    >
                       <p>{project.description}</p>
                     </DescriptionToggle>
 
