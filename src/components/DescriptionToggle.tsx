@@ -19,8 +19,8 @@ function cssEscape(value: string) {
 
 export function DescriptionToggle({
   targetName,
-  openLabel = "Open Description",
-  closeLabel = "Close Description",
+  openLabel = "Read More",
+  closeLabel = "Read Less",
   defaultOpen = false,
   children,
   buttonClassName,
