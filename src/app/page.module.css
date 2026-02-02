@@ -580,7 +580,6 @@
   display: block;
   color: #ffffff;
   opacity: 0.6;
-  width: 100%;
 
   transition: opacity 250ms ease-in-out;
 }
@@ -614,6 +613,7 @@
   align-items: center;
   gap: var(--space-xs);
   margin-top: auto;
+  width: 1000%;
 }
 
 
