@@ -170,7 +170,7 @@ export default async function HomePage() {
                       <p>{project.description}</p>
                     </div> */}
 
-                    <DescriptionToggle targetClass="projectCard">
+                    <DescriptionToggle targetClass={styles.projectCard}>
                       <p>{project.description}</p>
                     </DescriptionToggle>
 

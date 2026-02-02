@@ -18,7 +18,9 @@ export function DescriptionToggle({
   const handleToggle = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    const target = document.querySelector<HTMLElement>(`.${targetClass}`);
+    const target = 
+    // document.querySelector<HTMLElement>(`.${targetClass}`);
+    document.querySelector(`.${targetClass}`);
     if (!target) return;
 
     target.classList.toggle("open");
