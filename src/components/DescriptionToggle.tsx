@@ -35,7 +35,7 @@ export function DescriptionToggle({
         {labelOpen}
       </a>
 
-      <div className={`description-wrapper ${targetClass}`}>
+      <div className={`projectDescription`}>
         {children}
       </div>
     </>
