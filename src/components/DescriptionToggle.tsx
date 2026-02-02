@@ -1,39 +1,39 @@
 "use client";
 
+import { useState } from "react";
+
 type DescriptionToggleProps = {
-  open: boolean;
-  onToggle: () => void;
+  className?: string; // wrapper extra classes (optional)
+  buttonClassName?: string; // optional
   labelOpen?: string;
   labelClose?: string;
   children: React.ReactNode;
-  descriptionClassName: string; // pass styles.projectDescription
 };
 
 export function DescriptionToggle({
-  open,
-  onToggle,
+  className = "",
+  buttonClassName = "",
   labelOpen = "Open Description",
   labelClose = "Close Description",
   children,
-  descriptionClassName,
 }: DescriptionToggleProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <>
+    <div className={className + (isOpen ? " open" : "")}>
       <a
         href="#"
-        className="description-btn"
+        className={buttonClassName || "description-btn"}
         onClick={(e) => {
           e.preventDefault();
-          onToggle();
+          setIsOpen((v) => !v);
         }}
-        aria-expanded={open}
+        aria-expanded={isOpen}
       >
-        {open ? labelClose : labelOpen}
+        {isOpen ? labelClose : labelOpen}
       </a>
 
-      <div className={descriptionClassName}>
-        {children}
-      </div>
-    </>
+      <div className="projectDescription">{children}</div>
+    </div>
   );
 }
