@@ -514,6 +514,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  margin-bottom: 15px;
 }
 
 .projectDescription p{
@@ -612,7 +613,8 @@
   align-items: center;
   gap: var(--space-xs);
   margin-top: auto;
-  width: 1000%;
+  width: 100%;
+  padding: 0 10px;
 }
 
 

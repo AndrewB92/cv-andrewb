@@ -67,6 +67,13 @@ export function DescriptionToggle({
 
   return (
     <div ref={rootRef}>
+      <div
+        id={panelId}
+        className={panelClassName ?? "projectDescription"}
+        aria-hidden={!open}
+      >
+        {children}
+      </div>
       <button
         type="button"
         className={buttonClassName}
@@ -76,14 +83,6 @@ export function DescriptionToggle({
       >
         {open ? closeLabel : openLabel}
       </button>
-
-      <div
-        id={panelId}
-        className={panelClassName ?? "projectDescription"}
-        aria-hidden={!open}
-      >
-        {children}
-      </div>
     </div>
   );
 }
