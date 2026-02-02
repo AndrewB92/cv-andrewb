@@ -170,7 +170,11 @@ export default async function HomePage() {
                       <p>{project.description}</p>
                     </div> */}
 
-                    <DescriptionToggle targetClass={styles.projectCard}>
+                    <DescriptionToggle
+                      open={open}
+                      onToggle={() => setOpen((v) => !v)}
+                      descriptionClassName={styles.projectDescription}
+                    >
                       <p>{project.description}</p>
                     </DescriptionToggle>
 

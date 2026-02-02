@@ -1,41 +1,37 @@
 "use client";
 
-import { useCallback } from "react";
-
 type DescriptionToggleProps = {
-  targetClass: string;
+  open: boolean;
+  onToggle: () => void;
   labelOpen?: string;
   labelClose?: string;
   children: React.ReactNode;
+  descriptionClassName: string; // pass styles.projectDescription
 };
 
 export function DescriptionToggle({
-  targetClass,
+  open,
+  onToggle,
   labelOpen = "Open Description",
   labelClose = "Close Description",
   children,
+  descriptionClassName,
 }: DescriptionToggleProps) {
-  const handleToggle = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-
-    const target = 
-    // document.querySelector<HTMLElement>(`.${targetClass}`);
-    document.querySelector(`.${targetClass}`);
-    if (!target) return;
-
-    target.classList.toggle("open");
-
-    const isOpen = target.classList.contains("open");
-    e.currentTarget.textContent = isOpen ? labelClose : labelOpen;
-  }, [targetClass, labelOpen, labelClose]);
-
   return (
     <>
-      <a href="#" className="description-btn" onClick={handleToggle}>
-        {labelOpen}
+      <a
+        href="#"
+        className="description-btn"
+        onClick={(e) => {
+          e.preventDefault();
+          onToggle();
+        }}
+        aria-expanded={open}
+      >
+        {open ? labelClose : labelOpen}
       </a>
 
-      <div className={`projectDescription`}>
+      <div className={descriptionClassName}>
         {children}
       </div>
     </>

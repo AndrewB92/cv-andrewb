@@ -520,7 +520,7 @@
     transition: max-height 350ms linear;
 }
 
-.projectCard.open .projectDescription {
+.projectCard :global(.open) .projectDescription {
     max-height: 100px;
 }
 
