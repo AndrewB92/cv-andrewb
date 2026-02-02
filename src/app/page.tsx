@@ -14,6 +14,7 @@ import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ProjectImageSlider } from "@/components/ProjectImageSlider";
+import { DescriptionToggle } from "@/components/DescriptionToggle";
 
 
 const welcomeCode = `type UseCase =
@@ -164,10 +165,15 @@ export default async function HomePage() {
                       ))}
                     </div>
 
-                    <a className={styles.projectDividerUp}>Open Description</a>
+                    {/* <a className={styles.projectDividerUp}>Open Description</a>
                     <div className={styles.projectDescription}>
                       <p>{project.description}</p>
-                    </div>
+                    </div> */}
+
+                    <DescriptionToggle targetClass="projectCard">
+                      <p>{project.description}</p>
+                    </DescriptionToggle>
+
 
                     <div className={styles.projectLink}>
                     {project.year && (
