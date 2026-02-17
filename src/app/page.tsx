@@ -297,9 +297,7 @@ export default async function HomePage() {
 
 
 
-        <Link href="/projects" className={styles.sectionLink}>
-          View all projects →
-        </Link>
+
         <RainbowGlowLink href="/projects" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="arrow" iconDirection="right">
           View all projects
         </RainbowGlowLink>
