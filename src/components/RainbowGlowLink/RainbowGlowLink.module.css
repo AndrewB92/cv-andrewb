@@ -169,8 +169,8 @@
 /* keep your hover behavior */
 .wrapper:hover .bg {
   opacity: 1;
-  height: calc(100% - 2.5px);
-  width: calc(100% - 2px);
+  height: calc(100% - 2px);
+  width: calc(100% - 2.5px);
   top: 1px;
   left: 1px;
   border-radius: .9rem;
