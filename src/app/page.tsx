@@ -215,7 +215,7 @@ export default async function HomePage() {
 
 
 
-        <div className={styles.projectsPreview}>
+        <div className={styles.projectsPreview + " " + styles.projectsPreviewAlt}>
           {featuredProjects.map((project) => {
             const featuredImg =
               project.img?.find((i) => i.name === "featured")?.url;
