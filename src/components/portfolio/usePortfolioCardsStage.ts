@@ -55,8 +55,10 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.removeProperty("--expand-w");
   };
 
-  // Strict measurement: force-hide expanded subtree inline, so it cannot affect scrollHeight.
-  const measureCompactHeightsStrict = () => {
+  // OPTION B:
+  // Measure rendered compact height via getBoundingClientRect(), not scrollHeight.
+  // Also force-hide expanded subtree inline so it can never affect measurement.
+  const measureCompactHeightsBBox = () => {
     const stage = stageRef.current;
     if (!stage) return;
 
@@ -77,7 +79,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
         prevHeight: expanded.style.height,
       });
 
-      // inline overrides beat any CSS/state
       expanded.style.display = "none";
       expanded.style.height = "0px";
     }
@@ -91,8 +92,9 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       const prevH = card.style.height;
       card.style.height = "auto";
 
-      // Now guaranteed compact-only.
-      maxH = Math.max(maxH, Math.ceil(card.scrollHeight));
+      // Rendered height (immune to hidden scrollable content inflation).
+      const rect = card.getBoundingClientRect();
+      maxH = Math.max(maxH, Math.ceil(rect.height));
 
       card.style.height = prevH;
     }
@@ -106,7 +108,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
     stage.style.setProperty("--cards-h", hPx);
 
-    // Restore expanded inline styles.
     for (const item of expandedEls) {
       item.el.style.display = item.prevDisplay;
       item.el.style.height = item.prevHeight;
@@ -133,7 +134,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       card.style.setProperty("--x", `${Math.round(x)}px`);
     }
 
-    measureCompactHeightsStrict();
+    measureCompactHeightsBBox();
   };
 
   const computeShiftAndWidth = (index: number) => {
