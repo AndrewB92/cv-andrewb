@@ -5,15 +5,26 @@ type Phase = "idle" | "opening" | "expanded" | "closing";
 type Opts = {
   openExpandDelay?: number;
   closeResetDelay?: number;
+
+  // readiness thresholds
+  minStageWidthPx?: number;
+  maxInitialLayoutAttempts?: number;
 };
 
 const DEFAULTS: Required<Opts> = {
   openExpandDelay: 320,
   closeResetDelay: 420,
+  minStageWidthPx: 240,
+  maxInitialLayoutAttempts: 20,
 };
 
 export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
-  const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
+  const {
+    openExpandDelay,
+    closeResetDelay,
+    minStageWidthPx,
+    maxInitialLayoutAttempts,
+  } = { ...DEFAULTS, ...opts };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
 
@@ -28,6 +39,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const [phase, setPhase] = useState<Phase>("idle");
 
   const timers = useRef<{ t1?: number; t2?: number }>({});
+  const rafRef = useRef<number>(0);
 
   const isOpen = phase === "opening" || phase === "expanded" || phase === "closing";
   const isExpanded = phase === "expanded";
@@ -36,6 +48,11 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     if (timers.current.t1) window.clearTimeout(timers.current.t1);
     if (timers.current.t2) window.clearTimeout(timers.current.t2);
     timers.current = {};
+  };
+
+  const cancelRaf = () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = 0;
   };
 
   const getStageVars = () => {
@@ -57,7 +74,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   // OPTION B:
   // Measure rendered compact height via getBoundingClientRect(), not scrollHeight.
-  // Also force-hide expanded subtree inline so it can never affect measurement.
+  // Force-hide expanded subtree inline so it can never affect measurement.
   const measureCompactHeightsBBox = () => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -92,7 +109,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       const prevH = card.style.height;
       card.style.height = "auto";
 
-      // Rendered height (immune to hidden scrollable content inflation).
       const rect = card.getBoundingClientRect();
       maxH = Math.max(maxH, Math.ceil(rect.height));
 
@@ -120,6 +136,9 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
+    // If stage width is not ready (0 / tiny), skip measuring to avoid huge wrap-height.
+    if (stage.clientWidth < minStageWidthPx) return;
+
     const { gap } = getStageVars();
     const n = Math.max(1, count);
     const totalGaps = gap * (n - 1);
@@ -142,6 +161,8 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const card = cardRefs.current[index];
     if (!stage || !card) return;
 
+    if (stage.clientWidth < minStageWidthPx) return;
+
     const { sideGap } = getStageVars();
     const baseX = parseFloat(getComputedStyle(card).getPropertyValue("--x")) || 0;
 
@@ -150,6 +171,47 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
     card.style.setProperty("--shift-x", `${Math.round(shiftX)}px`);
     card.style.setProperty("--expand-w", `${Math.round(newW)}px`);
+  };
+
+  // Double-rAF scheduling: waits for layout + CSS to settle.
+  const scheduleLayout = () => {
+    cancelRaf();
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = requestAnimationFrame(() => {
+        layoutBasePositions();
+        const idx = activeIndexRef.current;
+        if (idx != null) computeShiftAndWidth(idx);
+      });
+    });
+  };
+
+  // Initial “stage readiness” loop: prevents first run when width is wrong.
+  const scheduleInitialLayoutWhenReady = () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    let attempts = 0;
+
+    const tick = () => {
+      attempts += 1;
+
+      const w = stage.clientWidth;
+
+      if (w >= minStageWidthPx) {
+        scheduleLayout();
+        return;
+      }
+
+      if (attempts >= maxInitialLayoutAttempts) {
+        // Last resort: still schedule once (better than never), but it may be off.
+        scheduleLayout();
+        return;
+      }
+
+      requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
   };
 
   const setExpandedA11y = (expandedIndex: number | null, expanded: boolean) => {
@@ -241,7 +303,9 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
     }
 
-    layoutBasePositions();
+    // Do NOT measure immediately here; wait for a stable width.
+    scheduleInitialLayoutWhenReady();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
@@ -249,24 +313,18 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
-    let raf = 0;
-
-    const bump = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        layoutBasePositions();
-        const idx = activeIndexRef.current;
-        if (idx != null) computeShiftAndWidth(idx);
-      });
-    };
+    const bump = () => scheduleLayout();
 
     const ro = new ResizeObserver(bump);
     ro.observe(stage);
 
     window.addEventListener("resize", bump, { passive: true });
 
+    // Run again after mount (covers hydration / CSS variables settling)
+    scheduleLayout();
+
     return () => {
-      cancelAnimationFrame(raf);
+      cancelRaf();
       ro.disconnect();
       window.removeEventListener("resize", bump);
     };
@@ -280,11 +338,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const imgs = Array.from(stage.querySelectorAll("img"));
     if (!imgs.length) return;
 
-    const bump = () => {
-      layoutBasePositions();
-      const idx = activeIndexRef.current;
-      if (idx != null) computeShiftAndWidth(idx);
-    };
+    const bump = () => scheduleLayout();
 
     imgs.forEach((img) => {
       if (img.complete) return;
@@ -300,6 +354,17 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
+
+  useEffect(() => {
+    // If fonts load after first paint, they can change wrapping -> re-measure once.
+    const anyDoc = document as unknown as { fonts?: { ready: Promise<unknown> } };
+    if (anyDoc.fonts?.ready) {
+      anyDoc.fonts.ready.then(() => {
+        scheduleLayout();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
