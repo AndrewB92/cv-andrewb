@@ -16,9 +16,12 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef<Array<HTMLArticleElement | null>>(
+
+  // Use HTMLElement to avoid depending on lib.dom-specific interfaces (HTMLArticleElement).
+  const cardRefs = useRef<Array<HTMLElement | null>>(
     Array.from({ length: count }, () => null)
   );
+
   const activeIndexRef = useRef<number | null>(null);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -45,7 +48,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     };
   };
 
-  const clearActiveVars = (card: HTMLArticleElement | null) => {
+  const clearActiveVars = (card: HTMLElement | null) => {
     if (!card) return;
     card.style.removeProperty("--shift-x");
     card.style.removeProperty("--expand-w");
@@ -58,6 +61,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     stage.setAttribute("data-measuring", "true");
 
     let maxH = 0;
+
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
       if (!card) continue;
@@ -199,12 +203,8 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   useLayoutEffect(() => {
     if (!count) return;
 
-    // keep refs array sized if project count changes
     if (cardRefs.current.length !== count) {
-      cardRefs.current = Array.from(
-        { length: count },
-        (_, i) => cardRefs.current[i] ?? null
-      );
+      cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
     }
 
     layoutBasePositions();
