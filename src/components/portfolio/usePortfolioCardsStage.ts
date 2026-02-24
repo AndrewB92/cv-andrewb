@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "opening" | "expanded" | "closing";
 
 type Opts = {
-  openExpandDelay?: number; // time for other cards to slide away before expand
-  closeResetDelay?: number; // time for shrink to finish before restoring
+  openExpandDelay?: number;
+  closeResetDelay?: number;
 };
 
 const DEFAULTS: Required<Opts> = {
@@ -12,15 +12,11 @@ const DEFAULTS: Required<Opts> = {
   closeResetDelay: 420,
 };
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
-
 export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const cardRefs = useRef<Array<HTMLElement | null>>(Array.from({ length: count }, () => null));
   const activeIndexRef = useRef<number | null>(null);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -40,16 +36,11 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const getStageVars = () => {
     const stage = stageRef.current;
     if (!stage) return { gap: 20, sideGap: 20 };
-
     const cs = getComputedStyle(stage);
-    const gap = parseFloat(cs.getPropertyValue("--gap")) || 20;
-    const sideGap = parseFloat(cs.getPropertyValue("--side-gap")) || 20;
-
-    return { gap, sideGap };
-  };
-
-  const setCSSVar = (el: HTMLElement, name: string, value: string) => {
-    el.style.setProperty(name, value);
+    return {
+      gap: parseFloat(cs.getPropertyValue("--gap")) || 20,
+      sideGap: parseFloat(cs.getPropertyValue("--side-gap")) || 20,
+    };
   };
 
   const clearActiveVars = (card: HTMLElement | null) => {
@@ -62,13 +53,9 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
-    // Put stage into "measuring" mode via data attr (CSS Modules-friendly).
     stage.setAttribute("data-measuring", "true");
 
-    // Ensure no expanded layout affects scrollHeight.
-    // We just measure each absolute card’s scrollHeight with compact content visible.
     let maxH = 0;
-
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
       if (!card) continue;
@@ -82,8 +69,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const hPx = `${maxH}px`;
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
-      if (!card) continue;
-      card.style.height = hPx;
+      if (card) card.style.height = hPx;
     }
     stage.style.setProperty("--cards-h", hPx);
 
@@ -95,19 +81,17 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     if (!stage) return;
 
     const { gap } = getStageVars();
-
-    const stageW = stage.clientWidth;
     const n = Math.max(1, count);
     const totalGaps = gap * (n - 1);
-    const cardW = (stageW - totalGaps) / n;
+    const cardW = (stage.clientWidth - totalGaps) / n;
 
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
       if (!card) continue;
 
       const x = i * (cardW + gap);
-      setCSSVar(card, "--w", `${Math.round(cardW)}px`);
-      setCSSVar(card, "--x", `${Math.round(x)}px`);
+      card.style.setProperty("--w", `${Math.round(cardW)}px`);
+      card.style.setProperty("--x", `${Math.round(x)}px`);
     }
 
     measureCompactHeightsOnly();
@@ -119,24 +103,23 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     if (!stage || !card) return;
 
     const { sideGap } = getStageVars();
-
     const baseX = parseFloat(getComputedStyle(card).getPropertyValue("--x")) || 0;
+
     const newW = Math.max(0, stage.clientWidth - sideGap * 2);
     const shiftX = sideGap - baseX;
 
-    setCSSVar(card, "--shift-x", `${Math.round(shiftX)}px`);
-    setCSSVar(card, "--expand-w", `${Math.round(newW)}px`);
+    card.style.setProperty("--shift-x", `${Math.round(shiftX)}px`);
+    card.style.setProperty("--expand-w", `${Math.round(newW)}px`);
   };
 
-  const setA11y = (expandedIndex: number | null, expanded: boolean) => {
+  const setExpandedA11y = (expandedIndex: number | null, expanded: boolean) => {
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
       if (!card) continue;
 
-      const toggle = card.querySelector<HTMLButtonElement>("[data-role='toggle']") ?? null;
-      const close = card.querySelector<HTMLButtonElement>("[data-role='close']") ?? null;
+      const toggle = card.querySelector<HTMLButtonElement>("[data-role='toggle']");
+      const close = card.querySelector<HTMLButtonElement>("[data-role='close']");
 
-      // In our TSX we didn’t add data-role to buttons; keep this future-proof.
       if (toggle) toggle.setAttribute("aria-expanded", "false");
       if (close) close.tabIndex = -1;
       card.removeAttribute("data-expanded");
@@ -147,71 +130,57 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const activeCard = cardRefs.current[expandedIndex];
     if (!activeCard) return;
 
-    const toggleBtn = activeCard.querySelector<HTMLButtonElement>("button[aria-expanded]") ?? null;
-    const closeBtn = activeCard.querySelector<HTMLButtonElement>("button[aria-label='Close details']") ?? null;
+    const toggle = activeCard.querySelector<HTMLButtonElement>("[data-role='toggle']");
+    const close = activeCard.querySelector<HTMLButtonElement>("[data-role='close']");
 
-    if (toggleBtn) toggleBtn.setAttribute("aria-expanded", String(expanded));
-    if (closeBtn) closeBtn.tabIndex = expanded ? 0 : -1;
+    if (toggle) toggle.setAttribute("aria-expanded", String(expanded));
+    if (close) close.tabIndex = expanded ? 0 : -1;
     if (expanded) activeCard.setAttribute("data-expanded", "true");
   };
 
   const openCard = (index: number) => {
     clearTimers();
-
-    const stage = stageRef.current;
-    const card = cardRefs.current[index];
-    if (!stage || !card) return;
-
-    // Reset any closing flags.
     setPhase("opening");
     setActiveIndex(index);
     activeIndexRef.current = index;
 
-    // Remove old active vars from any previous card.
-    for (let i = 0; i < count; i++) {
-      if (i !== index) clearActiveVars(cardRefs.current[i]);
-    }
-
-    // During "opening" the compact view fades out and others slide away via CSS.
-    setA11y(index, false);
+    setExpandedA11y(index, false);
 
     timers.current.t1 = window.setTimeout(() => {
       computeShiftAndWidth(index);
       setPhase("expanded");
-      setA11y(index, true);
+      setExpandedA11y(index, true);
 
-      const closeBtn = card.querySelector<HTMLButtonElement>("button[aria-label='Close details']");
-      closeBtn?.focus({ preventScroll: true });
+      const card = cardRefs.current[index];
+      const close = card?.querySelector<HTMLButtonElement>("[data-role='close']");
+      close?.focus({ preventScroll: true });
     }, openExpandDelay);
   };
 
   const closeCard = () => {
-    clearTimers();
-
     const index = activeIndexRef.current;
     if (index == null) return;
 
-    const card = cardRefs.current[index];
-    if (!card) return;
-
+    clearTimers();
     setPhase("closing");
-    setA11y(index, false);
+    setExpandedA11y(index, false);
 
     timers.current.t2 = window.setTimeout(() => {
+      const card = cardRefs.current[index];
+      clearActiveVars(card);
+
       setPhase("idle");
       setActiveIndex(null);
       activeIndexRef.current = null;
-      clearActiveVars(card);
 
-      const toggleBtn = card.querySelector<HTMLButtonElement>("button[aria-expanded]");
-      toggleBtn?.focus({ preventScroll: true });
+      const toggle = card?.querySelector<HTMLButtonElement>("[data-role='toggle']");
+      toggle?.focus({ preventScroll: true });
     }, closeResetDelay);
   };
 
   const onToggle = (index: number) => {
     const current = activeIndexRef.current;
 
-    // Switching from one active card to another:
     if (current != null && current !== index) {
       closeCard();
       clearTimers();
@@ -225,20 +194,22 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   const onClose = () => closeCard();
 
-  // Initial layout: positions + equal heights.
   useLayoutEffect(() => {
     if (!count) return;
+    // keep refs sized
+    if (cardRefs.current.length !== count) {
+      cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
+    }
     layoutBasePositions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
-  // Resize handling: recompute base positions and expanded shift.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
 
     let raf = 0;
-    const onResize = () => {
+    const bump = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         layoutBasePositions();
@@ -247,20 +218,19 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       });
     };
 
-    const ro = new ResizeObserver(onResize);
+    const ro = new ResizeObserver(bump);
     ro.observe(stage);
 
-    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("resize", bump, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", bump);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
-  // Re-measure when images load (lazy images can change heights).
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -268,10 +238,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const imgs = Array.from(stage.querySelectorAll("img"));
     if (!imgs.length) return;
 
-    let cancelled = false;
-
     const bump = () => {
-      if (cancelled) return;
       layoutBasePositions();
       const idx = activeIndexRef.current;
       if (idx != null) computeShiftAndWidth(idx);
@@ -284,7 +251,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     });
 
     return () => {
-      cancelled = true;
       imgs.forEach((img) => {
         img.removeEventListener("load", bump);
         img.removeEventListener("error", bump);
@@ -293,7 +259,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
-  // Escape to close.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && activeIndexRef.current != null) closeCard();
@@ -302,11 +267,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Keep refs array sized.
-  useMemo(() => {
-    cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
-  }, [count]);
 
   return {
     stageRef,

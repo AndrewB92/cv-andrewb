@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import styles from "./PortfolioSection.module.css";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
@@ -23,7 +25,6 @@ type Props = {
 };
 
 function getPrimaryImage(project: FeaturedProject) {
-  // Prefer "featured" then "secondary" then first.
   const byName = (n: string) => project.img?.find((i) => i.name === n)?.url;
   return byName("featured") || byName("secondary") || project.img?.[0]?.url || "";
 }
@@ -68,10 +69,7 @@ export default function PortfolioSection({
             const expandedContent =
               project.details ?? (
                 <>
-                  <p>
-                    {project.description}{" "}
-                    {/* You can replace this with a dedicated “long” field per project. */}
-                  </p>
+                  <p>{project.description}</p>
                   <p>
                     Add outcomes: performance, CVW, a11y, SEO, architecture, migrations, etc.
                   </p>
@@ -85,11 +83,7 @@ export default function PortfolioSection({
               <article
                 key={project.name}
                 ref={(el) => (cardRefs.current[i] = el)}
-                className={[
-                  styles.card,
-                  isActive ? styles.isActive : "",
-                  // Away classes are computed by the hook via data-attrs.
-                ].join(" ")}
+                className={[styles.card, isActive ? styles.isActive : ""].join(" ")}
                 data-away={isOpen && !isActive ? (i % 2 === 0 ? "down" : "up") : "none"}
               >
                 <div className={styles.cardLayout}>
@@ -114,8 +108,9 @@ export default function PortfolioSection({
                         type="button"
                         className={styles.cardClose}
                         aria-label="Close details"
-                        onClick={() => onClose()}
+                        onClick={onClose}
                         tabIndex={isActive && isExpanded ? 0 : -1}
+                        data-role="close"
                       >
                         ✕
                       </button>
@@ -170,6 +165,7 @@ export default function PortfolioSection({
                         className={styles.cardToggle}
                         aria-expanded={isActive && isExpanded}
                         onClick={() => onToggle(i)}
+                        data-role="toggle"
                       >
                         More info
                       </button>
