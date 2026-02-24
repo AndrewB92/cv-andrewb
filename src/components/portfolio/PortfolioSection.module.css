@@ -50,24 +50,17 @@
   --w: 0px;
   --shift-x: 0px;
   --expand-w: 0px;
-
   position: absolute;
   top: 0;
   left: 0;
-
   width: var(--w);
   transform: translateX(var(--x)) translateY(0);
   opacity: 1;
-
   background: #161b22;
   border: 1px solid #2a2f3a;
-  border-radius: 20px;
+  border-radius: .6rem;
   overflow: hidden;
-
-  transition:
-    transform 420ms cubic-bezier(.2,.8,.2,1),
-    width     420ms cubic-bezier(.2,.8,.2,1),
-    opacity   320ms ease;
+  transition:    transform 420ms cubic-bezier(.2,.8,.2,1),    width     420ms cubic-bezier(.2,.8,.2,1),    opacity   320ms ease;
   will-change: transform, width, opacity;
 }
 
