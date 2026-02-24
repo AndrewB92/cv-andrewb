@@ -50,11 +50,11 @@ export default function PortfolioSection({
   return (
     <section id="portfolio" className={styles.portfolio}>
       <div className={styles.container}>
-        <header className={styles.sectionHeader}>
+        {/* <header className={styles.sectionHeader}>
           <p className={styles.sectionKicker}>{kicker}</p>
           <h2 className={styles.sectionTitle}>{title}</h2>
           <p className={styles.sectionSubtitle}>{subtitle}</p>
-        </header>
+        </header> */}
 
         <div
           ref={stageRef}
