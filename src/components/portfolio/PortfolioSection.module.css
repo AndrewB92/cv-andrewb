@@ -76,6 +76,7 @@
 .cardMedia {
   width: 100%;
   height: auto;
+  min-height: 200px;
   overflow: hidden;
   background: #0b0e15;
 }
