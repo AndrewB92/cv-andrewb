@@ -6,29 +6,27 @@ type Opts = {
   openExpandDelay?: number;
   closeResetDelay?: number;
 
-  // readiness thresholds
-  minStageWidthPx?: number;
-  maxInitialLayoutAttempts?: number;
+  // How aggressive to be on first paint stabilization
+  stabilizeFrames?: number; // max frames to try (default 30)
+  stableRunsNeeded?: number; // how many identical runs in a row to accept as stable (default 2)
 };
 
 const DEFAULTS: Required<Opts> = {
   openExpandDelay: 320,
   closeResetDelay: 420,
-  minStageWidthPx: 240,
-  maxInitialLayoutAttempts: 20,
+  stabilizeFrames: 30,
+  stableRunsNeeded: 2,
 };
 
 export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
-  const {
-    openExpandDelay,
-    closeResetDelay,
-    minStageWidthPx,
-    maxInitialLayoutAttempts,
-  } = { ...DEFAULTS, ...opts };
+  const { openExpandDelay, closeResetDelay, stabilizeFrames, stableRunsNeeded } = {
+    ...DEFAULTS,
+    ...opts,
+  };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
 
-  // Use HTMLElement to avoid DOM lib typing issues in your TS setup.
+  // Keep as HTMLElement to avoid lib.dom interface dependency.
   const cardRefs = useRef<Array<HTMLElement | null>>(
     Array.from({ length: count }, () => null)
   );
@@ -72,12 +70,10 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.removeProperty("--expand-w");
   };
 
-  // OPTION B:
-  // Measure rendered compact height via getBoundingClientRect(), not scrollHeight.
-  // Force-hide expanded subtree inline so it can never affect measurement.
+  // OPTION B measurement: rendered bbox height, with expanded subtree force-hidden inline.
   const measureCompactHeightsBBox = () => {
     const stage = stageRef.current;
-    if (!stage) return;
+    if (!stage) return { cardsH: 0, stageW: 0, gap: 0 };
 
     stage.setAttribute("data-measuring", "true");
 
@@ -130,14 +126,14 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     }
 
     stage.removeAttribute("data-measuring");
+
+    const { gap } = getStageVars();
+    return { cardsH: maxH, stageW: stage.clientWidth, gap };
   };
 
   const layoutBasePositions = () => {
     const stage = stageRef.current;
-    if (!stage) return;
-
-    // If stage width is not ready (0 / tiny), skip measuring to avoid huge wrap-height.
-    if (stage.clientWidth < minStageWidthPx) return;
+    if (!stage) return { cardsH: 0, stageW: 0, gap: 0, cardW: 0 };
 
     const { gap } = getStageVars();
     const n = Math.max(1, count);
@@ -153,15 +149,14 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       card.style.setProperty("--x", `${Math.round(x)}px`);
     }
 
-    measureCompactHeightsBBox();
+    const m = measureCompactHeightsBBox();
+    return { ...m, cardW: Math.round(cardW) };
   };
 
   const computeShiftAndWidth = (index: number) => {
     const stage = stageRef.current;
     const card = cardRefs.current[index];
     if (!stage || !card) return;
-
-    if (stage.clientWidth < minStageWidthPx) return;
 
     const { sideGap } = getStageVars();
     const baseX = parseFloat(getComputedStyle(card).getPropertyValue("--x")) || 0;
@@ -173,8 +168,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.setProperty("--expand-w", `${Math.round(newW)}px`);
   };
 
-  // Double-rAF scheduling: waits for layout + CSS to settle.
-  const scheduleLayout = () => {
+  const scheduleLayoutOnce = () => {
     cancelRaf();
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = requestAnimationFrame(() => {
@@ -185,33 +179,43 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     });
   };
 
-  // Initial “stage readiness” loop: prevents first run when width is wrong.
-  const scheduleInitialLayoutWhenReady = () => {
-    const stage = stageRef.current;
-    if (!stage) return;
+  // Key fix: stabilization loop after mount.
+  // Re-run layout for a few frames until (stageW, cardW, cardsH, gap) stop changing.
+  const stabilizeInitialLayout = () => {
+    cancelRaf();
 
-    let attempts = 0;
+    let runs = 0;
+    let stableRuns = 0;
+    let lastSig = "";
 
     const tick = () => {
-      attempts += 1;
+      runs += 1;
 
-      const w = stage.clientWidth;
+      const stage = stageRef.current;
+      if (!stage) return;
 
-      if (w >= minStageWidthPx) {
-        scheduleLayout();
-        return;
-      }
+      const { cardsH, stageW, gap, cardW } = layoutBasePositions();
+      const idx = activeIndexRef.current;
+      if (idx != null) computeShiftAndWidth(idx);
 
-      if (attempts >= maxInitialLayoutAttempts) {
-        // Last resort: still schedule once (better than never), but it may be off.
-        scheduleLayout();
-        return;
-      }
+      // Signature of the layout state we care about.
+      const sig = `${stageW}|${gap}|${cardW}|${cardsH}`;
 
-      requestAnimationFrame(tick);
+      if (sig === lastSig) stableRuns += 1;
+      else stableRuns = 0;
+
+      lastSig = sig;
+
+      // Accept as stable after N identical runs.
+      if (stableRuns >= stableRunsNeeded) return;
+
+      // Give up after max frames.
+      if (runs >= stabilizeFrames) return;
+
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(tick);
   };
 
   const setExpandedA11y = (expandedIndex: number | null, expanded: boolean) => {
@@ -303,8 +307,8 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
     }
 
-    // Do NOT measure immediately here; wait for a stable width.
-    scheduleInitialLayoutWhenReady();
+    // The stabilization loop replaces “one-shot” initial measurement.
+    stabilizeInitialLayout();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
@@ -313,15 +317,15 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
-    const bump = () => scheduleLayout();
+    const bump = () => scheduleLayoutOnce();
 
     const ro = new ResizeObserver(bump);
     ro.observe(stage);
 
     window.addEventListener("resize", bump, { passive: true });
 
-    // Run again after mount (covers hydration / CSS variables settling)
-    scheduleLayout();
+    // Also rerun once at mount.
+    scheduleLayoutOnce();
 
     return () => {
       cancelRaf();
@@ -335,34 +339,53 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
+    // Re-stabilize after all images decode (better than load for layout correctness).
     const imgs = Array.from(stage.querySelectorAll("img"));
+
     if (!imgs.length) return;
 
-    const bump = () => scheduleLayout();
+    let cancelled = false;
 
-    imgs.forEach((img) => {
-      if (img.complete) return;
-      img.addEventListener("load", bump, { once: true });
-      img.addEventListener("error", bump, { once: true });
-    });
+    const after = () => {
+      if (cancelled) return;
+      stabilizeInitialLayout();
+    };
+
+    Promise.all(
+      imgs.map((img) => {
+        if (img.complete) return Promise.resolve();
+        // decode() is best-effort; fallback to load/error events.
+        if ("decode" in img) {
+          return (img.decode?.() as Promise<void>).catch(() => undefined);
+        }
+        return new Promise<void>((res) => {
+          img.addEventListener("load", () => res(), { once: true });
+          img.addEventListener("error", () => res(), { once: true });
+        });
+      })
+    ).then(after);
 
     return () => {
-      imgs.forEach((img) => {
-        img.removeEventListener("load", bump);
-        img.removeEventListener("error", bump);
-      });
+      cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
   useEffect(() => {
-    // If fonts load after first paint, they can change wrapping -> re-measure once.
+    // Fonts swapping changes wrapping -> restabilize once fonts are ready.
     const anyDoc = document as unknown as { fonts?: { ready: Promise<unknown> } };
-    if (anyDoc.fonts?.ready) {
-      anyDoc.fonts.ready.then(() => {
-        scheduleLayout();
-      });
-    }
+    if (!anyDoc.fonts?.ready) return;
+
+    let cancelled = false;
+
+    anyDoc.fonts.ready.then(() => {
+      if (cancelled) return;
+      stabilizeInitialLayout();
+    });
+
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
