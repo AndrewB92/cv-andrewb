@@ -1,3 +1,4 @@
+// src/app/page.tsx
 import Link from "next/link";
 import Script from "next/script";
 import styles from "./page.module.css";
@@ -8,7 +9,6 @@ import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { ExperienceSection } from "./ExperienceSection";
 import TypedRotator from "@/components/TypedRotator";
-// import { Terminal } from "@/components/Terminal/Terminal";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
@@ -16,7 +16,6 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { ProjectImageSlider } from "@/components/ProjectImageSlider";
 import { DescriptionToggle } from "@/components/DescriptionToggle";
 import PortfolioSection from "@/components/portfolio/PortfolioSection";
-
 
 const welcomeCode = `type UseCase =
   | "explore new tech"
@@ -36,35 +35,55 @@ export function formatWelcome({ title, uses }: Welcome): string {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const { profile, skills, projects } = await getPortfolioContent();
+  // Single fetch (avoid calling getPortfolioContent() twice)
+  const { profile, skills, projects, experiences } = await getPortfolioContent();
   const featuredProjects = projects.slice(0, 3);
-  const { experiences } = await getPortfolioContent();
 
   return (
     <main>
-
       <article className={`${styles.hero} glow-border`}>
         <Terminal path="~/andrew.dev/welcome.tsx">
           <TerminalCode code={welcomeCode} language="tsx" />
         </Terminal>
+
         <div className={styles.heroContent}>
-          <div className={styles.heroContentBG}>
-            {/* <div className={styles.heroContentBGinner}></div> */}
-          </div>
+          <div className={styles.heroContentBG} />
+
           <p className={styles.welcome}>Welcome to my website</p>
-          <h1 className={styles.title}>I&apos;m {profile.name}, your<br />
+
+          <h1 className={styles.title}>
+            I&apos;m {profile.name}, your
+            <br />
             <MagicText stars={0} intervalMs={2200}>
               product focused
-            </MagicText><br />
+            </MagicText>
+            <br />
             web developer
           </h1>
 
           <p>{profile.summary}</p>
+
           <div className={styles.heroActions}>
-            <RainbowGlowLink href="/?meet=hour-meeting" glow blob iconPosition="end" iconName="mail" iconDirection="up">
+            <RainbowGlowLink
+              href="/?meet=hour-meeting"
+              glow
+              blob
+              iconPosition="end"
+              iconName="mail"
+              iconDirection="up"
+            >
               Write a message
             </RainbowGlowLink>
-            <RainbowGlowLink href="#" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="download" iconDirection="up">
+
+            <RainbowGlowLink
+              href="#"
+              blob
+              variant="flat"
+              className={styles.flatButton}
+              iconPosition="end"
+              iconName="download"
+              iconDirection="up"
+            >
               Check my CV
             </RainbowGlowLink>
           </div>
@@ -72,8 +91,8 @@ export default async function HomePage() {
           <HeroMetaPopover className={styles.heroMetaPopover}>
             <div className={styles.heroMeta}>
               <strong>Short facts:</strong>
+
               <p>
-                {/* <strong>Role:</strong> {profile.title} */}
                 <strong>Preferred roles:</strong> Frontend / WordPress / Web developer
               </p>
               <p>
@@ -89,16 +108,12 @@ export default async function HomePage() {
                 <strong>Timezone:</strong> EET (UTC+2)
               </p>
               <p>
-                <strong>Email:</strong>{" "}
-                <a href={`mailto:${profile.email}`}>{profile.email}</a>
+                <strong>Email:</strong> <a href={`mailto:${profile.email}`}>{profile.email}</a>
               </p>
             </div>
           </HeroMetaPopover>
 
-          <StatusBadge
-            text="Available"
-            color="#2ecc71"
-          />
+          <StatusBadge text="Available" color="#2ecc71" />
         </div>
       </article>
 
@@ -134,98 +149,83 @@ export default async function HomePage() {
         title="My last works"
         description="Several samplings of recent launches. If you want to see them all - browse the full archive on the projects page."
       >
+        {/* Old preview (keep for now; remove when you’re ready) */}
         <div className={styles.projectsPreview}>
-          {featuredProjects.map((project) => {
-            const featuredImg =
-              project.img?.find((i) => i.name === "featured")?.url;
-            
-            const secondaryImg = project.img?.find(
-              (i) => i.name === "secondary"
-            )?.url;
+          {featuredProjects.map((project) => (
+            <article key={project.name} className={styles.projectCard}>
+              {!!project.img?.length && (
+                <ProjectImageSlider images={project.img} altBase={project.name} showArrows={false} />
+              )}
 
-            return (
-              <article key={project.name} className={styles.projectCard}>
-                {!!project.img?.length && (
-                  <ProjectImageSlider
-                    images={project.img}
-                    altBase={project.name}
-                    showArrows={false}
-                  />
-                )}
-
-                  <div className={styles.projectContent}>
-                    <div className={styles.projectTitle}>
-                      <h3>{project.name}</h3>
-                    </div>
-
-                    <div className={styles.projectStack}>
-                      {project.stack.map((item) => (
-                        <span key={`${project.name}-${item}`} className={styles.stackTag}>
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* <a className={styles.projectDividerUp}>Open Description</a>
-                    <div className={styles.projectDescription}>
-                      <p>{project.description}</p>
-                    </div> */}
-
-                    <DescriptionToggle
-                      targetName={styles.projectCard}
-                      buttonClassName={styles.projectDescriptionButton}
-                      panelClassName={styles.projectDescription}
-                    >
-                      <p>{project.description}</p>
-                    </DescriptionToggle>
-
-                    <div className={styles.projectLink}>
-                    {project.year && (
-                      <span className={styles.projectYear}>{project.year}</span>
-                    )}
-                    <a
-                      href={project.link}
-                      className={styles.sectionLink}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                        focusable="false"
-                      >
-                        <path d="M14 5h5v5" />
-                        <path d="M10 14L19 5" />
-                        <path d="M19 14v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
-                      </svg>
-                    </a>
-                  </div>
+              <div className={styles.projectContent}>
+                <div className={styles.projectTitle}>
+                  <h3>{project.name}</h3>
                 </div>
-              </article>
-            );
-          })}
+
+                <div className={styles.projectStack}>
+                  {project.stack.map((item) => (
+                    <span key={`${project.name}-${item}`} className={styles.stackTag}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <DescriptionToggle
+                  targetName={styles.projectCard}
+                  buttonClassName={styles.projectDescriptionButton}
+                  panelClassName={styles.projectDescription}
+                >
+                  <p>{project.description}</p>
+                </DescriptionToggle>
+
+                <div className={styles.projectLink}>
+                  {project.year && <span className={styles.projectYear}>{project.year}</span>}
+
+                  <a href={project.link} className={styles.sectionLink} target="_blank" rel="noreferrer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M14 5h5v5" />
+                      <path d="M10 14L19 5" />
+                      <path d="M19 14v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
 
+        {/* New portfolio cards */}
         <PortfolioSection featuredProjects={featuredProjects} />
 
-        <RainbowGlowLink href="/projects" blob variant="flat" className={styles.flatButton} iconPosition="end" iconName="arrow" iconDirection="right">
+        <RainbowGlowLink
+          href="/projects"
+          blob
+          variant="flat"
+          className={styles.flatButton}
+          iconPosition="end"
+          iconName="arrow"
+          iconDirection="right"
+        >
           View all projects
         </RainbowGlowLink>
       </Section>
+
       <CalPopup
         paramKey="meet"
         linksByKey={{
           "hour-meeting": "andrew-bielous-iyuwdo/hour-meeting",
-          // add more if you want:
-          // "quick-chat": "andrew-bielous-iyuwdo/quick-chat",
         }}
       />
     </main>

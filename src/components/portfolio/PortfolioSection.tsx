@@ -5,6 +5,7 @@ import styles from "./PortfolioSection.module.css";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
 
 type ProjectImg = { url: string; name?: string };
+
 export type FeaturedProject = {
   name: string;
   year?: string | number;
@@ -71,7 +72,8 @@ export default function PortfolioSection({
                 <>
                   <p>{project.description}</p>
                   <p>
-                    Add outcomes: performance, CVW, a11y, SEO, architecture, migrations, etc.
+                    Add outcomes: performance, Core Web Vitals, a11y, SEO, architecture, migrations,
+                    etc.
                   </p>
                   <p>Extra paragraphs to test scroll…</p>
                 </>
@@ -82,7 +84,9 @@ export default function PortfolioSection({
             return (
               <article
                 key={project.name}
-                ref={(el) => (cardRefs.current[i] = el)}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
                 className={[styles.card, isActive ? styles.isActive : ""].join(" ")}
                 data-away={isOpen && !isActive ? (i % 2 === 0 ? "down" : "up") : "none"}
               >

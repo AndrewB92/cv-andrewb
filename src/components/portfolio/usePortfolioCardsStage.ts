@@ -16,7 +16,9 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef<Array<HTMLElement | null>>(Array.from({ length: count }, () => null));
+  const cardRefs = useRef<Array<HTMLArticleElement | null>>(
+    Array.from({ length: count }, () => null)
+  );
   const activeIndexRef = useRef<number | null>(null);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -43,7 +45,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     };
   };
 
-  const clearActiveVars = (card: HTMLElement | null) => {
+  const clearActiveVars = (card: HTMLArticleElement | null) => {
     if (!card) return;
     card.style.removeProperty("--shift-x");
     card.style.removeProperty("--expand-w");
@@ -196,10 +198,15 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   useLayoutEffect(() => {
     if (!count) return;
-    // keep refs sized
+
+    // keep refs array sized if project count changes
     if (cardRefs.current.length !== count) {
-      cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
+      cardRefs.current = Array.from(
+        { length: count },
+        (_, i) => cardRefs.current[i] ?? null
+      );
     }
+
     layoutBasePositions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
@@ -209,6 +216,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     if (!stage) return;
 
     let raf = 0;
+
     const bump = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
