@@ -50,6 +50,11 @@ export default function PortfolioSection({
   return (
     <section id="portfolio" className={styles.portfolio}>
       <div className={styles.container}>
+        <header className={styles.sectionHeader}>
+          <p className={styles.sectionKicker}>{kicker}</p>
+          <h2 className={styles.sectionTitle}>{title}</h2>
+          <p className={styles.sectionSubtitle}>{subtitle}</p>
+        </header>
 
         <div
           ref={stageRef}
@@ -62,6 +67,7 @@ export default function PortfolioSection({
         >
           {featuredProjects.map((project, i) => {
             const img = getPrimaryImage(project);
+
             const expandedContent =
               project.details ?? (
                 <>
@@ -121,11 +127,19 @@ export default function PortfolioSection({
                       ))}
                     </ul>
 
-                    <div className={[styles.cardText, styles.cardTextCompact].join(" ")}>
+                    {/* COMPACT (used for measurement) */}
+                    <div
+                      className={[styles.cardText, styles.cardTextCompact].join(" ")}
+                      data-role="compact"
+                    >
                       <p className={styles.cardDescription}>{project.description}</p>
                     </div>
 
-                    <div className={[styles.cardText, styles.cardTextExpanded].join(" ")}>
+                    {/* EXPANDED (force-hidden inline during measurement) */}
+                    <div
+                      className={[styles.cardText, styles.cardTextExpanded].join(" ")}
+                      data-role="expanded"
+                    >
                       <div className={styles.expandedScroll}>{expandedContent}</div>
                     </div>
 

@@ -17,7 +17,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   const stageRef = useRef<HTMLDivElement | null>(null);
 
-  // Use HTMLElement to avoid depending on lib.dom-specific interfaces (HTMLArticleElement).
+  // Use HTMLElement to avoid DOM lib typing issues in your TS setup.
   const cardRefs = useRef<Array<HTMLElement | null>>(
     Array.from({ length: count }, () => null)
   );
@@ -40,11 +40,12 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   const getStageVars = () => {
     const stage = stageRef.current;
-    if (!stage) return { gap: 20, sideGap: 20 };
+    if (!stage) return { gap: 20, sideGap: 0 };
+
     const cs = getComputedStyle(stage);
     return {
       gap: parseFloat(cs.getPropertyValue("--gap")) || 20,
-      sideGap: parseFloat(cs.getPropertyValue("--side-gap")) || 20,
+      sideGap: parseFloat(cs.getPropertyValue("--side-gap")) || 0,
     };
   };
 
@@ -54,11 +55,32 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.removeProperty("--expand-w");
   };
 
-  const measureCompactHeightsOnly = () => {
+  // Strict measurement: force-hide expanded subtree inline, so it cannot affect scrollHeight.
+  const measureCompactHeightsStrict = () => {
     const stage = stageRef.current;
     if (!stage) return;
 
     stage.setAttribute("data-measuring", "true");
+
+    const expandedEls: Array<{ el: HTMLElement; prevDisplay: string; prevHeight: string }> = [];
+
+    for (let i = 0; i < count; i++) {
+      const card = cardRefs.current[i];
+      if (!card) continue;
+
+      const expanded = card.querySelector<HTMLElement>("[data-role='expanded']");
+      if (!expanded) continue;
+
+      expandedEls.push({
+        el: expanded,
+        prevDisplay: expanded.style.display,
+        prevHeight: expanded.style.height,
+      });
+
+      // inline overrides beat any CSS/state
+      expanded.style.display = "none";
+      expanded.style.height = "0px";
+    }
 
     let maxH = 0;
 
@@ -66,18 +88,29 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       const card = cardRefs.current[i];
       if (!card) continue;
 
-      const prev = card.style.height;
+      const prevH = card.style.height;
       card.style.height = "auto";
+
+      // Now guaranteed compact-only.
       maxH = Math.max(maxH, Math.ceil(card.scrollHeight));
-      card.style.height = prev;
+
+      card.style.height = prevH;
     }
 
     const hPx = `${maxH}px`;
+
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
       if (card) card.style.height = hPx;
     }
+
     stage.style.setProperty("--cards-h", hPx);
+
+    // Restore expanded inline styles.
+    for (const item of expandedEls) {
+      item.el.style.display = item.prevDisplay;
+      item.el.style.height = item.prevHeight;
+    }
 
     stage.removeAttribute("data-measuring");
   };
@@ -100,7 +133,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       card.style.setProperty("--x", `${Math.round(x)}px`);
     }
 
-    measureCompactHeightsOnly();
+    measureCompactHeightsStrict();
   };
 
   const computeShiftAndWidth = (index: number) => {
