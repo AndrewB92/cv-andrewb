@@ -74,15 +74,15 @@
 /* Media */
 .cardMedia {
   width: 100%;
-  height: 250px; /* stable initial header media height */
+  height: auto;
   overflow: hidden;
   background: #0b0e15;
 }
 
 .cardMedia img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   display: block;
 }
 
