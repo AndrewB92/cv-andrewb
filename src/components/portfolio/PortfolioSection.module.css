@@ -50,6 +50,7 @@
   --w: 0px;
   --shift-x: 0px;
   --expand-w: 0px;
+  max-height: 740px;
   position: absolute;
   top: 0;
   left: 0;
