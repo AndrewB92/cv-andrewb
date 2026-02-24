@@ -96,7 +96,8 @@
 /* Content */
 .cardContent {
   padding: 18px 18px 16px;
-  height: calc(100% - 250px);
+  /* height: calc(100% - 250px); */
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
