@@ -1,3 +1,4 @@
+// src/components/portfolio/usePortfolioCardsStage.ts
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "opening" | "expanded" | "closing";
@@ -6,9 +7,8 @@ type Opts = {
   openExpandDelay?: number;
   closeResetDelay?: number;
 
-  // How aggressive to be on first paint stabilization
-  stabilizeFrames?: number; // max frames to try (default 30)
-  stableRunsNeeded?: number; // how many identical runs in a row to accept as stable (default 2)
+  stabilizeFrames?: number;
+  stableRunsNeeded?: number;
 };
 
 const DEFAULTS: Required<Opts> = {
@@ -26,7 +26,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   const stageRef = useRef<HTMLDivElement | null>(null);
 
-  // Keep as HTMLElement to avoid lib.dom interface dependency.
+  // Avoid DOM-specific element interfaces (your TS env lacks them).
   const cardRefs = useRef<Array<HTMLElement | null>>(
     Array.from({ length: count }, () => null)
   );
@@ -70,7 +70,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.removeProperty("--expand-w");
   };
 
-  // OPTION B measurement: rendered bbox height, with expanded subtree force-hidden inline.
   const measureCompactHeightsBBox = () => {
     const stage = stageRef.current;
     if (!stage) return { cardsH: 0, stageW: 0, gap: 0 };
@@ -179,8 +178,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     });
   };
 
-  // Key fix: stabilization loop after mount.
-  // Re-run layout for a few frames until (stageW, cardW, cardsH, gap) stop changing.
   const stabilizeInitialLayout = () => {
     cancelRaf();
 
@@ -198,7 +195,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       const idx = activeIndexRef.current;
       if (idx != null) computeShiftAndWidth(idx);
 
-      // Signature of the layout state we care about.
       const sig = `${stageW}|${gap}|${cardW}|${cardsH}`;
 
       if (sig === lastSig) stableRuns += 1;
@@ -206,10 +202,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
       lastSig = sig;
 
-      // Accept as stable after N identical runs.
       if (stableRuns >= stableRunsNeeded) return;
-
-      // Give up after max frames.
       if (runs >= stabilizeFrames) return;
 
       rafRef.current = requestAnimationFrame(tick);
@@ -307,9 +300,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
     }
 
-    // The stabilization loop replaces “one-shot” initial measurement.
     stabilizeInitialLayout();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
@@ -324,7 +315,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
     window.addEventListener("resize", bump, { passive: true });
 
-    // Also rerun once at mount.
     scheduleLayoutOnce();
 
     return () => {
@@ -339,8 +329,8 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
-    // Re-stabilize after all images decode (better than load for layout correctness).
-    const imgs = Array.from(stage.querySelectorAll("img"));
+    // IMPORTANT: due to your TS DOM types, treat as Element[] and use "any" for listeners/decode.
+    const imgs = Array.from(stage.querySelectorAll("img")) as unknown as Element[];
 
     if (!imgs.length) return;
 
@@ -352,15 +342,23 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     };
 
     Promise.all(
-      imgs.map((img) => {
-        if (img.complete) return Promise.resolve();
-        // decode() is best-effort; fallback to load/error events.
-        if ("decode" in img) {
-          return (img.decode?.() as Promise<void>).catch(() => undefined);
+      imgs.map((el) => {
+        const img: any = el;
+
+        if (img?.complete) return Promise.resolve();
+
+        if (typeof img?.decode === "function") {
+          return Promise.resolve(img.decode()).catch(() => undefined);
         }
+
         return new Promise<void>((res) => {
-          img.addEventListener("load", () => res(), { once: true });
-          img.addEventListener("error", () => res(), { once: true });
+          if (typeof img?.addEventListener === "function") {
+            img.addEventListener("load", () => res(), { once: true });
+            img.addEventListener("error", () => res(), { once: true });
+            return;
+          }
+          // If it's not an EventTarget for some reason, resolve immediately.
+          res();
         });
       })
     ).then(after);
@@ -373,12 +371,12 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
   useEffect(() => {
     // Fonts swapping changes wrapping -> restabilize once fonts are ready.
-    const anyDoc = document as unknown as { fonts?: { ready: Promise<unknown> } };
-    if (!anyDoc.fonts?.ready) return;
+    const anyDoc: any = document;
+    if (!anyDoc?.fonts?.ready) return;
 
     let cancelled = false;
 
-    anyDoc.fonts.ready.then(() => {
+    Promise.resolve(anyDoc.fonts.ready).then(() => {
       if (cancelled) return;
       stabilizeInitialLayout();
     });
