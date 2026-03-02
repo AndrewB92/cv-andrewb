@@ -69,11 +69,11 @@
 
 .card {
   opacity: 1;
-  transition: opacity 350ms linear;
-  -webkit-transition: opacity 350ms linear;
-  -moz-transition: opacity 350ms linear;
-  -ms-transition: opacity 350ms linear;
-  -o-transition: opacity 350ms linear;
+  transition: opacity 150ms linear;
+  -webkit-transition: opacity 150ms linear;
+  -moz-transition: opacity 150ms linear;
+  -ms-transition: opacity 150ms linear;
+  -o-transition: opacity 150ms linear;
 }
 
 .cards:hover .card {
