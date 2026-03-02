@@ -52,8 +52,8 @@
   --w: 0px;
   --shift-x: 0px;
   --expand-w: 0px;
-  /* max-height: 420px; */
-  position: absolute;
+  /*max-height: 420px;
+  */position: absolute;
   top: 0;
   left: 0;
   width: var(--w);
@@ -63,17 +63,15 @@
   border: 1px solid #2a2f3a;
   border-radius: .6rem;
   overflow: hidden;
-  transition:    transform 420ms cubic-bezier(.2,.8,.2,1),    width     420ms cubic-bezier(.2,.8,.2,1),    opacity   320ms ease;
+  transition:    
+    transform 420ms cubic-bezier(.2,.8,.2,1),
+    width     420ms cubic-bezier(.2,.8,.2,1),
+    opacity   320ms ease;
   will-change: transform, width, opacity;
 }
 
 .card {
   opacity: 1;
-  transition: opacity 150ms linear;
-  -webkit-transition: opacity 150ms linear;
-  -moz-transition: opacity 150ms linear;
-  -ms-transition: opacity 150ms linear;
-  -o-transition: opacity 150ms linear;
 }
 
 .cards:hover .card {
