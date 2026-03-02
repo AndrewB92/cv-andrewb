@@ -90,7 +90,7 @@
 
 .mediaPlaceholder {
   width: 100%;
-  height: 100%;
+  height: auto;
   background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
 }
 
@@ -268,11 +268,11 @@
 }
 
 .isOpen.phaseExpand .isActive .cardMedia {
-  height: 100%;
+  height: auto;
 }
 
 .isOpen.phaseExpand .isActive .cardContent {
-  height: 100%;
+  height: auto;
 }
 
 .isOpen.phaseExpand .isActive .cardTextExpanded {
