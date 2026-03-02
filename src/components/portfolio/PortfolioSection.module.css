@@ -273,7 +273,7 @@
 .isOpen .isActive .cardActionsExpanded {
   opacity: 1;
   display: flex;
-  margin-top: 0 !important;
+  margin-top: auto;
   height: auto !important;
 }
 
@@ -298,11 +298,16 @@
 }
 
 .isOpen.phaseExpand .isActive .cardTextExpanded {
-  display: block;
+  display: flex;
   opacity: 1;
   flex: 1;
   min-height: 0px;
   height: auto;
+
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-bottom: 18px;
 }
 
 .isOpen.phaseExpand .isActive .cardClose {
