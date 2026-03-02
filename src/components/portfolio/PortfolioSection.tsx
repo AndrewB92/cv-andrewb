@@ -4,8 +4,6 @@ import React from "react";
 import styles from "./PortfolioSection.module.css";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
 
-import { ProjectImageSlider } from "@/components/ProjectImageSlider";
-
 type ProjectImg = { url: string; name?: string };
 
 export type FeaturedProject = {
@@ -99,9 +97,6 @@ export default function PortfolioSection({
                       <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
                     ) : (
                       <div className={styles.mediaPlaceholder} aria-hidden="true" />
-                    )}
-                    {!!project.img?.length && (
-                      <ProjectImageSlider images={project.img} altBase={project.name} showArrows={false} />
                     )}
                   </div>
 
