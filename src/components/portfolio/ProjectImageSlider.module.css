@@ -5,7 +5,8 @@
   /* aspect-ratio: 16 / 9; */
   /* border-radius: 14px; */
   overflow: hidden;
-  background: #ffffff08;
+  /* background: #ffffff08; */
+  background: transparent;
   /* user-select: none; */
 }
 
