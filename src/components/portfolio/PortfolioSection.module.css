@@ -188,17 +188,18 @@
 }
 
 /* Actions */
-.cardContent .cardActions {
-  display: none;
-  opacity: 0;
-}
-
 .cardActions {
   margin-top: auto;
   display: flex;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.cardContent .cardActions {
+  display: none;
+  opacity: 0;
+  margin-top: 0 !important;
 }
 
 .btn {
