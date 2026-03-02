@@ -13,7 +13,7 @@ import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
 import { StatusBadge } from "@/components/StatusBadge";
-import { ProjectImageSlider } from "@/components/ProjectImageSlider";
+// import { ProjectImageSlider } from "@/components/portfolio/ProjectImageSlider";
 import { DescriptionToggle } from "@/components/DescriptionToggle";
 import PortfolioSection from "@/components/portfolio/PortfolioSection";
 
