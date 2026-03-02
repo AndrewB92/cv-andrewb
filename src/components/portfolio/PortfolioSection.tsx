@@ -143,7 +143,7 @@ export default function PortfolioSection({
                       <div className={styles.expandedScroll}>{expandedContent}</div>
                     </div>
 
-                    {/* <div className={styles.cardActions}>
+                    <div className={styles.cardActions}>
                       <a
                         href={project.link}
                         className={styles.btn}
@@ -172,17 +172,7 @@ export default function PortfolioSection({
                           Case Study
                         </a>
                       ) : null}
-
-                      <button
-                        type="button"
-                        className={styles.cardToggle}
-                        aria-expanded={isActive && isExpanded}
-                        onClick={() => onToggle(i)}
-                        data-role="toggle"
-                      >
-                        More info
-                      </button>
-                    </div> */}
+                    </div>
                   </div>
 
 <div className={styles.cardActions}>
