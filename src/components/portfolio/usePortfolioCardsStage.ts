@@ -59,7 +59,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
 
     const cs = getComputedStyle(stage);
     return {
-      gap: parseFloat(cs.getPropertyValue("--gap")) || 20,
+      gap: parseFloat(cs.getPropertyValue("--gap")) || 0,
       sideGap: parseFloat(cs.getPropertyValue("--side-gap")) || 0,
     };
   };
