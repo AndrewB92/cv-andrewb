@@ -23,7 +23,7 @@ export type Project = {
   name: string;
   year?: number;
   description: string;
-  details?: React.ReactNode;
+  details?: string;
   stack: string[];
   link: string;
   img?: ProjectImage[];

@@ -15,7 +15,7 @@ export type FeaturedProject = {
   github?: string;
   caseStudy?: string;
   description: string; // compact text
-  details?: React.ReactNode; // expanded content (optional)
+  details?: string; // expanded content (optional)
   img?: ProjectImg[];
 };
 
