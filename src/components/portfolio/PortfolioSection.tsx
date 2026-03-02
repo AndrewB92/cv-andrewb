@@ -3,6 +3,7 @@
 import React from "react";
 import styles from "./PortfolioSection.module.css";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
+import { ProjectImageSlider } from "./ProjectImageSlider";
 
 type ProjectImg = { url: string; name?: string };
 
@@ -92,8 +93,25 @@ export default function PortfolioSection({
                 data-away={isOpen && !isActive ? (i % 2 === 0 ? "down" : "up") : "none"}
               >
                 <div className={styles.cardLayout}>
-                  <div className={styles.cardMedia}>
+                  {/* <div className={styles.cardMedia}>
                     {img ? (
+                      <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
+                    ) : (
+                      <div className={styles.mediaPlaceholder} aria-hidden="true" />
+                    )}
+                  </div> */}
+
+                  <div className={styles.cardMedia}>
+                    {isActive && isExpanded && (project.img?.length ?? 0) > 0 ? (
+                      <ProjectImageSlider
+                        images={(project.img ?? []).map((i, idx) => ({
+                          name: i.name ?? `img-${idx}`,
+                          url: i.url,
+                        }))}
+                        altBase={project.name}
+                        showArrows
+                      />
+                    ) : img ? (
                       <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
                     ) : (
                       <div className={styles.mediaPlaceholder} aria-hidden="true" />
