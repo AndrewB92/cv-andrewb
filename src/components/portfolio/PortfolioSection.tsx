@@ -143,7 +143,7 @@ export default function PortfolioSection({
                       <div className={styles.expandedScroll}>{expandedContent}</div>
                     </div>
 
-                    <div className={styles.cardActions}>
+                    <div className={styles.cardActionsExpanded}>
                       <a
                         href={project.link}
                         className={styles.btn}
