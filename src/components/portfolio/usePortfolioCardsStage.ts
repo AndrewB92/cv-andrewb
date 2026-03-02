@@ -1,5 +1,5 @@
 // src/components/portfolio/usePortfolioCardsStage.ts
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "opening" | "expanded" | "closing";
 
@@ -7,6 +7,7 @@ type Opts = {
   openExpandDelay?: number;
   closeResetDelay?: number;
 
+  // kept for compatibility, but no longer used as a long raf loop
   stabilizeFrames?: number;
   stableRunsNeeded?: number;
 };
@@ -18,18 +19,16 @@ const DEFAULTS: Required<Opts> = {
   stableRunsNeeded: 2,
 };
 
+const raf2 = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
 export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
-  const { openExpandDelay, closeResetDelay, stabilizeFrames, stableRunsNeeded } = {
-    ...DEFAULTS,
-    ...opts,
-  };
+  const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   // Avoid DOM-specific element interfaces (your TS env lacks them).
-  const cardRefs = useRef<Array<HTMLElement | null>>(
-    Array.from({ length: count }, () => null)
-  );
+  const cardRefs = useRef<Array<HTMLElement | null>>(Array.from({ length: count }, () => null));
 
   const activeIndexRef = useRef<number | null>(null);
 
@@ -70,11 +69,65 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.removeProperty("--expand-w");
   };
 
+  const waitForFonts = async () => {
+    const anyDoc: any = document;
+    if (!anyDoc?.fonts?.ready) return;
+    try {
+      await Promise.resolve(anyDoc.fonts.ready);
+    } catch {
+      // ignore
+    }
+  };
+
+  const waitForImagesInStage = async () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const imgs = Array.from(stage.querySelectorAll("img")) as unknown as Element[];
+    if (!imgs.length) return;
+
+    await Promise.all(
+      imgs.map((el) => {
+        const img: any = el;
+
+        if (img?.complete && img?.naturalWidth > 0) return Promise.resolve();
+
+        if (typeof img?.decode === "function") {
+          return Promise.resolve(img.decode()).catch(() => undefined);
+        }
+
+        return new Promise<void>((res) => {
+          if (typeof img?.addEventListener === "function") {
+            const done = () => res();
+            img.addEventListener("load", done, { once: true });
+            img.addEventListener("error", done, { once: true });
+            return;
+          }
+          res();
+        });
+      })
+    );
+  };
+
   const measureCompactHeightsBBox = () => {
     const stage = stageRef.current;
     if (!stage) return { cardsH: 0, stageW: 0, gap: 0 };
 
+    const stageW = stage.clientWidth;
+    if (stageW <= 0) return { cardsH: 0, stageW: 0, gap: 0 };
+
     stage.setAttribute("data-measuring", "true");
+
+    // HARD GUARD: if any card has tiny width, abort measurement (prevents insane wrapped heights)
+    for (let i = 0; i < count; i++) {
+      const card = cardRefs.current[i];
+      if (!card) continue;
+      const w = card.getBoundingClientRect().width;
+      if (w < 80) {
+        stage.removeAttribute("data-measuring");
+        return { cardsH: 0, stageW, gap: getStageVars().gap };
+      }
+    }
 
     const expandedEls: Array<{ el: HTMLElement; prevDisplay: string; prevHeight: string }> = [];
 
@@ -127,17 +180,19 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     stage.removeAttribute("data-measuring");
 
     const { gap } = getStageVars();
-    return { cardsH: maxH, stageW: stage.clientWidth, gap };
+    return { cardsH: maxH, stageW, gap };
   };
 
-  const layoutBasePositions = () => {
+  const layoutBasePositionsWrite = () => {
     const stage = stageRef.current;
-    if (!stage) return { cardsH: 0, stageW: 0, gap: 0, cardW: 0 };
+    if (!stage) return { stageW: 0, gap: 0, cardW: 0 };
 
+    const stageW = stage.clientWidth;
     const { gap } = getStageVars();
+
     const n = Math.max(1, count);
     const totalGaps = gap * (n - 1);
-    const cardW = (stage.clientWidth - totalGaps) / n;
+    const cardW = (stageW - totalGaps) / n;
 
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
@@ -148,8 +203,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       card.style.setProperty("--x", `${Math.round(x)}px`);
     }
 
-    const m = measureCompactHeightsBBox();
-    return { ...m, cardW: Math.round(cardW) };
+    return { stageW, gap, cardW: Math.round(cardW) };
   };
 
   const computeShiftAndWidth = (index: number) => {
@@ -167,49 +221,33 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.setProperty("--expand-w", `${Math.round(newW)}px`);
   };
 
-  const scheduleLayoutOnce = () => {
+  const layoutAndMeasure = useCallback(async () => {
+    cancelRaf();
+
+    // 1) write base vars
+    layoutBasePositionsWrite();
+
+    // 2) next frames: allow CSS vars to apply, then measure
+    await raf2();
+
+    const { cardsH } = measureCompactHeightsBBox();
+
+    // If guard aborted measurement (cardsH=0), try again next frame
+    if (!cardsH) {
+      await raf2();
+      measureCompactHeightsBBox();
+    }
+
+    const idx = activeIndexRef.current;
+    if (idx != null) computeShiftAndWidth(idx);
+  }, [count]);
+
+  const scheduleLayoutOnce = useCallback(() => {
     cancelRaf();
     rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = requestAnimationFrame(() => {
-        layoutBasePositions();
-        const idx = activeIndexRef.current;
-        if (idx != null) computeShiftAndWidth(idx);
-      });
+      void layoutAndMeasure();
     });
-  };
-
-  const stabilizeInitialLayout = () => {
-    cancelRaf();
-
-    let runs = 0;
-    let stableRuns = 0;
-    let lastSig = "";
-
-    const tick = () => {
-      runs += 1;
-
-      const stage = stageRef.current;
-      if (!stage) return;
-
-      const { cardsH, stageW, gap, cardW } = layoutBasePositions();
-      const idx = activeIndexRef.current;
-      if (idx != null) computeShiftAndWidth(idx);
-
-      const sig = `${stageW}|${gap}|${cardW}|${cardsH}`;
-
-      if (sig === lastSig) stableRuns += 1;
-      else stableRuns = 0;
-
-      lastSig = sig;
-
-      if (stableRuns >= stableRunsNeeded) return;
-      if (runs >= stabilizeFrames) return;
-
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-  };
+  }, [layoutAndMeasure]);
 
   const setExpandedA11y = (expandedIndex: number | null, expanded: boolean) => {
     for (let i = 0; i < count; i++) {
@@ -300,7 +338,8 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
     }
 
-    stabilizeInitialLayout();
+    // initial layout after refs exist
+    scheduleLayoutOnce();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
@@ -313,79 +352,40 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const ro = new ResizeObserver(bump);
     ro.observe(stage);
 
-    window.addEventListener("resize", bump, { passive: true });
+    // observing cards helps if internal content changes height
+    for (const el of cardRefs.current) if (el) ro.observe(el);
 
-    scheduleLayoutOnce();
+    window.addEventListener("resize", bump, { passive: true });
 
     return () => {
       cancelRaf();
       ro.disconnect();
       window.removeEventListener("resize", bump);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count]);
+  }, [count, scheduleLayoutOnce]);
 
   useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    // IMPORTANT: due to your TS DOM types, treat as Element[] and use "any" for listeners/decode.
-    const imgs = Array.from(stage.querySelectorAll("img")) as unknown as Element[];
-
-    if (!imgs.length) return;
-
     let cancelled = false;
 
-    const after = () => {
+    const run = async () => {
+      await waitForFonts();
       if (cancelled) return;
-      stabilizeInitialLayout();
+
+      await waitForImagesInStage();
+      if (cancelled) return;
+
+      await raf2();
+      if (cancelled) return;
+
+      scheduleLayoutOnce();
     };
 
-    Promise.all(
-      imgs.map((el) => {
-        const img: any = el;
-
-        if (img?.complete) return Promise.resolve();
-
-        if (typeof img?.decode === "function") {
-          return Promise.resolve(img.decode()).catch(() => undefined);
-        }
-
-        return new Promise<void>((res) => {
-          if (typeof img?.addEventListener === "function") {
-            img.addEventListener("load", () => res(), { once: true });
-            img.addEventListener("error", () => res(), { once: true });
-            return;
-          }
-          // If it's not an EventTarget for some reason, resolve immediately.
-          res();
-        });
-      })
-    ).then(after);
+    run();
 
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count]);
-
-  useEffect(() => {
-    // Fonts swapping changes wrapping -> restabilize once fonts are ready.
-    const anyDoc: any = document;
-    if (!anyDoc?.fonts?.ready) return;
-
-    let cancelled = false;
-
-    Promise.resolve(anyDoc.fonts.ready).then(() => {
-      if (cancelled) return;
-      stabilizeInitialLayout();
-    });
-
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [count, scheduleLayoutOnce]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
