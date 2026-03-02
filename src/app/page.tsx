@@ -220,6 +220,7 @@ export default async function HomePage() {
         >
           View all projects
         </RainbowGlowLink>
+
       </Section>
 
       <CalPopup

@@ -44,6 +44,8 @@
   overflow: hidden;
 }
 
+
+
 /* Absolute cards */
 .card {
   --x: 0px;
@@ -63,6 +65,23 @@
   overflow: hidden;
   transition:    transform 420ms cubic-bezier(.2,.8,.2,1),    width     420ms cubic-bezier(.2,.8,.2,1),    opacity   320ms ease;
   will-change: transform, width, opacity;
+}
+
+.card {
+  opacity: 1;
+  transition: opacity 350ms linear;
+  -webkit-transition: opacity 350ms linear;
+  -moz-transition: opacity 350ms linear;
+  -ms-transition: opacity 350ms linear;
+  -o-transition: opacity 350ms linear;
+}
+
+.cards:hover .card {
+  opacity: 0.5;
+}
+
+.cards:hover .card:hover {
+  opacity: 1;
 }
 
 /* Default layout (stacked) */
