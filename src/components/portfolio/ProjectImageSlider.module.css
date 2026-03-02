@@ -51,21 +51,22 @@
 .next { right: 10px; }
 
 .dots {
-  position: absolute;
-  left: 10px;
-  right: 10px;
+  /*position: absolute;*/
+  /*left: 10px;*/
+  /*right: 10px;*/
   display: flex;
   gap: 6px;
   justify-content: center;
   pointer-events: auto;
-  transition: bottom 350ms ease-in-out;
+  /* transition: bottom 350ms ease-in-out; */
+  position: relative;
 }
 
 .frame .dots{
-  bottom: -30px;
+  /* bottom: -30px; */
 }
 .frame:hover .dots{
-  bottom: 10px;
+  /* bottom: 10px; */
 } 
 
 .dot {

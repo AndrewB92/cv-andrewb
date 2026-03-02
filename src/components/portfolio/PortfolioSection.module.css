@@ -291,6 +291,14 @@
   height: auto;
 }
 
+.isOpen.phaseExpand .isActive .cardMedia {
+    aspect-ratio: unset;
+    background: transparent;
+    width: 100%;
+    overflow: hidden;
+    border-right: 1px solid #2a2f3a;
+}
+
 .isOpen.phaseExpand .isActive .cardContent {
   height: auto;
 }
