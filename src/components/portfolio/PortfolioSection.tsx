@@ -143,7 +143,7 @@ export default function PortfolioSection({
                       <div className={styles.expandedScroll}>{expandedContent}</div>
                     </div>
 
-                    <div className={styles.cardActions}>
+                    {/* <div className={styles.cardActions}>
                       <a
                         href={project.link}
                         className={styles.btn}
@@ -182,8 +182,50 @@ export default function PortfolioSection({
                       >
                         More info
                       </button>
-                    </div>
+                    </div> */}
                   </div>
+
+<div className={styles.cardActions}>
+  <a
+    href={project.link}
+    className={styles.btn}
+    target="_blank"
+    rel="noreferrer"
+  >
+    Live Site
+  </a>
+
+  {project.github ? (
+    <a
+      href={project.github}
+      className={[styles.btn, styles.btnOutline].join(" ")}
+      target="_blank"
+      rel="noreferrer"
+    >
+      GitHub
+    </a>
+  ) : project.caseStudy ? (
+    <a
+      href={project.caseStudy}
+      className={[styles.btn, styles.btnOutline].join(" ")}
+      target="_blank"
+      rel="noreferrer"
+    >
+      Case Study
+    </a>
+  ) : null}
+
+  <button
+    type="button"
+    className={styles.cardToggle}
+    aria-expanded={isActive && isExpanded}
+    onClick={() => onToggle(i)}
+    data-role="toggle"
+  >
+    More info
+  </button>
+</div>
+
                 </div>
               </article>
             );
