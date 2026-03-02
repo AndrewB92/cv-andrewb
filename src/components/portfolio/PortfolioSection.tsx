@@ -141,38 +141,40 @@ export default function PortfolioSection({
                       data-role="expanded"
                     >
                       <div className={styles.expandedScroll}>{expandedContent}</div>
-                    </div>
 
-                    <div className={styles.cardActionsExpanded}>
-                      <a
-                        href={project.link}
-                        className={styles.btn}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Live Site
-                      </a>
-
-                      {project.github ? (
+                      <div className={styles.cardActionsExpanded}>
                         <a
-                          href={project.github}
-                          className={[styles.btn, styles.btnOutline].join(" ")}
+                          href={project.link}
+                          className={styles.btn}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          GitHub
+                          Live Site
                         </a>
-                      ) : project.caseStudy ? (
-                        <a
-                          href={project.caseStudy}
-                          className={[styles.btn, styles.btnOutline].join(" ")}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Case Study
-                        </a>
-                      ) : null}
+
+                        {project.github ? (
+                          <a
+                            href={project.github}
+                            className={[styles.btn, styles.btnOutline].join(" ")}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            GitHub
+                          </a>
+                        ) : project.caseStudy ? (
+                          <a
+                            href={project.caseStudy}
+                            className={[styles.btn, styles.btnOutline].join(" ")}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Case Study
+                          </a>
+                        ) : null}
+                      </div>
+
                     </div>
+
                   </div>
 
 <div className={styles.cardActions}>
