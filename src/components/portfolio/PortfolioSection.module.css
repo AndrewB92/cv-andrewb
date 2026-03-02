@@ -196,10 +196,12 @@
   flex-wrap: wrap;
 }
 
-.cardContent .cardActions {
+.cardActionsExpanded {
   display: none;
   opacity: 0;
-  margin-top: 0 !important;
+  margin-top: 0px;
+  padding: 0px;
+  height: 0px;
 }
 
 .btn {
@@ -246,10 +248,11 @@
   display: none;
 }
 
-.isOpen .isActive .cardContent .cardActions {
+.isOpen .isActive .cardActionsExpanded {
   opacity: 1;
   display: flex;
   margin-top: 0 !important;
+  height: auto !important;
 }
 
 .isOpen .isActive .cardActions {
