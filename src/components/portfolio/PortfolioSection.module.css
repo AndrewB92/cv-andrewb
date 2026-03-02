@@ -75,16 +75,18 @@
 /* Media */
 .cardMedia {
   width: 100%;
-  height: auto;
-  min-height: 200px;
+  /* height: auto; */
+  /* min-height: 200px; */
   overflow: hidden;
   background: #0b0e15;
+
+  aspect-ratio: 16 / 9;
 }
 
 .cardMedia img {
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  /* height: auto; */
+  /* object-fit: contain; */
   display: block;
 }
 
