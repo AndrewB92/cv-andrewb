@@ -150,7 +150,7 @@ export default async function HomePage() {
         description="Several samplings of recent launches. If you want to see them all - browse the full archive on the projects page."
       >
         {/* Old preview (keep for now; remove when you’re ready) */}
-        <div className={styles.projectsPreview}>
+        {/* <div className={styles.projectsPreview}>
           {featuredProjects.map((project) => (
             <article key={project.name} className={styles.projectCard}>
               {!!project.img?.length && (
@@ -204,7 +204,7 @@ export default async function HomePage() {
               </div>
             </article>
           ))}
-        </div>
+        </div> */}
 
         {/* New portfolio cards */}
         <PortfolioSection featuredProjects={featuredProjects} />
