@@ -73,11 +73,7 @@ export default function PortfolioSection({
               project.details ?? (
                 <>
                   <p>{project.description}</p>
-                  <p>
-                    Add outcomes: performance, Core Web Vitals, a11y, SEO, architecture, migrations,
-                    etc.
-                  </p>
-                  <p>Extra paragraphs to test scroll…</p>
+                  <p>{project.details}</p>
                 </>
               );
 
