@@ -62,6 +62,7 @@
   pointer-events: auto;
   /* transition: bottom 350ms ease-in-out; */
   position: relative;
+  padding: 12px 8px 0px;
 }
 
 .frame .dots{
