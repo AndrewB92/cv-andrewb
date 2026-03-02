@@ -237,6 +237,9 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
     return undefined;
   }
 
+  const details =
+  typeof payload.details === "string" ? payload.details : undefined;
+
   const description =
     typeof payload.description === "string" ? payload.description : "";
   const stack = sanitizeStringArray(payload.stack);
@@ -246,6 +249,7 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
   return {
     name,
     ...(Number.isFinite(year) ? { year } : {}),
+    details,
     description,
     stack,
     link,

@@ -69,13 +69,11 @@ export default function PortfolioSection({
           {featuredProjects.map((project, i) => {
             const img = getPrimaryImage(project);
 
-            const expandedContent =
-              project.details ?? (
-                <>
-                  <p>{project.description}</p>
-                  <p>{project.details}</p>
-                </>
-              );
+            const expandedContent = project.details ? (
+              <p>{project.details}</p>
+            ) : (
+              <p>{project.description}</p>
+            );
 
             const isActive = activeIndex === i;
 
