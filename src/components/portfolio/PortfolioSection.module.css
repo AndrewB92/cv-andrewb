@@ -247,7 +247,8 @@
 
 .isOpen .isActive .cardContent .cardActions {
   opacity: 1;
-  display: block;
+  display: flex;
+  margin-top: 0 !important;
 }
 
 .isOpen .isActive .cardActions {
