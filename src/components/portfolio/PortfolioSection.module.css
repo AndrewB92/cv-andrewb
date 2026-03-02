@@ -34,7 +34,7 @@
 /* Stage */
 .cards {
   --gap: 20px;
-  --side-gap: 20px;
+  --side-gap: 0px;
   --cards-h: auto;
 
   position: relative;
