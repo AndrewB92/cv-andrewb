@@ -7,7 +7,7 @@ type Opts = {
   openExpandDelay?: number;
   closeResetDelay?: number;
 
-  // kept for compatibility, but no longer used as a long raf loop
+  // kept for compatibility with your prior API (not used as a long raf loop anymore)
   stabilizeFrames?: number;
   stableRunsNeeded?: number;
 };
@@ -19,8 +19,13 @@ const DEFAULTS: Required<Opts> = {
   stableRunsNeeded: 2,
 };
 
+// TS-safe: never pass resolve directly into requestAnimationFrame
 const raf2 = () =>
-  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
 
 export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
@@ -83,6 +88,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
+    // IMPORTANT: due to your TS DOM types, treat as Element[] and use "any" for listeners/decode.
     const imgs = Array.from(stage.querySelectorAll("img")) as unknown as Element[];
     if (!imgs.length) return;
 
@@ -183,6 +189,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     return { cardsH: maxH, stageW, gap };
   };
 
+  // WRITE pass only: sets --w/--x (no measuring)
   const layoutBasePositionsWrite = () => {
     const stage = stageRef.current;
     if (!stage) return { stageW: 0, gap: 0, cardW: 0 };
@@ -227,12 +234,12 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     // 1) write base vars
     layoutBasePositionsWrite();
 
-    // 2) next frames: allow CSS vars to apply, then measure
+    // 2) allow CSS vars to apply, then measure
     await raf2();
 
     const { cardsH } = measureCompactHeightsBBox();
 
-    // If guard aborted measurement (cardsH=0), try again next frame
+    // If guard aborted measurement (cardsH=0), try again next frames
     if (!cardsH) {
       await raf2();
       measureCompactHeightsBBox();
@@ -380,7 +387,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       scheduleLayoutOnce();
     };
 
-    run();
+    void run();
 
     return () => {
       cancelled = true;
