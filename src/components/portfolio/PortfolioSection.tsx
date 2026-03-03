@@ -78,7 +78,7 @@ export default function PortfolioSection({
     const cls = [styles.cards];
     if (isOpen) cls.push(styles.isOpen);
     if (isExpanded) cls.push(styles.isExpanded);
-    if (phase === "closing" || phase === "collapsing" || phase === "slidingIn") cls.push(styles.isClosing);
+    if (phase === "collapsing" || phase === "slidingIn") cls.push(styles.isClosing);
     return cls.join(" ");
   }, [isOpen, isExpanded, phase]);
 
