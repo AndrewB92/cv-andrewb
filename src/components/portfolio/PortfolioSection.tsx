@@ -1,7 +1,6 @@
-// src/components/portfolio/PortfolioSection.tsx
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import styles from "./PortfolioSection.module.css";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
 import { ProjectImageSlider } from "./ProjectImageSlider";
@@ -37,6 +36,7 @@ function getPrimaryImage(project: FeaturedProject) {
   const imgs = project.img ?? [];
   if (!imgs.length) return "";
 
+  // Prefer likely “hero/featured” variants first, then anything.
   const pick = (variants: string[]) =>
     imgs.find((i) => variants.includes(normalize(i.variant).toLowerCase()))?.url;
 
@@ -55,44 +55,27 @@ export default function PortfolioSection({
   kicker = "Portfolio",
   subtitle = "Short descriptions and technologies used.",
 }: Props) {
-  const count = featuredProjects.length;
-
-  const {
-    stageRef,
-    cardRefs,
-    activeIndex,
-    phase,
-    onToggle,
-    onClose,
-    isOpen,
-    isExpanded,
-    canMountSlider,
-  } = usePortfolioCardsStage(count, {
-    // These are only fallback timeouts if transitionend is missed.
-    // Make them >= your CSS durations.
-    fallbackOpenMs: 520,
-    fallbackCloseMs: 520,
-  });
-
-  const stageClassName = useMemo(() => {
-    const cls = [styles.cards];
-    if (isOpen) cls.push(styles.isOpen);
-    if (isExpanded) cls.push(styles.isExpanded);
-    if (phase === "collapsing" || phase === "slidingIn") cls.push(styles.isClosing);
-    return cls.join(" ");
-  }, [isOpen, isExpanded, phase]);
+  const { stageRef, cardRefs, activeIndex, phase, onToggle, onClose, isOpen, isExpanded } =
+    usePortfolioCardsStage(featuredProjects.length);
 
   return (
     <section id="portfolio" className={styles.portfolio}>
       <div className={styles.container}>
-        {/* Optional header */}
         {/* <header className={styles.sectionHeader}>
           <p className={styles.sectionKicker}>{kicker}</p>
           <h2 className={styles.sectionTitle}>{title}</h2>
           <p className={styles.sectionSubtitle}>{subtitle}</p>
         </header> */}
 
-        <div ref={stageRef} className={stageClassName}>
+        <div
+          ref={stageRef}
+          className={[
+            styles.cards,
+            isOpen ? styles.isOpen : "",
+            isExpanded ? styles.phaseExpand : "",
+            phase === "closing" ? styles.isClosing : "",
+          ].join(" ")}
+        >
           {featuredProjects.map((project, i) => {
             const img = getPrimaryImage(project);
             const isActive = activeIndex === i;
@@ -111,11 +94,10 @@ export default function PortfolioSection({
                 }}
                 className={[styles.card, isActive ? styles.isActive : ""].join(" ")}
                 data-away={isOpen && !isActive ? (i % 2 === 0 ? "down" : "up") : "none"}
-                data-expanded={isActive && isExpanded ? "true" : "false"}
               >
                 <div className={styles.cardLayout}>
                   <div className={styles.cardMedia}>
-                    {isActive && isExpanded && canMountSlider && (project.img?.length ?? 0) > 0 ? (
+                    {isActive && isExpanded && (project.img?.length ?? 0) > 0 ? (
                       <ProjectImageSlider images={project.img ?? []} altBase={project.name} showArrows />
                     ) : img ? (
                       <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
@@ -149,60 +131,59 @@ export default function PortfolioSection({
                       ))}
                     </ul>
 
-                    {/* SAME SPACE, NO display:none. Swap via opacity/visibility/pointer-events only */}
-                    <div className={styles.cardTextZone}>
-                      <div className={styles.cardTextCompact} data-role="compact">
-                        <p className={styles.cardDescription}>{project.description}</p>
-                      </div>
-
-                      <div className={styles.cardTextExpanded} data-role="expanded">
-                        <div className={styles.expandedScroll}>{expandedContent}</div>
-
-                        <div className={styles.cardActionsExpanded}>
-                          <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
-                            Live Site
-                          </a>
-
-                          {project.github ? (
-                            <a
-                              href={project.github}
-                              className={[styles.btn, styles.btnOutline].join(" ")}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              GitHub
-                            </a>
-                          ) : null}
-                        </div>
-                      </div>
+                    {/* COMPACT */}
+                    <div className={[styles.cardText, styles.cardTextCompact].join(" ")} data-role="compact">
+                      <p className={styles.cardDescription}>{project.description}</p>
                     </div>
 
-                    <div className={styles.cardActions}>
-                      <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
-                        Live Site
-                      </a>
+                    {/* EXPANDED */}
+                    <div className={[styles.cardText, styles.cardTextExpanded].join(" ")} data-role="expanded">
+                      <div className={styles.expandedScroll}>{expandedContent}</div>
 
-                      {project.github ? (
-                        <a
-                          href={project.github}
-                          className={[styles.btn, styles.btnOutline].join(" ")}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          GitHub
+                      <div className={styles.cardActionsExpanded}>
+                        <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
+                          Live Site
                         </a>
-                      ) : null}
 
-                      <button
-                        type="button"
-                        className={styles.cardToggle}
-                        aria-expanded={isActive && isExpanded}
-                        onClick={() => onToggle(i)}
-                        data-role="toggle"
-                      >
-                        More info
-                      </button>
+                        {project.github ? (
+                          <a
+                            href={project.github}
+                            className={[styles.btn, styles.btnOutline].join(" ")}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            GitHub
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
+                  </div>
+
+                  <div className={styles.cardActions}>
+                    <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
+                      Live Site
+                    </a>
+
+                    {project.github ? (
+                      <a
+                        href={project.github}
+                        className={[styles.btn, styles.btnOutline].join(" ")}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        GitHub
+                      </a>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      className={styles.cardToggle}
+                      aria-expanded={isActive && isExpanded}
+                      onClick={() => onToggle(i)}
+                      data-role="toggle"
+                    >
+                      More info
+                    </button>
                   </div>
                 </div>
               </article>

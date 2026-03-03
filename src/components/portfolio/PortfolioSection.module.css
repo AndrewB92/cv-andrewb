@@ -1,21 +1,41 @@
-/* src/components/portfolio/PortfolioSection.module.css */
-
-.portfolio {}
+.portfolio {
+  /* keep neutral; you can merge with your theme */
+}
 
 .container {
+  /* max-width: 1100px; */
+  /* margin: 0 auto; */
   padding: 0;
 }
 
-.sectionHeader { margin-bottom: 40px; }
-.sectionKicker { margin: 0 0 10px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; }
-.sectionTitle { margin: 0 0 10px; font-size: 32px; }
-.sectionSubtitle { margin: 0; opacity: .7; max-width: 60ch; }
+.sectionHeader {
+  margin-bottom: 40px;
+}
+
+.sectionKicker {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 32px;
+}
+
+.sectionSubtitle {
+  margin: 0;
+  opacity: 0.7;
+  max-width: 60ch;
+}
 
 /* Stage */
 .cards {
   --gap: 20px;
   --side-gap: 0px;
-  --cards-h: 420px;
+  --cards-h: auto;
 
   position: relative;
   height: var(--cards-h);
@@ -24,78 +44,84 @@
   overflow: hidden;
 }
 
+
+
 /* Absolute cards */
 .card {
   --x: 0px;
   --w: 0px;
   --shift-x: 0px;
   --expand-w: 0px;
-
-  position: absolute;
+  /*max-height: 420px;
+  */position: absolute;
   top: 0;
   left: 0;
-
   width: var(--w);
-  height: 100%;
-
   transform: translateX(var(--x)) translateY(0);
   opacity: 1;
-
   background: #161b22;
   border: 1px solid #2a2f3a;
   border-radius: .6rem;
   overflow: hidden;
-
-  transition:
+  transition:    
     transform 420ms cubic-bezier(.2,.8,.2,1),
     width     420ms cubic-bezier(.2,.8,.2,1),
-    opacity   260ms ease;
-
-  /* Do not keep a permanent will-change on all cards.
-     We enable it only while stage is "open" to reduce VRAM churn. */
-  will-change: auto;
-}
-
-.isOpen .card {
+    opacity   320ms ease;
   will-change: transform, width, opacity;
 }
 
-/* Hover opacity behavior */
-.cards:hover .card { opacity: 0.5; }
-.cards:hover .card:hover { opacity: 1; }
+.card {
+  opacity: 1;
+}
 
-/* Layout inside card */
+.cards:hover .card {
+  opacity: 0.5;
+}
+
+.cards:hover .card:hover {
+  opacity: 1;
+}
+
+/* Default layout (stacked) */
 .cardLayout {
   height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr; /* media + content */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Media */
 .cardMedia {
   width: 100%;
+  /* height: auto; */
+  /* min-height: 200px; */
   overflow: hidden;
   background: #0b0e15;
+
   aspect-ratio: 16 / 9;
 }
+
 .cardMedia img {
   width: 100%;
+  /* height: auto; */
+  /* object-fit: contain; */
   display: block;
 }
+
 .mediaPlaceholder {
   width: 100%;
-  height: 100%;
+  height: auto;
   background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
 }
 
 /* Content */
 .cardContent {
-  padding: 18px 18px 18px;
-  height: 100%;
-  min-height: 0;
+  padding: 18px 18px 0px;
+  /* height: calc(100% - 250px); */
+  height: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0; /* critical for scroll containers in flex */
 }
 
 .cardTop {
@@ -108,12 +134,21 @@
 .cardHead {
   display: flex;
   flex-direction: column-reverse;
+  justify-content: flex-start;
   align-items: flex-start;
   gap: 0px;
+  flex-wrap: nowrap;
 }
 
-.cardTitle { margin: 0; font-size: 18px; }
-.cardYear { font-size: 13px; opacity: .6; }
+.cardTitle {
+  margin: 0;
+  font-size: 18px;
+}
+
+.cardYear {
+  font-size: 13px;
+  opacity: 0.6;
+}
 
 .cardStack {
   list-style: none;
@@ -123,6 +158,7 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+
 .cardStack li {
   font-size: 12px;
   padding: 4px 8px;
@@ -130,29 +166,17 @@
   border-radius: 6px;
 }
 
-/* Text Zone: both compact + expanded are always mounted (no display:none).
-   They occupy the same logical area and cross-fade smoothly. */
-.cardTextZone {
-  position: relative;
-  flex: 1;
-  min-height: 0;
+/* Text blocks */
+.cardText {
+  transition: opacity 220ms ease;
+  will-change: opacity;
 }
 
-.cardTextCompact,
-.cardTextExpanded {
-  position: absolute;
-  inset: 0;
-  transition: opacity 220ms ease, transform 220ms ease, visibility 0ms linear 220ms;
-  will-change: opacity, transform;
-}
-
-/* Compact visible by default */
 .cardTextCompact {
   opacity: 1;
-  visibility: visible;
-  transform: translateY(0px);
-  pointer-events: auto;
+  display: block;
 }
+
 .cardDescription {
   margin: 0;
   font-size: 14px;
@@ -160,28 +184,27 @@
   opacity: 0.85;
 }
 
-/* Expanded hidden by default */
 .cardTextExpanded {
+  display: none;
   opacity: 0;
-  visibility: hidden;
-  transform: translateY(6px);
-  pointer-events: none;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  height: 0px;
 }
 
 .expandedScroll {
-  flex: 1;
-  min-height: 0;
   overflow: auto;
   padding-right: 6px;
+  min-height: 0;
   line-height: 1.6;
   opacity: 0.9;
 }
-.expandedScroll p { margin: 0 0 12px; }
-.expandedScroll p:last-child { margin-bottom: 0; }
+
+.expandedScroll p {
+  margin: 0 0 12px;
+}
+
+.expandedScroll p:last-child {
+  margin-bottom: 0;
+}
 
 /* Actions */
 .cardActions {
@@ -190,13 +213,15 @@
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+  padding: 0px 18px 18px;
 }
 
 .cardActionsExpanded {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
+  display: none;
+  opacity: 0;
+  margin-top: 0px;
+  padding: 0px;
+  height: 0px;
 }
 
 .btn {
@@ -208,7 +233,10 @@
   border: 1px solid #2a2f3a;
   border-radius: 8px;
 }
-.btnOutline { background: transparent; }
+
+.btnOutline {
+  background: transparent;
+}
 
 .cardToggle,
 .cardClose {
@@ -221,86 +249,135 @@
   cursor: pointer;
 }
 
-/* Close hidden until expanded (opacity only; no display flip) */
+/* Close hidden until expanded */
 .cardClose {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 220ms ease;
 }
 
 /* =========================
-   Stage states
+   Sequencing & states
    ========================= */
 
 .isOpen .card { pointer-events: none; }
 .isOpen .isActive { pointer-events: auto; z-index: 5; }
 
-/* Movement: away cards */
-.isOpen .card[data-away="up"]   { transform: translateX(var(--x)) translateY(-520px); }
-.isOpen .card[data-away="down"] { transform: translateX(var(--x)) translateY(520px); }
-
-/* Expanded: hide others smoothly */
-.isExpanded .card:not(.isActive) {
+/* During open (others moving): fade compact + actions on active card */
+.isOpen .isActive .cardTextCompact{
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 220ms ease;
+  display: none;
 }
 
-/* Expanded: active card expands via width/shift (outer animation stays smooth) */
-.isExpanded .isActive {
+.isOpen .isActive .cardActionsExpanded {
+  opacity: 1;
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  height: auto !important;
+}
+
+.isOpen .isActive .cardActions {
+  opacity: 0;
+  display: none;
+}
+
+/* Expanded: active card becomes 2-col layout */
+.isOpen.phaseExpand .isActive .cardLayout {
+  display: grid;
+  grid-template-columns: minmax(260px, 40%) 1fr;
+  height: 100%;
+}
+
+.isOpen.phaseExpand .isActive .cardMedia {
+  height: auto;
+}
+
+.isOpen.phaseExpand .isActive .cardMedia {
+    aspect-ratio: unset;
+    background: transparent;
+    width: 100%;
+    overflow: hidden;
+    border-right: 1px solid #2a2f3a;
+}
+
+.isOpen.phaseExpand .isActive .cardContent {
+  height: auto;
+}
+
+.isOpen.phaseExpand .isActive .cardTextExpanded {
+  display: flex;
+  opacity: 1;
+  flex: 1;
+  min-height: 0px;
+  height: auto;
+
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-bottom: 18px;
+}
+
+.isOpen.phaseExpand .isActive .cardClose {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Closing: expanded fades out immediately */
+.isClosing .isActive .cardTextExpanded {
+  opacity: 0;
+  display: none;
+  height: 0px;
+}
+
+/* Movement: away cards */
+.isOpen .card[data-away="up"] {
+  transform: translateX(var(--x)) translateY(-520px);
+}
+.isOpen .card[data-away="down"] {
+  transform: translateX(var(--x)) translateY(520px);
+}
+
+/* Expanded: hide others, expand active */
+.isOpen.phaseExpand .card:not(.isActive) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.isOpen.phaseExpand .isActive {
   width: var(--expand-w);
   transform: translateX(calc(var(--x) + var(--shift-x))) translateY(0);
 }
 
-/* Expanded: internal layout switches AFTER expand (no mid-flight layout thrash).
-   Still smooth because the heavy motion already finished. */
-.isExpanded .isActive .cardLayout {
-  grid-template-rows: 1fr;
-  grid-template-columns: minmax(260px, 40%) 1fr;
-  height: 100%;
-}
-.isExpanded .isActive .cardMedia {
-  aspect-ratio: unset;
-  height: 100%;
-  border-right: 1px solid #2a2f3a;
-}
-.isExpanded .isActive .cardContent {
-  height: 100%;
-}
-
-/* Cross-fade text blocks without display:none */
-.isExpanded .isActive .cardTextCompact {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 220ms ease, transform 220ms ease, visibility 0ms linear 220ms;
-}
-
-.isExpanded .isActive .cardTextExpanded {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0px);
-  pointer-events: auto;
-  transition: opacity 220ms ease, transform 220ms ease, visibility 0ms linear 0ms;
-}
-
-.isExpanded .isActive .cardClose {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Closing: keep others hidden until slide-in begins (hook controls classes) */
+/* Closing: keep others hidden while active shrinks back */
 .isClosing .card:not(.isActive) {
   opacity: 0;
   pointer-events: none;
 }
 
+.isClosing .isActive {
+  width: var(--w);
+  transform: translateX(var(--x)) translateY(0);
+}
+
+/* Active marker for module */
+.isActive {}
+
+/* Measuring mode: force compact-only reliably */
+.cards[data-measuring="true"] .cardTextExpanded { display: none !important; }
+.cards[data-measuring="true"] .cardTextCompact { opacity: 1 !important; }
+.cards[data-measuring="true"] .cardActions { opacity: 1 !important; }
+.cards[data-measuring="true"] .cardClose { opacity: 0 !important; pointer-events: none !important; }
+.cards[data-measuring="true"] .cardLayout {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.cards[data-measuring="true"] .cardMedia { height: 250px !important; }
+.cards[data-measuring="true"] .cardContent { height: auto !important; }
+
 @media (prefers-reduced-motion: reduce) {
   .card,
-  .cardTextCompact,
-  .cardTextExpanded,
-  .cardClose {
+  .cardText,
+  .cardActions {
     transition: none !important;
   }
 }

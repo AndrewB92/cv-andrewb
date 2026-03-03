@@ -1,31 +1,38 @@
 // src/components/portfolio/usePortfolioCardsStage.ts
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-type Phase = "idle" | "slidingOut" | "expanding" | "expanded" | "collapsing" | "slidingIn";
+type Phase = "idle" | "opening" | "expanded" | "closing";
 
 type Opts = {
-  fallbackOpenMs?: number;
-  fallbackCloseMs?: number;
+  openExpandDelay?: number;
+  closeResetDelay?: number;
+
+  // kept for compatibility with your prior API (not used as a long raf loop anymore)
+  stabilizeFrames?: number;
+  stableRunsNeeded?: number;
 };
 
 const DEFAULTS: Required<Opts> = {
-  fallbackOpenMs: 520,
-  fallbackCloseMs: 520,
+  openExpandDelay: 320,
+  closeResetDelay: 420,
+  stabilizeFrames: 30,
+  stableRunsNeeded: 2,
 };
 
+// TS-safe: never pass resolve directly into requestAnimationFrame
 const raf2 = () =>
   new Promise<void>((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
   });
 
-function isBusy(phase: Phase) {
-  return phase !== "idle";
-}
-
 export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
-  const { fallbackOpenMs, fallbackCloseMs } = { ...DEFAULTS, ...opts };
+  const { openExpandDelay, closeResetDelay } = { ...DEFAULTS, ...opts };
 
   const stageRef = useRef<HTMLDivElement | null>(null);
+
+  // Avoid DOM-specific element interfaces (your TS env lacks them).
   const cardRefs = useRef<Array<HTMLElement | null>>(Array.from({ length: count }, () => null));
 
   const activeIndexRef = useRef<number | null>(null);
@@ -33,18 +40,15 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
 
-  const timers = useRef<{ openFallback?: number; closeFallback?: number }>({});
+  const timers = useRef<{ t1?: number; t2?: number }>({});
   const rafRef = useRef<number>(0);
 
-  // Mount heavy slider only after expand completes (reduces mid-animation layout churn)
-  const [canMountSlider, setCanMountSlider] = useState(false);
-
-  const isOpen = phase !== "idle";
+  const isOpen = phase === "opening" || phase === "expanded" || phase === "closing";
   const isExpanded = phase === "expanded";
 
   const clearTimers = () => {
-    if (timers.current.openFallback) window.clearTimeout(timers.current.openFallback);
-    if (timers.current.closeFallback) window.clearTimeout(timers.current.closeFallback);
+    if (timers.current.t1) window.clearTimeout(timers.current.t1);
+    if (timers.current.t2) window.clearTimeout(timers.current.t2);
     timers.current = {};
   };
 
@@ -64,6 +68,12 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     };
   };
 
+  const clearActiveVars = (card: HTMLElement | null) => {
+    if (!card) return;
+    card.style.removeProperty("--shift-x");
+    card.style.removeProperty("--expand-w");
+  };
+
   const waitForFonts = async () => {
     const anyDoc: any = document;
     if (!anyDoc?.fonts?.ready) return;
@@ -78,6 +88,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     const stage = stageRef.current;
     if (!stage) return;
 
+    // IMPORTANT: due to your TS DOM types, treat as Element[] and use "any" for listeners/decode.
     const imgs = Array.from(stage.querySelectorAll("img")) as unknown as Element[];
     if (!imgs.length) return;
 
@@ -104,13 +115,88 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     );
   };
 
-  // Base positions (WRITE only)
+  const measureCompactHeightsBBox = () => {
+    const stage = stageRef.current;
+    if (!stage) return { cardsH: 0, stageW: 0, gap: 0 };
+
+    const stageW = stage.clientWidth;
+    if (stageW <= 0) return { cardsH: 0, stageW: 0, gap: 0 };
+
+    stage.setAttribute("data-measuring", "true");
+
+    // HARD GUARD: if any card has tiny width, abort measurement (prevents insane wrapped heights)
+    for (let i = 0; i < count; i++) {
+      const card = cardRefs.current[i];
+      if (!card) continue;
+      const w = card.getBoundingClientRect().width;
+      if (w < 80) {
+        stage.removeAttribute("data-measuring");
+        return { cardsH: 0, stageW, gap: getStageVars().gap };
+      }
+    }
+
+    const expandedEls: Array<{ el: HTMLElement; prevDisplay: string; prevHeight: string }> = [];
+
+    for (let i = 0; i < count; i++) {
+      const card = cardRefs.current[i];
+      if (!card) continue;
+
+      const expanded = card.querySelector<HTMLElement>("[data-role='expanded']");
+      if (!expanded) continue;
+
+      expandedEls.push({
+        el: expanded,
+        prevDisplay: expanded.style.display,
+        prevHeight: expanded.style.height,
+      });
+
+      expanded.style.display = "none";
+      expanded.style.height = "0px";
+    }
+
+    let maxH = 0;
+
+    for (let i = 0; i < count; i++) {
+      const card = cardRefs.current[i];
+      if (!card) continue;
+
+      const prevH = card.style.height;
+      card.style.height = "auto";
+
+      const rect = card.getBoundingClientRect();
+      maxH = Math.max(maxH, Math.ceil(rect.height));
+
+      card.style.height = prevH;
+    }
+
+    const hPx = `${maxH}px`;
+
+    for (let i = 0; i < count; i++) {
+      const card = cardRefs.current[i];
+      if (card) card.style.height = hPx;
+    }
+
+    stage.style.setProperty("--cards-h", hPx);
+
+    for (const item of expandedEls) {
+      item.el.style.display = item.prevDisplay;
+      item.el.style.height = item.prevHeight;
+    }
+
+    stage.removeAttribute("data-measuring");
+
+    const { gap } = getStageVars();
+    return { cardsH: maxH, stageW, gap };
+  };
+
+  // WRITE pass only: sets --w/--x (no measuring)
   const layoutBasePositionsWrite = () => {
     const stage = stageRef.current;
     if (!stage) return { stageW: 0, gap: 0, cardW: 0 };
 
     const stageW = stage.clientWidth;
     const { gap } = getStageVars();
+
     const n = Math.max(1, count);
     const totalGaps = gap * (n - 1);
     const cardW = (stageW - totalGaps) / n;
@@ -127,24 +213,7 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     return { stageW, gap, cardW: Math.round(cardW) };
   };
 
-  // Measure compact max height ONCE (IDLE only), write stage --cards-h only (not per-card heights)
-  const measureCompactMaxHeightWriteStage = () => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    let maxH = 0;
-    for (let i = 0; i < count; i++) {
-      const card = cardRefs.current[i];
-      if (!card) continue;
-
-      const rect = card.getBoundingClientRect();
-      maxH = Math.max(maxH, Math.ceil(rect.height));
-    }
-
-    if (maxH > 0) stage.style.setProperty("--cards-h", `${maxH}px`);
-  };
-
-  const computeShiftAndWidthForIndex = (index: number) => {
+  const computeShiftAndWidth = (index: number) => {
     const stage = stageRef.current;
     const card = cardRefs.current[index];
     if (!stage || !card) return;
@@ -159,40 +228,34 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     card.style.setProperty("--expand-w", `${Math.round(newW)}px`);
   };
 
-  const clearActiveVars = (index: number) => {
-    const card = cardRefs.current[index];
-    if (!card) return;
-    card.style.removeProperty("--shift-x");
-    card.style.removeProperty("--expand-w");
-  };
-
-  // Layout engine: only runs when NOT animating
-  const layoutIdleOnly = useCallback(async () => {
-    if (isBusy(phase)) return;
-
+  const layoutAndMeasure = useCallback(async () => {
     cancelRaf();
+
+    // 1) write base vars
     layoutBasePositionsWrite();
+
+    // 2) allow CSS vars to apply, then measure
     await raf2();
 
-    // Guard: stage width must be real to avoid wrapped-measure spikes
-    const stage = stageRef.current;
-    if (!stage || stage.clientWidth < 120) return;
+    const { cardsH } = measureCompactHeightsBBox();
 
-    measureCompactMaxHeightWriteStage();
+    // If guard aborted measurement (cardsH=0), try again next frames
+    if (!cardsH) {
+      await raf2();
+      measureCompactHeightsBBox();
+    }
 
-    // If there is an active index (rare in idle), keep vars consistent
     const idx = activeIndexRef.current;
-    if (idx != null) computeShiftAndWidthForIndex(idx);
-  }, [count, phase]);
+    if (idx != null) computeShiftAndWidth(idx);
+  }, [count]);
 
-  const scheduleIdleLayoutOnce = useCallback(() => {
+  const scheduleLayoutOnce = useCallback(() => {
     cancelRaf();
     rafRef.current = requestAnimationFrame(() => {
-      void layoutIdleOnly();
+      void layoutAndMeasure();
     });
-  }, [layoutIdleOnly]);
+  }, [layoutAndMeasure]);
 
-  // A11y sync (minimal, no layout writes)
   const setExpandedA11y = (expandedIndex: number | null, expanded: boolean) => {
     for (let i = 0; i < count; i++) {
       const card = cardRefs.current[i];
@@ -219,159 +282,86 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     if (expanded) activeCard.setAttribute("data-expanded", "true");
   };
 
-  // Transition helper: wait for a property on active card to finish.
-  const waitForActiveTransition = (prop: string) =>
-    new Promise<void>((resolve) => {
-      const idx = activeIndexRef.current;
-      const card = idx != null ? cardRefs.current[idx] : null;
-      if (!card) return resolve();
-
-      let done = false;
-
-      const finish = () => {
-        if (done) return;
-        done = true;
-        card.removeEventListener("transitionend", onEnd);
-        resolve();
-      };
-
-      const onEnd = (e: TransitionEvent) => {
-        if (e.target !== card) return;
-        if (e.propertyName !== prop) return;
-        finish();
-      };
-
-      card.addEventListener("transitionend", onEnd);
-
-      // Fallback: if transitionend is missed
-      const t = window.setTimeout(() => finish(), fallbackOpenMs);
-      // Ensure timeout cleared when resolved
-      const originalResolve = resolve;
-      resolve = () => {
-        window.clearTimeout(t);
-        originalResolve();
-      };
-    });
-
-  const openCard = async (index: number) => {
+  const openCard = (index: number) => {
     clearTimers();
-    setCanMountSlider(false);
-
-    activeIndexRef.current = index;
+    setPhase("opening");
     setActiveIndex(index);
-
-    // Ensure base layout exists and vars are ready BEFORE animation begins
-    if (!isBusy(phase)) {
-      layoutBasePositionsWrite();
-      await raf2();
-      measureCompactMaxHeightWriteStage();
-      computeShiftAndWidthForIndex(index);
-    } else {
-      computeShiftAndWidthForIndex(index);
-    }
+    activeIndexRef.current = index;
 
     setExpandedA11y(index, false);
 
-    // 1) slide others away
-    setPhase("slidingOut");
+    timers.current.t1 = window.setTimeout(() => {
+      computeShiftAndWidth(index);
+      setPhase("expanded");
+      setExpandedA11y(index, true);
 
-    // Wait for transform end (slide out uses transform)
-    await waitForActiveTransition("transform");
-
-    // 2) expand active width/shift (CSS uses width + transform; we’ll wait on width)
-    setPhase("expanding");
-    await waitForActiveTransition("width");
-
-    // 3) expanded (now we can mount heavy slider + enable close focus)
-    setPhase("expanded");
-    setExpandedA11y(index, true);
-    setCanMountSlider(true);
-
-    const card = cardRefs.current[index];
-    const close = card?.querySelector<HTMLButtonElement>("[data-role='close']");
-    close?.focus({ preventScroll: true });
+      const card = cardRefs.current[index];
+      const close = card?.querySelector<HTMLButtonElement>("[data-role='close']");
+      close?.focus({ preventScroll: true });
+    }, openExpandDelay);
   };
 
-  const closeCard = async () => {
+  const closeCard = () => {
     const index = activeIndexRef.current;
     if (index == null) return;
 
     clearTimers();
+    setPhase("closing");
     setExpandedA11y(index, false);
-    setCanMountSlider(false);
 
-    // 1) collapse active (back to compact width)
-    setPhase("collapsing");
-    clearActiveVars(index);
-    computeShiftAndWidthForIndex(index); // keep values sane (won’t be used while collapsing)
+    timers.current.t2 = window.setTimeout(() => {
+      const card = cardRefs.current[index];
+      clearActiveVars(card);
 
-    // Wait for width end (active shrinking)
-    await waitForActiveTransition("width");
+      setPhase("idle");
+      setActiveIndex(null);
+      activeIndexRef.current = null;
 
-    // 2) slide others back in
-    setPhase("slidingIn");
-    await waitForActiveTransition("transform");
-
-    // 3) idle cleanup
-    setPhase("idle");
-    setActiveIndex(null);
-    activeIndexRef.current = null;
-
-    // Re-layout once after everything is stable
-    scheduleIdleLayoutOnce();
-
-    const card = cardRefs.current[index];
-    const toggle = card?.querySelector<HTMLButtonElement>("[data-role='toggle']");
-    toggle?.focus({ preventScroll: true });
+      const toggle = card?.querySelector<HTMLButtonElement>("[data-role='toggle']");
+      toggle?.focus({ preventScroll: true });
+    }, closeResetDelay);
   };
 
   const onToggle = (index: number) => {
     const current = activeIndexRef.current;
 
-    // If another card open, close first then open requested card.
     if (current != null && current !== index) {
-      void (async () => {
-        await closeCard();
-        await openCard(index);
-      })();
+      closeCard();
+      clearTimers();
+      timers.current.t1 = window.setTimeout(() => openCard(index), closeResetDelay);
       return;
     }
 
-    if (current === index) void closeCard();
-    else void openCard(index);
+    if (current === index) closeCard();
+    else openCard(index);
   };
 
-  const onClose = () => {
-    void closeCard();
-  };
+  const onClose = () => closeCard();
 
-  // Keep refs array aligned with count
   useLayoutEffect(() => {
     if (!count) return;
+
     if (cardRefs.current.length !== count) {
       cardRefs.current = Array.from({ length: count }, (_, i) => cardRefs.current[i] ?? null);
     }
-    // Initial layout after refs exist
-    scheduleIdleLayoutOnce();
+
+    // initial layout after refs exist
+    scheduleLayoutOnce();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
-  // ResizeObserver: stage only, and only schedule layout when idle
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
 
-    const bump = () => {
-      if (activeIndexRef.current != null) {
-        // Keep expanded vars correct on resize, but do minimal work.
-        const idx = activeIndexRef.current;
-        if (idx != null) computeShiftAndWidthForIndex(idx);
-      }
-      if (!isBusy(phase)) scheduleIdleLayoutOnce();
-    };
+    const bump = () => scheduleLayoutOnce();
 
     const ro = new ResizeObserver(bump);
     ro.observe(stage);
+
+    // observing cards helps if internal content changes height
+    for (const el of cardRefs.current) if (el) ro.observe(el);
+
     window.addEventListener("resize", bump, { passive: true });
 
     return () => {
@@ -379,9 +369,8 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       ro.disconnect();
       window.removeEventListener("resize", bump);
     };
-  }, [phase, scheduleIdleLayoutOnce]);
+  }, [count, scheduleLayoutOnce]);
 
-  // One-time stabilization: fonts + images, then layout (idle only)
   useEffect(() => {
     let cancelled = false;
 
@@ -395,19 +384,19 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
       await raf2();
       if (cancelled) return;
 
-      if (!isBusy(phase)) scheduleIdleLayoutOnce();
+      scheduleLayoutOnce();
     };
 
     void run();
+
     return () => {
       cancelled = true;
     };
-  }, [phase, scheduleIdleLayoutOnce]);
+  }, [count, scheduleLayoutOnce]);
 
-  // Escape to close
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && activeIndexRef.current != null) void closeCard();
+      if (e.key === "Escape" && activeIndexRef.current != null) closeCard();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -421,7 +410,6 @@ export function usePortfolioCardsStage(count: number, opts: Opts = {}) {
     phase,
     isOpen,
     isExpanded,
-    canMountSlider,
     onToggle,
     onClose,
   };
