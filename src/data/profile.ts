@@ -242,12 +242,10 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
       : typeof payload.url === "string"
         ? payload.url
         : undefined;
-  const github =
+  const github = 
     typeof payload.github === "string"
-      ? payload.github
-      : typeof payload.github === "string"
-        ? payload.github
-        : undefined;
+    ? payload.github
+    : undefined;
   const year =
     typeof payload.year === "number"
       ? payload.year
