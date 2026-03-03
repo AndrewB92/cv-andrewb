@@ -1,9 +1,14 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import styles from "./ProjectImageSlider.module.css";
 
-type ProjectImage = { name?: string; url: string };
+type ProjectImage = {
+  url: string;
+  variant?: string;
+  alt?: string;
+  caption?: string;
+};
 
 type Props = {
   images: ProjectImage[];
@@ -11,43 +16,60 @@ type Props = {
   showArrows?: boolean; // default: false
 };
 
+const normalize = (s?: string) => (typeof s === "string" ? s.trim() : "");
+const isNonEmpty = (s?: string) => normalize(s).length > 0;
+
+// Optional ordering: prioritize likely “hero/featured” variants.
+// You can tune this list to your naming style in DB.
+const variantRank = (v?: string) => {
+  const key = normalize(v).toLowerCase();
+  if (!key) return 999;
+
+  if (["featured", "hero", "main", "homepage"].includes(key)) return 0;
+  if (["shop", "product", "catalog"].includes(key)) return 1;
+  if (["mobile", "responsive"].includes(key)) return 2;
+
+  return 50;
+};
+
 export function ProjectImageSlider({ images, altBase, showArrows = false }: Props) {
   const id = useId();
 
   const slides = useMemo(() => {
-    // sanitize + dedupe by url
     const cleaned = (Array.isArray(images) ? images : [])
-      .filter((i): i is ProjectImage => Boolean(i?.url && typeof i.url === "string"))
-      .map((i, idx) => ({
+      .filter((i) => i && typeof i.url === "string" && i.url.trim().length > 0)
+      .map((i) => ({
         url: i.url.trim(),
-        name: (typeof i.name === "string" ? i.name.trim() : "") || `img-${idx}`,
-      }))
-      .filter((i) => i.url.length > 0);
+        variant: isNonEmpty(i.variant) ? i.variant!.trim() : undefined,
+        alt: isNonEmpty(i.alt) ? i.alt!.trim() : undefined,
+        caption: isNonEmpty(i.caption) ? i.caption!.trim() : undefined,
+      }));
 
-    const deduped: { url: string; name: string }[] = [];
+    // dedupe by URL
     const seen = new Set<string>();
+    const deduped: typeof cleaned = [];
     for (const item of cleaned) {
       if (seen.has(item.url)) continue;
       seen.add(item.url);
       deduped.push(item);
     }
 
-    // stable ordering: featured -> secondary -> rest in original order
-    const pick = (n: string) => deduped.find((i) => i.name === n);
-    const featured = pick("featured");
-    const secondary = pick("secondary");
-    const rest = deduped.filter((i) => i !== featured && i !== secondary);
-
-    return [featured, secondary, ...rest].filter(Boolean) as { url: string; name: string }[];
+    // stable sort: rank by variant priority, but keep original order inside same rank
+    return deduped
+      .map((s, idx) => ({ ...s, __idx: idx }))
+      .sort((a, b) => {
+        const r = variantRank(a.variant) - variantRank(b.variant);
+        return r !== 0 ? r : a.__idx - b.__idx;
+      })
+      .map(({ __idx, ...s }) => s);
   }, [images]);
 
   const [index, setIndex] = useState(0);
 
-  // keep index valid if slides count changes (e.g. DB update / hydration)
-  if (index >= slides.length && slides.length > 0) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    setIndex(0);
-  }
+  // keep index valid if slides count changes
+  useEffect(() => {
+    if (index >= slides.length) setIndex(0);
+  }, [index, slides.length]);
 
   if (!slides.length) return null;
 
@@ -64,17 +86,24 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
           aria-live="polite"
           id={id}
         >
-          {slides.map((s, i) => (
-            <div className={styles.slide} key={`${s.url}-${i}`}>
-              <img
-                className={styles.img}
-                src={s.url}
-                alt={`${altBase} screenshot ${i + 1}`}
-                loading="lazy"
-                draggable={false}
-              />
-            </div>
-          ))}
+          {slides.map((s, i) => {
+            const alt = s.alt || `${altBase} screenshot ${i + 1}`;
+            const caption = s.caption || s.variant; // optional fallback to variant
+
+            return (
+              <div className={styles.slide} key={`${s.url}-${i}`}>
+                <img
+                  className={styles.img}
+                  src={s.url}
+                  alt={alt}
+                  loading="lazy"
+                  draggable={false}
+                />
+
+                {caption ? <div className={styles.caption}>{caption}</div> : null}
+              </div>
+            );
+          })}
         </div>
 
         {showArrows && slides.length > 1 && (

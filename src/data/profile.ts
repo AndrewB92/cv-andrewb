@@ -15,8 +15,10 @@ export type Experience = {
 };
 
 export type ProjectImage = {
-  name: string; // e.g. "featured", "secondary"
   url: string;
+  variant?: string; // "Hero" | "Shop" | "mobile" etc
+  alt?: string;     // accessibility text
+  caption?: string; // UI caption text
 };
 
 export type Project = {
@@ -143,11 +145,24 @@ const sanitizeProjectImages = (value: unknown): ProjectImage[] => {
   return value
     .filter(isRecord)
     .map((item) => {
-      const name = typeof item.name === "string" ? item.name.trim() : "";
       const url = typeof item.url === "string" ? item.url.trim() : "";
+      if (!url) return undefined;
 
-      if (!name || !url) return undefined;
-      return { name, url };
+      const variant =
+        typeof item.variant === "string" ? item.variant.trim() : undefined;
+
+      const alt =
+        typeof item.alt === "string" ? item.alt.trim() : undefined;
+
+      const caption =
+        typeof item.caption === "string" ? item.caption.trim() : undefined;
+
+      return {
+        url,
+        ...(variant ? { variant } : {}),
+        ...(alt ? { alt } : {}),
+        ...(caption ? { caption } : {}),
+      };
     })
     .filter((img): img is ProjectImage => Boolean(img));
 };

@@ -33,6 +33,18 @@
   display: block;
 }
 
+.caption {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
 .nav {
   position: absolute;
   top: 50%;
