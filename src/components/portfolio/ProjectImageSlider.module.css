@@ -34,15 +34,14 @@
 }
 
 .caption {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  padding: 6px 10px;
-  font-size: 0.75rem;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
+    color: #fff;
+    background: #192133;
+    border-radius: 0px;
+    padding: 6px 10px;
+    font-size: .75rem;
+    position: absolute;
+    bottom: -42px;
+    left: 12px;
 }
 
 .nav {
@@ -66,44 +65,34 @@
 .next { right: 10px; }
 
 .dots {
-  /*position: absolute;*/
-  /*left: 10px;*/
-  /*right: 10px;*/
   display: flex;
   gap: 6px;
   justify-content: center;
   pointer-events: auto;
-  /* transition: bottom 350ms ease-in-out; */
   position: relative;
   padding: 12px 8px 0px;
+  margin-top: 50px;
 }
-
-.frame .dots{
-  /* bottom: -30px; */
-}
-.frame:hover .dots{
-  /* bottom: 10px; */
-} 
 
 .dot {
-  width: fit-content;
-  height: auto;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
-  background: #192133;
-  cursor: pointer;
-  opacity: .8;
-  padding: 4px 16px;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    opacity: .6;
+    background: #ffffff;
+    border-radius: 500px;
+    width: 18px;
+    height: 8px;
 
-  transition: all 350ms linear;
+    transition: all .35s linear;
 }
 
 .dotActive {
   opacity: 1;
-  border: 1px solid #ba25d1bd;
+  width: 55px;
+  /* border: 1px solid #ba25d1bd; */
 }
 
-.dotLabel {
+/* .dotLabel {
   position: relative;
   white-space: nowrap;
   font-size: 12px;
@@ -113,8 +102,9 @@
   opacity: 1;
   pointer-events: none;
   transition: opacity 120ms ease;
-}
+} */
 
+.dot:hover,
 .dot:hover .dotLabel,
 .dotActive .dotLabel {
   opacity: 1;
