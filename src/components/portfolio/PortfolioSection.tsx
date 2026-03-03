@@ -13,7 +13,6 @@ export type FeaturedProject = {
   stack: string[];
   link: string;
   github?: string;
-  caseStudy?: string;
   description: string; // compact text
   details?: string; // expanded content (optional)
   img?: ProjectImg[];
@@ -173,15 +172,6 @@ export default function PortfolioSection({
                           >
                             GitHub
                           </a>
-                        ) : project.caseStudy ? (
-                          <a
-                            href={project.caseStudy}
-                            className={[styles.btn, styles.btnOutline].join(" ")}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Case Study
-                          </a>
                         ) : null}
                       </div>
 
@@ -207,15 +197,6 @@ export default function PortfolioSection({
       rel="noreferrer"
     >
       GitHub
-    </a>
-  ) : project.caseStudy ? (
-    <a
-      href={project.caseStudy}
-      className={[styles.btn, styles.btnOutline].join(" ")}
-      target="_blank"
-      rel="noreferrer"
-    >
-      Case Study
     </a>
   ) : null}
 
