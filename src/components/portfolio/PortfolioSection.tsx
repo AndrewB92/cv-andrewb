@@ -1,3 +1,4 @@
+/* PortfolioSection.tsx */
 "use client";
 
 import React from "react";
@@ -36,7 +37,6 @@ function getPrimaryImage(project: FeaturedProject) {
   const imgs = project.img ?? [];
   if (!imgs.length) return "";
 
-  // Prefer likely “hero/featured” variants first, then anything.
   const pick = (variants: string[]) =>
     imgs.find((i) => variants.includes(normalize(i.variant).toLowerCase()))?.url;
 
@@ -55,12 +55,13 @@ export default function PortfolioSection({
   kicker = "Portfolio",
   subtitle = "Short descriptions and technologies used.",
 }: Props) {
-  const { stageRef, cardRefs, activeIndex, phase, onToggle, onClose, isOpen, isExpanded } =
+  const { stageRef, cardRefs, activeIndex, phase, onToggle, onClose, isOpen } =
     usePortfolioCardsStage(featuredProjects.length);
 
   return (
     <section id="portfolio" className={styles.portfolio}>
       <div className={styles.container}>
+        {/* Optional section header */}
         {/* <header className={styles.sectionHeader}>
           <p className={styles.sectionKicker}>{kicker}</p>
           <h2 className={styles.sectionTitle}>{title}</h2>
@@ -72,7 +73,6 @@ export default function PortfolioSection({
           className={[
             styles.cards,
             isOpen ? styles.isOpen : "",
-            isExpanded ? styles.phaseExpand : "",
             phase === "closing" ? styles.isClosing : "",
           ].join(" ")}
         >
@@ -96,52 +96,117 @@ export default function PortfolioSection({
                 data-away={isOpen && !isActive ? (i % 2 === 0 ? "down" : "up") : "none"}
               >
                 <div className={styles.cardLayout}>
-                  <div className={styles.cardMedia}>
-                    {isActive && isExpanded && (project.img?.length ?? 0) > 0 ? (
-                      <ProjectImageSlider images={project.img ?? []} altBase={project.name} showArrows />
-                    ) : img ? (
-                      <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
-                    ) : (
-                      <div className={styles.mediaPlaceholder} aria-hidden="true" />
-                    )}
-                  </div>
+                  {/* --- COMPACT VIEW --- */}
+                  <div className={styles.compactView}>
+                    <div className={styles.compactMedia}>
+                      {img ? (
+                        <img src={img} alt={project.name} loading="lazy" />
+                      ) : (
+                        <div className={styles.mediaPlaceholder} aria-hidden="true" />
+                      )}
+                    </div>
 
-                  <div className={styles.cardContent}>
-                    <div className={styles.cardTop}>
-                      <div className={styles.cardHead}>
-                        <h3 className={styles.cardTitle}>{project.name}</h3>
-                        {project.year != null && <span className={styles.cardYear}>{project.year}</span>}
+                    <div className={styles.cardContent}>
+                      <div className={styles.cardTop}>
+                        <div className={styles.cardHead}>
+                          <h3 className={styles.cardTitle}>{project.name}</h3>
+                          {project.year != null && (
+                            <span className={styles.cardYear}>{project.year}</span>
+                          )}
+                        </div>
                       </div>
 
-                      <button
-                        type="button"
-                        className={styles.cardClose}
-                        aria-label="Close details"
-                        onClick={onClose}
-                        tabIndex={isActive && isExpanded ? 0 : -1}
-                        data-role="close"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                      <ul className={styles.cardStack} aria-label="Tech stack">
+                        {project.stack.map((item) => (
+                          <li key={`${project.name}-${item}`}>{item}</li>
+                        ))}
+                      </ul>
 
-                    <ul className={styles.cardStack} aria-label="Tech stack">
-                      {project.stack.map((item) => (
-                        <li key={`${project.name}-${item}`}>{item}</li>
-                      ))}
-                    </ul>
-
-                    {/* COMPACT */}
-                    <div className={[styles.cardText, styles.cardTextCompact].join(" ")} data-role="compact">
                       <p className={styles.cardDescription}>{project.description}</p>
+
+                      <div className={styles.cardActions}>
+                        <a
+                          href={project.link}
+                          className={styles.btn}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Live Site
+                        </a>
+
+                        {project.github ? (
+                          <a
+                            href={project.github}
+                            className={[styles.btn, styles.btnOutline].join(" ")}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            GitHub
+                          </a>
+                        ) : null}
+
+                        <button
+                          type="button"
+                          className={styles.cardToggle}
+                          onClick={() => onToggle(i)}
+                        >
+                          More info
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* --- EXPANDED VIEW --- */}
+                  <div className={styles.expandedView}>
+                    <div className={styles.expandedMedia}>
+                      {isActive && isOpen && (project.img?.length ?? 0) > 0 ? (
+                        <ProjectImageSlider
+                          images={project.img ?? []}
+                          altBase={project.name}
+                          showArrows
+                        />
+                      ) : img ? (
+                        <img src={img} alt={project.name} loading="lazy" />
+                      ) : (
+                        <div className={styles.mediaPlaceholder} aria-hidden="true" />
+                      )}
                     </div>
 
-                    {/* EXPANDED */}
-                    <div className={[styles.cardText, styles.cardTextExpanded].join(" ")} data-role="expanded">
+                    <div className={styles.expandedContent}>
+                      <div className={styles.cardTop}>
+                        <div className={styles.cardHead}>
+                          <h3 className={styles.cardTitle}>{project.name}</h3>
+                          {project.year != null && (
+                            <span className={styles.cardYear}>{project.year}</span>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          className={styles.cardClose}
+                          onClick={onClose}
+                          tabIndex={isActive && isOpen ? 0 : -1}
+                          aria-label="Close details"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <ul className={styles.cardStack} aria-label="Tech stack">
+                        {project.stack.map((item) => (
+                          <li key={`${project.name}-${item}`}>{item}</li>
+                        ))}
+                      </ul>
+
                       <div className={styles.expandedScroll}>{expandedContent}</div>
 
                       <div className={styles.cardActionsExpanded}>
-                        <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
+                        <a
+                          href={project.link}
+                          className={styles.btn}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           Live Site
                         </a>
 
@@ -157,33 +222,6 @@ export default function PortfolioSection({
                         ) : null}
                       </div>
                     </div>
-                  </div>
-
-                  <div className={styles.cardActions}>
-                    <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
-                      Live Site
-                    </a>
-
-                    {project.github ? (
-                      <a
-                        href={project.github}
-                        className={[styles.btn, styles.btnOutline].join(" ")}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        GitHub
-                      </a>
-                    ) : null}
-
-                    <button
-                      type="button"
-                      className={styles.cardToggle}
-                      aria-expanded={isActive && isExpanded}
-                      onClick={() => onToggle(i)}
-                      data-role="toggle"
-                    >
-                      More info
-                    </button>
                   </div>
                 </div>
               </article>

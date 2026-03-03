@@ -1,10 +1,9 @@
+/* PortfolioSection.module.css */
 .portfolio {
-  /* keep neutral; you can merge with your theme */
+  /* keep your theme */
 }
 
 .container {
-  /* max-width: 1100px; */
-  /* margin: 0 auto; */
   padding: 0;
 }
 
@@ -36,7 +35,6 @@
   --gap: 20px;
   --side-gap: 0px;
   --cards-h: auto;
-
   position: relative;
   height: var(--cards-h);
   min-height: 320px;
@@ -44,16 +42,13 @@
   overflow: hidden;
 }
 
-
-
 /* Absolute cards */
 .card {
   --x: 0px;
   --w: 0px;
   --shift-x: 0px;
   --expand-w: 0px;
-  /*max-height: 420px;
-  */position: absolute;
+  position: absolute;
   top: 0;
   left: 0;
   width: var(--w);
@@ -61,17 +56,13 @@
   opacity: 1;
   background: #161b22;
   border: 1px solid #2a2f3a;
-  border-radius: .6rem;
+  border-radius: 0.6rem;
   overflow: hidden;
-  transition:    
+  transition:
     transform 420ms cubic-bezier(.2,.8,.2,1),
-    width     420ms cubic-bezier(.2,.8,.2,1),
-    opacity   320ms ease;
+    width 420ms cubic-bezier(.2,.8,.2,1),
+    opacity 320ms ease;
   will-change: transform, width, opacity;
-}
-
-.card {
-  opacity: 1;
 }
 
 .cards:hover .card {
@@ -82,46 +73,117 @@
   opacity: 1;
 }
 
-/* Default layout (stacked) */
+/* State classes (applied by TSX) */
+.isOpen {}
+.isClosing {}
+.isActive {}
+
+/* THE MAGIC: Crossfade Wrapper */
 .cardLayout {
+  position: relative;
   height: 100%;
+  width: 100%;
+}
+
+/* --- COMPACT VIEW --- */
+.compactView {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  width: 100%;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 250ms ease, visibility 250ms;
 }
 
-/* Media */
-.cardMedia {
-  width: 100%;
-  /* height: auto; */
-  /* min-height: 200px; */
-  overflow: hidden;
-  background: #0b0e15;
+/* Fade out compact view when expanding */
+.isOpen .isActive .compactView {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 
+/* Fade it back in instantly when shrinking */
+.isClosing .isActive .compactView {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 150ms ease;
+}
+
+/* --- EXPANDED VIEW --- */
+.expandedView {
+  position: absolute;
+  inset: 0; /* fills the entire card container smoothly */
+  display: grid;
+  grid-template-columns: minmax(260px, 40%) 1fr;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 300ms ease 150ms, visibility 300ms 150ms; /* Delay fade in */
+}
+
+/* Show expanded view when active */
+.isOpen .isActive .expandedView {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Hide instantly during close to prevent awkward text overlap */
+.isClosing .isActive .expandedView {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+
+/* Shared Media / Content Styles */
+.compactMedia {
+  width: 100%;
   aspect-ratio: 16 / 9;
+  background: #0b0e15;
+  overflow: hidden;
 }
 
-.cardMedia img {
+.compactMedia img {
   width: 100%;
-  /* height: auto; */
-  /* object-fit: contain; */
   display: block;
+}
+
+.expandedMedia {
+  height: 100%;
+  background: transparent;
+  border-right: 1px solid #2a2f3a;
+  overflow: hidden;
+}
+
+.expandedMedia img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .mediaPlaceholder {
   width: 100%;
-  height: auto;
-  background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  height: 100%;
+  background: #0b0e15;
 }
 
-/* Content */
 .cardContent {
   padding: 18px 18px 0px;
-  /* height: calc(100% - 250px); */
-  height: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 0; /* critical for scroll containers in flex */
+  height: 100%;
+}
+
+.expandedContent {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
 }
 
 .cardTop {
@@ -137,7 +199,6 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: 0px;
-  flex-wrap: nowrap;
 }
 
 .cardTitle {
@@ -166,17 +227,6 @@
   border-radius: 6px;
 }
 
-/* Text blocks */
-.cardText {
-  transition: opacity 220ms ease;
-  will-change: opacity;
-}
-
-.cardTextCompact {
-  opacity: 1;
-  display: block;
-}
-
 .cardDescription {
   margin: 0;
   font-size: 14px;
@@ -184,13 +234,8 @@
   opacity: 0.85;
 }
 
-.cardTextExpanded {
-  display: none;
-  opacity: 0;
-  height: 0px;
-}
-
 .expandedScroll {
+  flex: 1;
   overflow: auto;
   padding-right: 6px;
   min-height: 0;
@@ -206,22 +251,20 @@
   margin-bottom: 0;
 }
 
-/* Actions */
 .cardActions {
   margin-top: auto;
   display: flex;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-  padding: 0px 18px 18px;
+  padding-bottom: 18px;
 }
 
 .cardActionsExpanded {
-  display: none;
-  opacity: 0;
-  margin-top: 0px;
-  padding: 0px;
-  height: 0px;
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -249,106 +292,26 @@
   cursor: pointer;
 }
 
-/* Close hidden until expanded */
-.cardClose {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* =========================
-   Sequencing & states
-   ========================= */
-
-.isOpen .card { pointer-events: none; }
-.isOpen .isActive { pointer-events: auto; z-index: 5; }
-
-/* During open (others moving): fade compact + actions on active card */
-.isOpen .isActive .cardTextCompact{
-  opacity: 0;
-  display: none;
-}
-
-.isOpen .isActive .cardActionsExpanded {
-  opacity: 1;
-  display: flex;
-  gap: 8px;
-  margin-top: auto;
-  height: auto !important;
-}
-
-.isOpen .isActive .cardActions {
-  opacity: 0;
-  display: none;
-}
-
-/* Expanded: active card becomes 2-col layout */
-.isOpen.phaseExpand .isActive .cardLayout {
-  display: grid;
-  grid-template-columns: minmax(260px, 40%) 1fr;
-  height: 100%;
-}
-
-.isOpen.phaseExpand .isActive .cardMedia {
-  height: auto;
-}
-
-.isOpen.phaseExpand .isActive .cardMedia {
-    aspect-ratio: unset;
-    background: transparent;
-    width: 100%;
-    overflow: hidden;
-    border-right: 1px solid #2a2f3a;
-}
-
-.isOpen.phaseExpand .isActive .cardContent {
-  height: auto;
-}
-
-.isOpen.phaseExpand .isActive .cardTextExpanded {
-  display: flex;
-  opacity: 1;
-  flex: 1;
-  min-height: 0px;
-  height: auto;
-
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding-bottom: 18px;
-}
-
-.isOpen.phaseExpand .isActive .cardClose {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Closing: expanded fades out immediately */
-.isClosing .isActive .cardTextExpanded {
-  opacity: 0;
-  display: none;
-  height: 0px;
-}
-
 /* Movement: away cards */
 .isOpen .card[data-away="up"] {
   transform: translateX(var(--x)) translateY(-520px);
 }
+
 .isOpen .card[data-away="down"] {
   transform: translateX(var(--x)) translateY(520px);
 }
 
-/* Expanded: hide others, expand active */
-.isOpen.phaseExpand .card:not(.isActive) {
+/* Hide other cards while expanded */
+.isOpen .card:not(.isActive) {
   opacity: 0;
   pointer-events: none;
 }
 
-.isOpen.phaseExpand .isActive {
+.isOpen .isActive {
   width: var(--expand-w);
   transform: translateX(calc(var(--x) + var(--shift-x))) translateY(0);
 }
 
-/* Closing: keep others hidden while active shrinks back */
 .isClosing .card:not(.isActive) {
   opacity: 0;
   pointer-events: none;
@@ -359,25 +322,11 @@
   transform: translateX(var(--x)) translateY(0);
 }
 
-/* Active marker for module */
-.isActive {}
-
-/* Measuring mode: force compact-only reliably */
-.cards[data-measuring="true"] .cardTextExpanded { display: none !important; }
-.cards[data-measuring="true"] .cardTextCompact { opacity: 1 !important; }
-.cards[data-measuring="true"] .cardActions { opacity: 1 !important; }
-.cards[data-measuring="true"] .cardClose { opacity: 0 !important; pointer-events: none !important; }
-.cards[data-measuring="true"] .cardLayout {
-  display: flex !important;
-  flex-direction: column !important;
+.isOpen .card {
+  pointer-events: none;
 }
-.cards[data-measuring="true"] .cardMedia { height: 250px !important; }
-.cards[data-measuring="true"] .cardContent { height: auto !important; }
 
-@media (prefers-reduced-motion: reduce) {
-  .card,
-  .cardText,
-  .cardActions {
-    transition: none !important;
-  }
+.isOpen .isActive {
+  pointer-events: auto;
+  z-index: 5;
 }
