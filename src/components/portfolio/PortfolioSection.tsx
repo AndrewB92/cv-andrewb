@@ -30,9 +30,23 @@ type Props = {
   subtitle?: string;
 };
 
+const normalize = (s?: string) => (typeof s === "string" ? s.trim() : "");
+
 function getPrimaryImage(project: FeaturedProject) {
-  const byName = (n: string) => project.img?.find((i) => i.name === n)?.url;
-  return byName("featured") || byName("secondary") || project.img?.[0]?.url || "";
+  const imgs = project.img ?? [];
+  if (!imgs.length) return "";
+
+  // Prefer likely “hero/featured” variants first, then anything.
+  const pick = (variants: string[]) =>
+    imgs.find((i) => variants.includes(normalize(i.variant).toLowerCase()))?.url;
+
+  return (
+    pick(["featured", "hero", "main", "homepage"]) ||
+    pick(["shop", "product", "catalog"]) ||
+    pick(["mobile", "responsive"]) ||
+    imgs[0]?.url ||
+    ""
+  );
 }
 
 export default function PortfolioSection({
@@ -41,16 +55,8 @@ export default function PortfolioSection({
   kicker = "Portfolio",
   subtitle = "Short descriptions and technologies used.",
 }: Props) {
-  const {
-    stageRef,
-    cardRefs,
-    activeIndex,
-    phase,
-    onToggle,
-    onClose,
-    isOpen,
-    isExpanded,
-  } = usePortfolioCardsStage(featuredProjects.length);
+  const { stageRef, cardRefs, activeIndex, phase, onToggle, onClose, isOpen, isExpanded } =
+    usePortfolioCardsStage(featuredProjects.length);
 
   return (
     <section id="portfolio" className={styles.portfolio}>
@@ -72,14 +78,13 @@ export default function PortfolioSection({
         >
           {featuredProjects.map((project, i) => {
             const img = getPrimaryImage(project);
+            const isActive = activeIndex === i;
 
             const expandedContent = project.details ? (
               <p>{project.details}</p>
             ) : (
               <p>{project.description}</p>
             );
-
-            const isActive = activeIndex === i;
 
             return (
               <article
@@ -91,21 +96,9 @@ export default function PortfolioSection({
                 data-away={isOpen && !isActive ? (i % 2 === 0 ? "down" : "up") : "none"}
               >
                 <div className={styles.cardLayout}>
-                  {/* <div className={styles.cardMedia}>
-                    {img ? (
-                      <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
-                    ) : (
-                      <div className={styles.mediaPlaceholder} aria-hidden="true" />
-                    )}
-                  </div> */}
-
                   <div className={styles.cardMedia}>
                     {isActive && isExpanded && (project.img?.length ?? 0) > 0 ? (
-                      <ProjectImageSlider
-                        images={project.img ?? []}
-                        altBase={project.name}
-                        showArrows
-                      />
+                      <ProjectImageSlider images={project.img ?? []} altBase={project.name} showArrows />
                     ) : img ? (
                       <img src={img} alt={`${project.name} screenshot`} loading="lazy" />
                     ) : (
@@ -117,9 +110,7 @@ export default function PortfolioSection({
                     <div className={styles.cardTop}>
                       <div className={styles.cardHead}>
                         <h3 className={styles.cardTitle}>{project.name}</h3>
-                        {project.year != null && (
-                          <span className={styles.cardYear}>{project.year}</span>
-                        )}
+                        {project.year != null && <span className={styles.cardYear}>{project.year}</span>}
                       </div>
 
                       <button
@@ -140,28 +131,17 @@ export default function PortfolioSection({
                       ))}
                     </ul>
 
-                    {/* COMPACT (used for measurement) */}
-                    <div
-                      className={[styles.cardText, styles.cardTextCompact].join(" ")}
-                      data-role="compact"
-                    >
+                    {/* COMPACT */}
+                    <div className={[styles.cardText, styles.cardTextCompact].join(" ")} data-role="compact">
                       <p className={styles.cardDescription}>{project.description}</p>
                     </div>
 
-                    {/* EXPANDED (force-hidden inline during measurement) */}
-                    <div
-                      className={[styles.cardText, styles.cardTextExpanded].join(" ")}
-                      data-role="expanded"
-                    >
+                    {/* EXPANDED */}
+                    <div className={[styles.cardText, styles.cardTextExpanded].join(" ")} data-role="expanded">
                       <div className={styles.expandedScroll}>{expandedContent}</div>
 
                       <div className={styles.cardActionsExpanded}>
-                        <a
-                          href={project.link}
-                          className={styles.btn}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
                           Live Site
                         </a>
 
@@ -176,43 +156,35 @@ export default function PortfolioSection({
                           </a>
                         ) : null}
                       </div>
-
                     </div>
-
                   </div>
 
-<div className={styles.cardActions}>
-  <a
-    href={project.link}
-    className={styles.btn}
-    target="_blank"
-    rel="noreferrer"
-  >
-    Live Site
-  </a>
+                  <div className={styles.cardActions}>
+                    <a href={project.link} className={styles.btn} target="_blank" rel="noreferrer">
+                      Live Site
+                    </a>
 
-  {project.github ? (
-    <a
-      href={project.github}
-      className={[styles.btn, styles.btnOutline].join(" ")}
-      target="_blank"
-      rel="noreferrer"
-    >
-      GitHub
-    </a>
-  ) : null}
+                    {project.github ? (
+                      <a
+                        href={project.github}
+                        className={[styles.btn, styles.btnOutline].join(" ")}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        GitHub
+                      </a>
+                    ) : null}
 
-  <button
-    type="button"
-    className={styles.cardToggle}
-    aria-expanded={isActive && isExpanded}
-    onClick={() => onToggle(i)}
-    data-role="toggle"
-  >
-    More info
-  </button>
-</div>
-
+                    <button
+                      type="button"
+                      className={styles.cardToggle}
+                      aria-expanded={isActive && isExpanded}
+                      onClick={() => onToggle(i)}
+                      data-role="toggle"
+                    >
+                      More info
+                    </button>
+                  </div>
                 </div>
               </article>
             );
