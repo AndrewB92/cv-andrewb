@@ -5,7 +5,12 @@ import styles from "./PortfolioSection.module.css";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
 import { ProjectImageSlider } from "./ProjectImageSlider";
 
-type ProjectImg = { url: string; name?: string };
+type ProjectImg = {
+  url: string;
+  variant?: string;
+  alt?: string;
+  caption?: string;
+};
 
 export type FeaturedProject = {
   name: string;
@@ -97,10 +102,7 @@ export default function PortfolioSection({
                   <div className={styles.cardMedia}>
                     {isActive && isExpanded && (project.img?.length ?? 0) > 0 ? (
                       <ProjectImageSlider
-                        images={(project.img ?? []).map((i, idx) => ({
-                          name: i.name ?? `img-${idx}`,
-                          url: i.url,
-                        }))}
+                        images={project.img ?? []}
                         altBase={project.name}
                         showArrows
                       />
