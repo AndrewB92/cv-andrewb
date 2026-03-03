@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import styles from "./ProjectImageSlider.module.css";
 
-type ProjectImage = {
+export type ProjectImage = {
   url: string;
   variant?: string;
   alt?: string;
@@ -19,8 +19,8 @@ type Props = {
 const normalize = (s?: string) => (typeof s === "string" ? s.trim() : "");
 const isNonEmpty = (s?: string) => normalize(s).length > 0;
 
-// Optional ordering: prioritize likely “hero/featured” variants.
-// You can tune this list to your naming style in DB.
+// Optional ordering: prioritize likely "hero/featured" variants.
+// Tune this list to your DB naming style.
 const variantRank = (v?: string) => {
   const key = normalize(v).toLowerCase();
   if (!key) return 999;
@@ -37,15 +37,15 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
 
   const slides = useMemo(() => {
     const cleaned = (Array.isArray(images) ? images : [])
-      .filter((i) => i && typeof i.url === "string" && i.url.trim().length > 0)
+      .filter((i): i is ProjectImage => Boolean(i && typeof i.url === "string" && i.url.trim()))
       .map((i) => ({
         url: i.url.trim(),
-        variant: isNonEmpty(i.variant) ? i.variant!.trim() : undefined,
-        alt: isNonEmpty(i.alt) ? i.alt!.trim() : undefined,
-        caption: isNonEmpty(i.caption) ? i.caption!.trim() : undefined,
+        variant: isNonEmpty(i.variant) ? normalize(i.variant) : undefined,
+        alt: isNonEmpty(i.alt) ? normalize(i.alt) : undefined,
+        caption: isNonEmpty(i.caption) ? normalize(i.caption) : undefined,
       }));
 
-    // dedupe by URL
+    // dedupe by URL (keep first)
     const seen = new Set<string>();
     const deduped: typeof cleaned = [];
     for (const item of cleaned) {
@@ -54,7 +54,7 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
       deduped.push(item);
     }
 
-    // stable sort: rank by variant priority, but keep original order inside same rank
+    // stable ordering: rank by variant priority, preserve original order inside same rank
     return deduped
       .map((s, idx) => ({ ...s, __idx: idx }))
       .sort((a, b) => {
@@ -66,10 +66,10 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
 
   const [index, setIndex] = useState(0);
 
-  // keep index valid if slides count changes
+  // Keep index valid when slides count changes (e.g. different project opened / DB updates)
   useEffect(() => {
-    if (index >= slides.length) setIndex(0);
-  }, [index, slides.length]);
+    setIndex((cur) => (slides.length ? Math.min(cur, slides.length - 1) : 0));
+  }, [slides.length]);
 
   if (!slides.length) return null;
 
@@ -77,8 +77,14 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
     setIndex((cur) => (cur + delta + slides.length) % slides.length);
   };
 
+  const canNavigate = slides.length > 1;
+
   return (
-    <div className={styles.root} aria-roledescription="carousel" aria-label={`${altBase} screenshots`}>
+    <div
+      className={styles.root}
+      aria-roledescription="carousel"
+      aria-label={`${altBase} screenshots`}
+    >
       <div className={styles.frame}>
         <div
           className={styles.track}
@@ -87,26 +93,25 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
           id={id}
         >
           {slides.map((s, i) => {
-            const alt = s.alt || `${altBase} screenshot ${i + 1}`;
-            const caption = s.caption || s.variant; // optional fallback to variant
+            const altText = s.alt || `${altBase} screenshot ${i + 1}`;
+            const caption = s.caption || s.variant;
 
             return (
               <div className={styles.slide} key={`${s.url}-${i}`}>
                 <img
                   className={styles.img}
                   src={s.url}
-                  alt={alt}
+                  alt={altText}
                   loading="lazy"
                   draggable={false}
                 />
-
                 {caption ? <div className={styles.caption}>{caption}</div> : null}
               </div>
             );
           })}
         </div>
 
-        {showArrows && slides.length > 1 && (
+        {showArrows && canNavigate && (
           <>
             <button
               type="button"
@@ -130,7 +135,7 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
           </>
         )}
 
-        {slides.length > 1 && (
+        {canNavigate && (
           <div className={styles.dots} role="tablist" aria-label="Screenshots">
             {slides.map((_, i) => (
               <button
