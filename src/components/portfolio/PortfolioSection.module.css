@@ -271,6 +271,7 @@
 .isOpen .isActive .cardActionsExpanded {
   opacity: 1;
   display: flex;
+  gap: 8px;
   margin-top: auto;
   height: auto !important;
 }
