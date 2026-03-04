@@ -13,7 +13,7 @@ type Opts = {
 };
 
 const DEFAULTS: Required<Opts> = {
-  openExpandDelay: 320,
+  openExpandDelay: 420,
   closeResetDelay: 420,
   stabilizeFrames: 30,
   stableRunsNeeded: 2,
