@@ -238,7 +238,20 @@
   background: transparent;
 }
 
-.cardToggle,
+.cardToggle{
+  font-family: var(--font-geist-mono);
+  color: #fff;
+  background: transparent;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: auto;
+}
+
 .cardClose {
   padding: 5px 10px;
   font-size: 20px;
