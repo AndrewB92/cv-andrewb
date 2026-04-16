@@ -106,8 +106,6 @@ export default function PortfolioSection({
                     )}
                   </div>
 
-                  <div className={styles.cardMediaBorder}></div>
-
                   <div className={styles.cardContent}>
                     <div className={styles.cardTop}>
                       <div className={styles.cardHead}>

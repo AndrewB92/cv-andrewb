@@ -100,15 +100,6 @@
   aspect-ratio: 16 / 9;
 }
 
-.cardMediaBorder{
-  display: block;
-  width: 100%;
-  height: 60px;
-  backdrop-filter: blur(12px);
-  
-  border-radius: 0px;
-}
-
 .cardMedia img {
   width: 100%;
   /* height: auto; */
