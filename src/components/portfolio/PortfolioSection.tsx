@@ -106,6 +106,8 @@ export default function PortfolioSection({
                     )}
                   </div>
 
+                  <div className={styles.cardMediaBorder}></div>
+
                   <div className={styles.cardContent}>
                     <div className={styles.cardTop}>
                       <div className={styles.cardHead}>
@@ -182,7 +184,7 @@ export default function PortfolioSection({
                       onClick={() => onToggle(i)}
                       data-role="toggle"
                     >
-                      More info
+                      Expand card
                     </button>
                   </div>
                 </div>
