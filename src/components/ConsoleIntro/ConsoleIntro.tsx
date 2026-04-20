@@ -71,23 +71,6 @@ AA   AA nn   nn  dddddd rr      eeeee   ww  ww   ...  dddddd  eeeee    v
                 Andrew.dev
 `;
 
-console.log(
-  "%c" + ASCII,
-  `
-  color: #00ffff;
-  background: #0a0a0a;
-  font-family: monospace;
-  font-size: 12px;
-  line-height: 1.2;
-  text-shadow:
-    0 0 5px #00ffff,
-    0 0 10px #00ffff,
-    0 0 20px #00ffff;
-  padding: 16px;
-  border-radius: 8px;
-`
-);
-
 function safeGet<T>(getter: () => T, fallback: T): T {
   try {
     const value = getter();
@@ -242,8 +225,11 @@ export default function ConsoleIntro({ config }: Props) {
         color:#f8f8f2;
         padding:8px 12px;
         border-radius:8px;
-        font-family:Menlo,Consolas,monospace;
-        line-height:1.35;
+        font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size:11px;
+        font-weight:700;
+        line-height:1.1;
+        white-space:pre;
       `,
       title: "color:#8be9fd;font-weight:bold;font-size:14px;",
       label: "color:#bd93f9;font-weight:bold;",
