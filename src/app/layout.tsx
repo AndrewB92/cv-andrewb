@@ -4,6 +4,7 @@ import "./globals.css";
 import styles from "./layout.module.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import ConsoleIntro from "@/components/ConsoleIntro/ConsoleIntro";
 // import { CustomCursor } from "@/components/CustomCursor/CustomCursor";
 // import RouteLoader from "@/components/RouteLoader";
 
@@ -70,6 +71,17 @@ export default function RootLayout({
           </div>
           <Footer />
         </div>
+        <ConsoleIntro
+          config={{
+            brand: "Andrew.dev",
+            tagline: "Frontend Engineer / WordPress / UI-focused development",
+            version: "1.0.0",
+            contactEmail: "babujjioh@gmail.com",
+            techStack: ["Next.js", "React", "TypeScript", "Vercel"],
+            githubUrl: "https://github.com/AndrewB92",
+            linkedinUrl: "https://www.linkedin.com/in/your-linkedin/",
+          }}
+        />
       </body>
     </html>
   );
