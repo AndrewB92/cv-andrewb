@@ -291,7 +291,7 @@ export default function ConsoleIntro({ config }: Props) {
     const memoryInfo = getMemoryInfo();
     const navTiming = getNavigationTiming();
 
-    console.log(`%c${ASCII}`, `${styles.block}color:#8be9fd;`);
+    // console.log(`%c${ASCII}`, `${styles.block}color:#8be9fd;`);
     console.log(
       `%c${mergedConfig.brand}%c  ${mergedConfig.tagline || ""}`,
       "color:#bd93f9;font-size:16px;font-weight:800;",
