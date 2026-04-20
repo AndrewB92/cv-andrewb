@@ -64,12 +64,29 @@ const DEFAULT_CONFIG: ConsoleIntroConfig = {
 
 const ASCII = String.raw`
     ___              __                    __
-   /   |  ____  ____/ /________ _      __ / /____ _   __
-  / /| | / __ \/ __  / ___/ _ \ | /| / // __/ _ \ | / /
+   /   |  ____  ____/ /________ _      __ / /____ _
+  / /| | / __ \\/ __  / ___/ _ \\ | /| / // __/ _ \\ | / /
  / ___ |/ / / / /_/ / /  /  __/ |/ |/ // /_/  __/ |/ /
-/_/  |_/_/ /_/\__,_/_/   \___/|__/|__/ \__/\___/|___/
-                                Andrew.dev
+/_/  |_/_/ /_/\\__,_/_/   \\___/|__/|__/ \\__/\\___/|___/
+                Andrew.dev
 `;
+
+console.log(
+  "%c" + ASCII,
+  `
+  color: #00ffff;
+  background: #0a0a0a;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.2;
+  text-shadow:
+    0 0 5px #00ffff,
+    0 0 10px #00ffff,
+    0 0 20px #00ffff;
+  padding: 16px;
+  border-radius: 8px;
+`
+);
 
 function safeGet<T>(getter: () => T, fallback: T): T {
   try {
