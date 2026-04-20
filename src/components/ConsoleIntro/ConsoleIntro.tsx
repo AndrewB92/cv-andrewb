@@ -63,11 +63,11 @@ const DEFAULT_CONFIG: ConsoleIntroConfig = {
 };
 
 const ASCII = String.raw`
-    ___              __                    __
-   /   |  ____  ____/ /________ _      __ / /____ _
-  / /| | / __ \\/ __  / ___/ _ \\ | /| / // __/ _ \\ | / /
- / ___ |/ / / / /_/ / /  /  __/ |/ |/ // /_/  __/ |/ /
-/_/  |_/_/ /_/\\__,_/_/   \\___/|__/|__/ \\__/\\___/|___/
+  AAA                dd                                   dd                
+ AAAAA  nn nnn       dd rr rr    eee  ww      ww          dd   eee  vv   vv 
+AA   AA nnn  nn  dddddd rrr  r ee   e ww      ww      dddddd ee   e  vv vv  
+AAAAAAA nn   nn dd   dd rr     eeeee   ww ww ww  ... dd   dd eeeee    vvv   
+AA   AA nn   nn  dddddd rr      eeeee   ww  ww   ...  dddddd  eeeee    v    
                 Andrew.dev
 `;
 
