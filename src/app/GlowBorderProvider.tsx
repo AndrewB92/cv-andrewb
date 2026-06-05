@@ -77,6 +77,8 @@ export default function GlowBorderProvider() {
       canvas.style.opacity = "0";
       canvas.style.transition = "opacity 200ms ease";
       canvas.style.zIndex = "1";
+      canvas.style.top = "-1px";
+      canvas.style.left = "-1px";
 
       const cs = getComputedStyle(el);
       if (cs.position === "static") el.style.position = "relative";
