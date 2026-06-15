@@ -14,18 +14,21 @@ type SkillsHoverListProps = {
 
 const HOVER_OFFSET = 6;
 const EXIT_OFFSET = 40;
+const ACTIVE_CLASS = styles.isActive;
 
 export function SkillsHoverList({ skills }: SkillsHoverListProps) {
-    const wrapperRef = useRef<HTMLDivElement | null>(null);
+    const rootRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        if (!wrapperRef.current) return;
+        const root = rootRef.current;
 
-        return initSkillsHover(wrapperRef.current);
+        if (!root) return;
+
+        return initSkillsHover(root);
     }, []);
 
     return (
-        <div ref={wrapperRef} className={styles.skillsHoverArea}>
+        <div ref={rootRef}>
             <span className={styles.skillsHoverBg} aria-hidden="true" />
 
             {skills.map((group) => (
@@ -45,69 +48,83 @@ export function SkillsHoverList({ skills }: SkillsHoverListProps) {
     );
 }
 
-function initSkillsHover(wrapper: HTMLDivElement): () => void {
-    const hoverBg = wrapper.querySelector<HTMLElement>(
-        `.${styles.skillsHoverBg}`
-    );
+function initSkillsHover(root: HTMLDivElement): () => void {
+    const hoverBg = root.querySelector<HTMLElement>(`.${styles.skillsHoverBg}`);
 
-    if (!hoverBg) return () => { };
+    if (!hoverBg) {
+        return () => { };
+    }
 
-    let wrapperRect: DOMRect | null = null;
+    let rootRect: DOMRect | null = null;
     let activeSkill: HTMLElement | null = null;
+    let frameId = 0;
 
-    const getWrapperRect = (): DOMRect => {
-        wrapperRect ??= wrapper.getBoundingClientRect();
-        return wrapperRect;
+    const getRootRect = (): DOMRect => {
+        rootRect ??= root.getBoundingClientRect();
+        return rootRect;
     };
 
-    const resetWrapperRect = (): void => {
-        wrapperRect = null;
+    const resetRootRect = (): void => {
+        rootRect = null;
     };
 
-    const moveTo = (target: HTMLElement): void => {
-        if (target === activeSkill) return;
+    const setHoverBg = (
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        scale = 1
+    ): void => {
+        cancelAnimationFrame(frameId);
 
-        activeSkill = target;
+        frameId = requestAnimationFrame(() => {
+            hoverBg.style.width = `${width}px`;
+            hoverBg.style.height = `${height}px`;
+            hoverBg.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+        });
+    };
 
-        const wrapperBox = getWrapperRect();
-        const targetBox = target.getBoundingClientRect();
+    const moveTo = (skill: HTMLElement): void => {
+        if (skill === activeSkill) return;
 
-        const x = targetBox.left - wrapperBox.left - HOVER_OFFSET;
-        const y = targetBox.top - wrapperBox.top - HOVER_OFFSET;
-        const width = targetBox.width + HOVER_OFFSET * 2;
-        const height = targetBox.height + HOVER_OFFSET * 2;
+        activeSkill = skill;
 
-        hoverBg.style.width = `${width}px`;
-        hoverBg.style.height = `${height}px`;
-        hoverBg.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1)`;
+        const rootBox = getRootRect();
+        const skillBox = skill.getBoundingClientRect();
 
-        wrapper.classList.add(styles.isActive);
+        const x = skillBox.left - rootBox.left - HOVER_OFFSET;
+        const y = skillBox.top - rootBox.top - HOVER_OFFSET;
+        const width = skillBox.width + HOVER_OFFSET * 2;
+        const height = skillBox.height + HOVER_OFFSET * 2;
+
+        setHoverBg(x, y, width, height);
+        root.classList.add(ACTIVE_CLASS);
     };
 
     const moveOut = (event: PointerEvent): void => {
-        const wrapperBox = getWrapperRect();
+        const rootBox = getRootRect();
 
         const width = hoverBg.offsetWidth;
         const height = hoverBg.offsetHeight;
 
         let x = -width - EXIT_OFFSET;
-        let y = wrapperBox.height / 2 - height / 2;
+        let y = rootBox.height / 2 - height / 2;
 
-        if (event.clientX > wrapperBox.right) {
-            x = wrapperBox.width + EXIT_OFFSET;
-        } else if (event.clientY < wrapperBox.top) {
-            x = wrapperBox.width / 2 - width / 2;
+        if (event.clientX > rootBox.right) {
+            x = rootBox.width + EXIT_OFFSET;
+        } else if (event.clientY < rootBox.top) {
+            x = rootBox.width / 2 - width / 2;
             y = -height - EXIT_OFFSET;
-        } else if (event.clientY > wrapperBox.bottom) {
-            x = wrapperBox.width / 2 - width / 2;
-            y = wrapperBox.height + EXIT_OFFSET;
+        } else if (event.clientY > rootBox.bottom) {
+            x = rootBox.width / 2 - width / 2;
+            y = rootBox.height + EXIT_OFFSET;
         }
 
-        hoverBg.style.transform = `translate3d(${x}px, ${y}px, 0) scale(0.96)`;
+        setHoverBg(x, y, width, height, 0.96);
 
         activeSkill = null;
-        wrapper.classList.remove(styles.isActive);
-        resetWrapperRect();
+        root.classList.remove(ACTIVE_CLASS);
+        resetRootRect();
     };
 
     const handlePointerOver = (event: PointerEvent): void => {
@@ -117,20 +134,26 @@ function initSkillsHover(wrapper: HTMLDivElement): () => void {
 
         const skill = target.closest<HTMLElement>(`.${styles.skillPill}`);
 
-        if (!skill || !wrapper.contains(skill)) return;
+        if (!skill || !root.contains(skill)) return;
 
         moveTo(skill);
     };
 
-    wrapper.addEventListener("pointerover", handlePointerOver);
-    wrapper.addEventListener("pointerenter", getWrapperRect);
-    wrapper.addEventListener("pointerleave", moveOut);
-    window.addEventListener("resize", resetWrapperRect, { passive: true });
+    const handleResize = (): void => {
+        resetRootRect();
+        activeSkill = null;
+        root.classList.remove(ACTIVE_CLASS);
+    };
+
+    root.addEventListener("pointerover", handlePointerOver);
+    root.addEventListener("pointerleave", moveOut);
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
-        wrapper.removeEventListener("pointerover", handlePointerOver);
-        wrapper.removeEventListener("pointerenter", getWrapperRect);
-        wrapper.removeEventListener("pointerleave", moveOut);
-        window.removeEventListener("resize", resetWrapperRect);
+        cancelAnimationFrame(frameId);
+
+        root.removeEventListener("pointerover", handlePointerOver);
+        root.removeEventListener("pointerleave", moveOut);
+        window.removeEventListener("resize", handleResize);
     };
 }
