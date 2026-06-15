@@ -120,6 +120,7 @@ export default async function HomePage() {
 
       <div className={styles.grid}>
         <SkillsHoverList skills={skills} />
+
         <ExperienceSection experiences={experiences} />
       </div>
 
