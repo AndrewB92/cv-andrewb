@@ -16,32 +16,23 @@ const HOVER_OFFSET = 6;
 const EXIT_OFFSET = 40;
 
 export function SkillsHoverList({ skills }: SkillsHoverListProps) {
-    const wrappersRef = useRef<Array<HTMLUListElement | null>>([]);
+    const wrapperRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        const cleanups = wrappersRef.current
-            .filter((wrapper): wrapper is HTMLUListElement => wrapper !== null)
-            .map(initSkillsHover);
+        if (!wrapperRef.current) return;
 
-        return () => {
-            cleanups.forEach((cleanup) => cleanup());
-        };
-    }, [skills]);
+        return initSkillsHover(wrapperRef.current);
+    }, []);
 
     return (
-        <>
-            {skills.map((group, index) => (
+        <div ref={wrapperRef} className={styles.skillsHoverArea}>
+            <span className={styles.skillsHoverBg} aria-hidden="true" />
+
+            {skills.map((group) => (
                 <article key={group.title}>
                     <h3>{group.title}</h3>
 
-                    <ul
-                        ref={(node) => {
-                            wrappersRef.current[index] = node;
-                        }}
-                        className={styles.skillsList}
-                    >
-                        <span className={styles.skillsHoverBg} aria-hidden="true" />
-
+                    <ul className={styles.skillsList}>
                         {group.items.map((skill) => (
                             <li key={skill} className={styles.skillPill}>
                                 {skill}
@@ -50,20 +41,19 @@ export function SkillsHoverList({ skills }: SkillsHoverListProps) {
                     </ul>
                 </article>
             ))}
-        </>
+        </div>
     );
 }
 
-function initSkillsHover(wrapper: HTMLUListElement): () => void {
+function initSkillsHover(wrapper: HTMLDivElement): () => void {
     const hoverBg = wrapper.querySelector<HTMLElement>(
         `.${styles.skillsHoverBg}`
     );
 
-    if (!hoverBg) {
-        return () => { };
-    }
+    if (!hoverBg) return () => { };
 
     let wrapperRect: DOMRect | null = null;
+    let activeSkill: HTMLElement | null = null;
 
     const getWrapperRect = (): DOMRect => {
         wrapperRect ??= wrapper.getBoundingClientRect();
@@ -75,6 +65,10 @@ function initSkillsHover(wrapper: HTMLUListElement): () => void {
     };
 
     const moveTo = (target: HTMLElement): void => {
+        if (target === activeSkill) return;
+
+        activeSkill = target;
+
         const wrapperBox = getWrapperRect();
         const targetBox = target.getBoundingClientRect();
 
@@ -111,6 +105,7 @@ function initSkillsHover(wrapper: HTMLUListElement): () => void {
 
         hoverBg.style.transform = `translate3d(${x}px, ${y}px, 0) scale(0.96)`;
 
+        activeSkill = null;
         wrapper.classList.remove(styles.isActive);
         resetWrapperRect();
     };
