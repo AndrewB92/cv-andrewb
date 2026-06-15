@@ -245,9 +245,9 @@
   gap: var(--space-2xl);
 }
 
-.skillsHoverArea {
+.skillsHoverRoot {
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .skillsList {
@@ -304,7 +304,7 @@
   will-change: transform, width, height;
 }
 
-.skillsList.isActive .skillsHoverBg {
+.skillsHoverRoot.isActive .skillsHoverBg {
   opacity: 1;
 }
 
