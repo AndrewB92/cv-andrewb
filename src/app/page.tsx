@@ -126,7 +126,8 @@ export default async function HomePage() {
           title="Skills"
           description="My tech stack and tools I know how to use."
         >
-          {skills.map((group) => (
+          <SkillsHoverList skills={skills} />
+          {/* {skills.map((group) => (
             <article key={group.title}>
               <h3>{group.title}</h3>
               <ul className={styles.skillsList}>
@@ -137,7 +138,7 @@ export default async function HomePage() {
                 ))}
               </ul>
             </article>
-          ))}
+          ))} */}
         </Section>
 
         <ExperienceSection experiences={experiences} />
