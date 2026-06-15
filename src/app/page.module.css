@@ -246,15 +246,25 @@
 }
 
 .skillsList {
-  position: relative;
-  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
   overflow: hidden;
-  border-radius: 999px;
 }
 
 .skillPill {
-  position: relative;
-  z-index: 2;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 999px;
+  /* background: var(--color-muted); */
+  background-color: #192133;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+}
+.skillPill:hover {
+  background-color: #192133;
+  color: var(--color-text-primary);
 }
 
 .skillsHoverBg {
@@ -289,12 +299,6 @@
 
 .skillsList.isActive .skillsHoverBg {
   opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skillsHoverBg {
-    transition: none;
-  }
 }
 
 .experienceList {
