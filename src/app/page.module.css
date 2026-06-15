@@ -251,6 +251,7 @@
   gap: var(--space-sm);
   padding: 0;
   list-style: none;
+  position: relative;
   overflow: hidden;
 }
 
@@ -261,6 +262,7 @@
   background-color: #192133;
   color: var(--color-text-primary);
   font-size: 0.9rem;
+  z-index: 0;
 }
 .skillPill:hover {
   background-color: #192133;
