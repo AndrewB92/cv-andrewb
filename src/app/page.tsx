@@ -7,6 +7,7 @@ import { getPortfolioContent } from "@/data/profile";
 import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
+import { SkillsHoverList } from "@/components/SkillsHoverList";
 import { ExperienceSection } from "./ExperienceSection";
 import TypedRotator from "@/components/TypedRotator";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
@@ -118,27 +119,7 @@ export default async function HomePage() {
       </article>
 
       <div className={styles.grid}>
-        <Section
-          id="skills"
-          className="glow-border"
-          eyebrow="Toolkit"
-          title="Skills & focus areas"
-          description="Tools I keep close to ship resilient, maintainable interfaces."
-        >
-          {skills.map((group) => (
-            <article key={group.title}>
-              <h3>{group.title}</h3>
-              <ul className={styles.skillsList}>
-                {group.items.map((skill) => (
-                  <li key={skill} className={styles.skillPill}>
-                    {skill}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </Section>
-
+        <SkillsHoverList skills={skills} />
         <ExperienceSection experiences={experiences} />
       </div>
 

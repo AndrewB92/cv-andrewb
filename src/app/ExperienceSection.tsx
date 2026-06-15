@@ -97,8 +97,8 @@ export function ExperienceSection({ experiences }: { experiences: Experience[] }
       id="experience"
       className="glow-border"
       eyebrow="Journey"
-      title="Recent experience"
-      description="Selected roles that shaped my approach to product engineering."
+      title="Experience"
+      description="Selected roles that shaped me as a developer."
     >
       <ol className={styles.experienceList}>
         {experiences.map((experience, index) => {
