@@ -20,8 +20,8 @@ export function SkillsHoverList({ skills }: SkillsHoverListProps) {
 
     useEffect(() => {
         const cleanups = wrappersRef.current
-            .filter(Boolean)
-            .map((wrapper) => initSkillsHover(wrapper));
+            .filter((wrapper): wrapper is HTMLUListElement => wrapper !== null)
+            .map(initSkillsHover);
 
         return () => {
             cleanups.forEach((cleanup) => cleanup());
@@ -54,7 +54,7 @@ export function SkillsHoverList({ skills }: SkillsHoverListProps) {
     );
 }
 
-function initSkillsHover(wrapper: HTMLUListElement) {
+function initSkillsHover(wrapper: HTMLUListElement): () => void {
     const hoverBg = wrapper.querySelector<HTMLElement>(
         `.${styles.skillsHoverBg}`
     );
@@ -65,16 +65,16 @@ function initSkillsHover(wrapper: HTMLUListElement) {
 
     let wrapperRect: DOMRect | null = null;
 
-    const getWrapperRect = () => {
+    const getWrapperRect = (): DOMRect => {
         wrapperRect ??= wrapper.getBoundingClientRect();
         return wrapperRect;
     };
 
-    const resetWrapperRect = () => {
+    const resetWrapperRect = (): void => {
         wrapperRect = null;
     };
 
-    const moveTo = (target: HTMLElement) => {
+    const moveTo = (target: HTMLElement): void => {
         const wrapperBox = getWrapperRect();
         const targetBox = target.getBoundingClientRect();
 
@@ -90,7 +90,7 @@ function initSkillsHover(wrapper: HTMLUListElement) {
         wrapper.classList.add(styles.isActive);
     };
 
-    const moveOut = (event: PointerEvent) => {
+    const moveOut = (event: PointerEvent): void => {
         const wrapperBox = getWrapperRect();
 
         const width = hoverBg.offsetWidth;
@@ -115,7 +115,7 @@ function initSkillsHover(wrapper: HTMLUListElement) {
         resetWrapperRect();
     };
 
-    const handlePointerEnter = (event: PointerEvent) => {
+    const handlePointerOver = (event: PointerEvent): void => {
         const target = event.target;
 
         if (!(target instanceof HTMLElement)) return;
@@ -127,13 +127,13 @@ function initSkillsHover(wrapper: HTMLUListElement) {
         moveTo(skill);
     };
 
-    wrapper.addEventListener("pointerover", handlePointerEnter);
+    wrapper.addEventListener("pointerover", handlePointerOver);
     wrapper.addEventListener("pointerenter", getWrapperRect);
     wrapper.addEventListener("pointerleave", moveOut);
     window.addEventListener("resize", resetWrapperRect, { passive: true });
 
     return () => {
-        wrapper.removeEventListener("pointerover", handlePointerEnter);
+        wrapper.removeEventListener("pointerover", handlePointerOver);
         wrapper.removeEventListener("pointerenter", getWrapperRect);
         wrapper.removeEventListener("pointerleave", moveOut);
         window.removeEventListener("resize", resetWrapperRect);
