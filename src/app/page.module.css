@@ -267,7 +267,7 @@
   background-color: #192133;
   color: var(--color-text-primary);
   font-size: 0.9rem;
-  z-index: 0;
+  z-index: 2;
 }
 .skillPill:hover {
   background-color: #192133;
