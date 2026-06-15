@@ -1,5 +1,6 @@
 "use client";
 
+import { Section } from "@/components/Section";
 import { useEffect, useRef } from "react";
 import styles from "@/app/page.module.css";
 
@@ -112,7 +113,13 @@ export function SkillsHoverList({ skills }: SkillsHoverListProps) {
     }, [skills]);
 
     return (
-        <>
+        <Section
+            id="skills"
+            className="glow-border"
+            eyebrow="Toolkit"
+            title="Skills"
+            description="My tech stack and tools I know how to use."
+        >
             {skills.map((group, index) => (
                 <article key={group.title}>
                     <h3>{group.title}</h3>
@@ -133,6 +140,6 @@ export function SkillsHoverList({ skills }: SkillsHoverListProps) {
                     </ul>
                 </article>
             ))}
-        </>
+        </Section>
     );
 }
