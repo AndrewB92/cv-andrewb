@@ -119,7 +119,27 @@ export default async function HomePage() {
       </article>
 
       <div className={styles.grid}>
-        <SkillsHoverList skills={skills} />
+        <Section
+          id="skills"
+          className="glow-border"
+          eyebrow="Toolkit"
+          title="Skills"
+          description="My tech stack and tools I know how to use."
+        >
+          {skills.map((group) => (
+            <article key={group.title}>
+              <h3>{group.title}</h3>
+              <ul className={styles.skillsList}>
+                {group.items.map((skill) => (
+                  <li key={skill} className={styles.skillPill}>
+                    {skill}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </Section>
+
         <ExperienceSection experiences={experiences} />
       </div>
 
