@@ -65,6 +65,8 @@ function initSkillsHover(root: HTMLDivElement): () => void {
   };
 
   const moveTo = (skill: HTMLElement): void => {
+    resetRootRect();
+
     if (skill === activeSkill) return;
 
     activeSkill = skill;
@@ -85,6 +87,8 @@ function initSkillsHover(root: HTMLDivElement): () => void {
   };
 
   const moveOut = (event: PointerEvent): void => {
+    resetRootRect();
+
     const rootBox = getRootRect();
 
     const width = hoverBg.offsetWidth;
@@ -128,13 +132,20 @@ function initSkillsHover(root: HTMLDivElement): () => void {
     root.classList.remove(styles.isActive);
   };
 
+  const handleScroll = (): void => {
+    resetRootRect();
+    activeSkill = null;
+  };
+
   root.addEventListener("pointerover", handlePointerOver);
   root.addEventListener("pointerleave", moveOut);
   window.addEventListener("resize", handleResize, { passive: true });
+  window.addEventListener("scroll", handleScroll, { passive: true });
 
   return () => {
     root.removeEventListener("pointerover", handlePointerOver);
     root.removeEventListener("pointerleave", moveOut);
     window.removeEventListener("resize", handleResize);
+    window.removeEventListener("scroll", handleScroll);
   };
 }
