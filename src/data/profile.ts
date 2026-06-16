@@ -29,6 +29,7 @@ export type Project = {
   stack: string[];
   link: string;
   github?: string;
+  codepen?: string;
   img?: ProjectImage[];
 };
 
@@ -246,6 +247,10 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
     typeof payload.github === "string"
     ? payload.github
     : undefined;
+  const codepen = 
+    typeof payload.codepen === "string"
+    ? payload.codepen
+    : undefined;
   const year =
     typeof payload.year === "number"
       ? payload.year
@@ -274,6 +279,7 @@ const mapProject = (payload: Record<string, unknown>): Project | undefined => {
     stack,
     link,
     github,
+    codepen,
     ...(img.length ? { img } : {}),
   };
 };

@@ -94,16 +94,37 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
         <div className={styles.projectsGrid}>
           {data.projects.map((project) => (
             <article key={project.name} className={styles.project}>
-              <h3>{project.name}</h3>
-              <p>{project.description}</p>
-              <div className={styles.stack}>
-                {project.stack.map((item) => (
-                  <span key={`${project.name}-${item}`}>{item}</span>
-                ))}
+              <div className={styles.wrapper}>
+                <h3>{project.name}</h3>
+                <p>{project.description}</p>
+                <div className={styles.stack}>
+                  {project.stack.map((item) => (
+                    <span key={`${project.name}-${item}`}>{item}</span>
+                  ))}
+                </div>
               </div>
-              <a href={project.link} target="_blank" rel="noreferrer">
+              
+              {/* <a href={project.link} target="_blank" rel="noreferrer">
                 Visit site →
-              </a>
+              </a> */}
+
+              <div className={styles.projectLinks}>
+                <a href={project.link} target="_blank" rel="noreferrer">
+                  Visit site →
+                </a>
+
+                {project.github && (
+                  <a href={project.github} target="_blank" rel="noreferrer">
+                    Check GitHub →
+                  </a>
+                )}
+
+                {project.codepen && (
+                  <a href={project.codepen} target="_blank" rel="noreferrer">
+                    View CodePen →
+                  </a>
+                )}
+              </div>
             </article>
           ))}
         </div>
