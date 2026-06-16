@@ -8,6 +8,12 @@
   --blob-mix: 0.5;
 }
 
+:global(#highlights) .wrapper {
+    margin: 2rem auto 0px;
+    display: block;
+    width: fit-content;
+}
+
 /* Keep !important */
 .link {
   position: relative;

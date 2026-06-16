@@ -4,7 +4,7 @@ import Script from "next/script";
 import styles from "./page.module.css";
 import { Section } from "@/components/Section";
 import { getPortfolioContent } from "@/data/profile";
-import { siteMetadata } from "@/config/site";
+// import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { SkillsHoverList } from "@/components/SkillsHoverList";
@@ -15,7 +15,7 @@ import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
 import { StatusBadge } from "@/components/StatusBadge";
 // import { ProjectImageSlider } from "@/components/portfolio/ProjectImageSlider";
-import { DescriptionToggle } from "@/components/DescriptionToggle";
+// import { DescriptionToggle } from "@/components/DescriptionToggle";
 import PortfolioSection from "@/components/portfolio/PortfolioSection";
 
 const welcomeCode = `type UseCase =
