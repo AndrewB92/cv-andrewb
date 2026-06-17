@@ -1,13 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./ProjectsGallery.module.css";
 import type { Project } from "@/data/profile";
+
+type StackCount = {
+  name: string;
+  count: number;
+};
 
 type ProjectsResponse = {
   projects: Project[];
   totalPages: number;
   totalItems: number;
+  stackCounts: StackCount[];
 };
 
 type ProjectsGalleryProps = {
@@ -15,13 +21,33 @@ type ProjectsGalleryProps = {
   initialData: ProjectsResponse;
 };
 
+const TOP_TAGS_LIMIT = 5;
+
 export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) {
   const [activeFilter, setActiveFilter] = useState(filters[0] ?? "All");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<ProjectsResponse>(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const isFirstLoad = useRef(true);
+
+  const stackCountMap = useMemo(() => {
+    return new Map(data.stackCounts.map((item) => [item.name, item.count]));
+  }, [data.stackCounts]);
+
+  const topTags = useMemo(() => {
+    const totalTagUsage = data.stackCounts.reduce((sum, item) => sum + item.count, 0);
+
+    return [...data.stackCounts]
+      .filter((item) => item.name !== "All")
+      .sort((a, b) => b.count - a.count)
+      .slice(0, TOP_TAGS_LIMIT)
+      .map((item) => ({
+        ...item,
+        percentage: totalTagUsage > 0 ? Math.round((item.count / totalTagUsage) * 100) : 0,
+      }));
+  }, [data.stackCounts]);
 
   useEffect(() => {
     if (isFirstLoad.current) {
@@ -30,12 +56,15 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
     }
 
     const controller = new AbortController();
+
     const fetchProjects = async () => {
       try {
         setLoading(true);
         setError(null);
+
         const params = new URLSearchParams();
         params.set("page", String(page));
+
         if (activeFilter !== "All") {
           params.set("stack", activeFilter);
         }
@@ -43,9 +72,11 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
         const response = await fetch(`/api/projects?${params.toString()}`, {
           signal: controller.signal,
         });
+
         if (!response.ok) {
           throw new Error("Failed to load projects");
         }
+
         const payload = (await response.json()) as ProjectsResponse;
         setData(payload);
       } catch (err) {
@@ -71,20 +102,59 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
 
   return (
     <section className={styles.panel} aria-live="polite">
-      <ul className={styles.filters} aria-label="Filter projects by stack">
-        {filters.map((filter) => (
-          <li key={filter}>
-            <button
-              type="button"
-              className={styles.filterButton}
-              aria-pressed={activeFilter === filter}
-              onClick={() => handleFilterChange(filter)}
-            >
-              {filter}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className={styles.summary}>
+        <p>
+          Total projects: <strong>{data.totalItems}</strong>
+        </p>
+
+        {topTags.length > 0 && (
+          <div className={styles.topTags} aria-label="Most used tags">
+            {topTags.map((tag) => (
+              <span key={tag.name}>
+                {tag.name} — {tag.percentage}%
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <button
+        type="button"
+        className={styles.filtersToggle}
+        aria-expanded={filtersOpen}
+        aria-controls="project-filters"
+        onClick={() => setFiltersOpen((prev) => !prev)}
+      >
+        Filters
+        <span>{filtersOpen ? "−" : "+"}</span>
+      </button>
+
+      {filtersOpen && (
+        <ul
+          id="project-filters"
+          className={styles.filters}
+          aria-label="Filter projects by stack"
+        >
+          {filters.map((filter) => {
+            const count =
+              filter === "All" ? data.totalItems : stackCountMap.get(filter) ?? 0;
+
+            return (
+              <li key={filter}>
+                <button
+                  type="button"
+                  className={styles.filterButton}
+                  aria-pressed={activeFilter === filter}
+                  onClick={() => handleFilterChange(filter)}
+                >
+                  {filter}
+                  <span>{count}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {error ? (
         <div className={styles.emptyState}>{error}</div>
@@ -97,16 +167,13 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
               <div className={styles.wrapper}>
                 <h3>{project.name}</h3>
                 <p>{project.description}</p>
+
                 <div className={styles.stack}>
                   {project.stack.map((item) => (
                     <span key={`${project.name}-${item}`}>{item}</span>
                   ))}
                 </div>
               </div>
-              
-              {/* <a href={project.link} target="_blank" rel="noreferrer">
-                Visit site →
-              </a> */}
 
               <div className={styles.projectLinks}>
                 <a href={project.link} target="_blank" rel="noreferrer">
@@ -138,9 +205,11 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
         >
           Previous
         </button>
+
         <p className={styles.status}>
           Page {page} of {Math.max(1, data.totalPages)}
         </p>
+
         <button
           type="button"
           onClick={() =>
