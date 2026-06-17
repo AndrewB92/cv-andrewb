@@ -84,7 +84,9 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
           setError((err as Error).message);
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -96,6 +98,8 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
   }, [activeFilter, page]);
 
   const handleFilterChange = (filter: string) => {
+    if (filter === activeFilter) return;
+
     setActiveFilter(filter);
     setPage(1);
   };
@@ -107,6 +111,9 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
           Total projects: <strong>{data.totalItems}</strong>
         </p>
 
+        <p>
+          Most used tags:
+        </p>
         {topTags.length > 0 && (
           <div className={styles.topTags} aria-label="Most used tags">
             {topTags.map((tag) => (
@@ -125,7 +132,7 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
         aria-controls="project-filters"
         onClick={() => setFiltersOpen((prev) => !prev)}
       >
-        Filters
+        Filter by tags
         <span>{filtersOpen ? "−" : "+"}</span>
       </button>
 
@@ -146,6 +153,7 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
                   className={styles.filterButton}
                   aria-pressed={activeFilter === filter}
                   onClick={() => handleFilterChange(filter)}
+                  disabled={loading}
                 >
                   {filter}
                   <span>{count}</span>
@@ -156,46 +164,54 @@ export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) 
         </ul>
       )}
 
-      {error ? (
-        <div className={styles.emptyState}>{error}</div>
-      ) : data.projects.length === 0 ? (
-        <div className={styles.emptyState}>No projects match that filter yet.</div>
-      ) : (
-        <div className={styles.projectsGrid}>
-          {data.projects.map((project) => (
-            <article key={project.name} className={styles.project}>
-              <div className={styles.wrapper}>
-                <h3>{project.name}</h3>
-                <p>{project.description}</p>
+      <div className={styles.projectsStage} aria-busy={loading}>
+        {error ? (
+          <div className={styles.emptyState}>{error}</div>
+        ) : data.projects.length === 0 ? (
+          <div className={styles.emptyState}>No projects match that filter yet.</div>
+        ) : (
+          <div className={`${styles.projectsGrid} ${loading ? styles.projectsGridLoading : ""}`}>
+            {data.projects.map((project) => (
+              <article key={project.name} className={styles.project}>
+                <div className={styles.wrapper}>
+                  <h3>{project.name}</h3>
+                  <p>{project.description}</p>
 
-                <div className={styles.stack}>
-                  {project.stack.map((item) => (
-                    <span key={`${project.name}-${item}`}>{item}</span>
-                  ))}
+                  <div className={styles.stack}>
+                    {project.stack.map((item) => (
+                      <span key={`${project.name}-${item}`}>{item}</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className={styles.projectLinks}>
-                <a href={project.link} target="_blank" rel="noreferrer">
-                  Visit site →
-                </a>
-
-                {project.github && (
-                  <a href={project.github} target="_blank" rel="noreferrer">
-                    Check GitHub →
+                <div className={styles.projectLinks}>
+                  <a href={project.link} target="_blank" rel="noreferrer">
+                    Visit site →
                   </a>
-                )}
 
-                {project.codepen && (
-                  <a href={project.codepen} target="_blank" rel="noreferrer">
-                    View CodePen →
-                  </a>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
+                  {project.github && (
+                    <a href={project.github} target="_blank" rel="noreferrer">
+                      Check GitHub →
+                    </a>
+                  )}
+
+                  {project.codepen && (
+                    <a href={project.codepen} target="_blank" rel="noreferrer">
+                      View CodePen →
+                    </a>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {loading && (
+          <div className={styles.loaderOverlay} role="status" aria-label="Loading projects">
+            <span className={styles.spinner} />
+          </div>
+        )}
+      </div>
 
       <div className={styles.pagination}>
         <button
