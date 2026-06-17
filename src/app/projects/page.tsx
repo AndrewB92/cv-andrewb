@@ -7,9 +7,19 @@ export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
+
   const uniqueStacks = Array.from(
     new Set(projects.flatMap((project) => project.stack)),
   ).sort((a, b) => a.localeCompare(b));
+
+  const stackCounts = uniqueStacks.map((stack) => ({
+    name: stack,
+    count: projects.filter((project) =>
+      project.stack.some(
+        (item) => item.trim().toLowerCase() === stack.trim().toLowerCase(),
+      ),
+    ).length,
+  }));
 
   const initialProjects = projects.slice(0, PROJECTS_PAGE_SIZE);
   const totalPages = Math.max(1, Math.ceil(projects.length / PROJECTS_PAGE_SIZE));
@@ -30,6 +40,7 @@ export default async function ProjectsPage() {
           projects: initialProjects,
           totalPages,
           totalItems: projects.length,
+          stackCounts,
         }}
       />
     </main>
