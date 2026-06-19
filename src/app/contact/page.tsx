@@ -5,52 +5,48 @@ import { contactDefaults } from "@/config/site";
 
 export const dynamic = "force-dynamic";
 
-type ContactProfile = Awaited<ReturnType<typeof getProfile>> & {
-  phone?: string;
-};
-
 type ContactLink = {
   label: string;
   url: string;
 };
 
-const getContactLinks = (profile: ContactProfile, email: string): ContactLink[] => {
-  const phone = profile.phone?.replace(/[^\d+]/g, "");
+const phone = "+380681025393";
+const telegramUrl = "https://t.me/pm4life";
+const whatsappUrl = "https://wa.me/380681025393";
 
-  const defaults: ContactLink[] = [
+export default async function ContactPage() {
+  const profile = await getProfile();
+
+  const email = profile.email ?? contactDefaults.email;
+  const location = profile.location ?? contactDefaults.location;
+
+  const directLinks: ContactLink[] = [
     {
-      label: "Email",
+      label: email,
       url: `mailto:${email}`,
+    },
+    {
+      label: phone,
+      url: `tel:${phone}`,
     },
   ];
 
-  if (!phone) return defaults;
-
-  return [
-    ...defaults,
+  const messengerLinks: ContactLink[] = [
     {
-      label: "Phone",
-      url: `tel:${phone}`,
+      label: "Telegram",
+      url: telegramUrl,
     },
     {
       label: "WhatsApp",
-      url: `https://wa.me/${phone.replace("+", "")}`,
+      url: whatsappUrl,
     },
     {
-      label: "Telegram",
-      url: "https://t.me/pm4life",
-    },
-  ];
-};
-
-const getSocialLinks = (profile: ContactProfile): ContactLink[] => {
-  const socials = profile.socials.length ? profile.socials : contactDefaults.socials;
-
-  const requiredLinks: ContactLink[] = [
-    {
-      label: "Cal.com",
+      label: "Book a call",
       url: "https://cal.com/andrew-bielous",
     },
+  ];
+
+  const profileLinks: ContactLink[] = [
     {
       label: "GitHub",
       url: "https://github.com/AndrewB92",
@@ -65,24 +61,12 @@ const getSocialLinks = (profile: ContactProfile): ContactLink[] => {
     },
   ];
 
-  const merged = [...requiredLinks, ...socials];
-
-  return merged.filter(
-    (link, index, self) =>
-      link.url &&
-      link.url !== "#" &&
-      index === self.findIndex((item) => item.label === link.label || item.url === link.url),
-  );
-};
-
-export default async function ContactPage() {
-  const profile = (await getProfile()) as ContactProfile;
-
-  const email = profile.email ?? contactDefaults.email;
-  const location = profile.location ?? contactDefaults.location;
-
-  const contactLinks = getContactLinks(profile, email);
-  const socialLinks = getSocialLinks(profile);
+  const socialLinks: ContactLink[] = [
+    {
+      label: "LinkedIn",
+      url: "https://linkedin.com/in/yourname",
+    },
+  ];
 
   return (
     <main className={styles.page}>
@@ -107,16 +91,22 @@ export default async function ContactPage() {
           </div>
 
           <div className={styles.infoGroup}>
-            <span className={styles.label}>Direct contact</span>
-
+            <span className={styles.label}>Direct</span>
             <ul className={styles.links}>
-              {contactLinks.map((link) => (
+              {directLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.url}
-                    target={link.url.startsWith("http") ? "_blank" : undefined}
-                    rel={link.url.startsWith("http") ? "noreferrer" : undefined}
-                  >
+                  <a href={link.url}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className={styles.infoGroup}>
+            <span className={styles.label}>Messengers</span>
+            <ul className={styles.links}>
+              {messengerLinks.map((link) => (
+                <li key={link.label}>
+                  <a href={link.url} target="_blank" rel="noreferrer">
                     {link.label}
                   </a>
                 </li>
@@ -125,13 +115,25 @@ export default async function ContactPage() {
           </div>
 
           <div className={styles.infoGroup}>
-            <span className={styles.label}>Socials & profiles</span>
-
+            <span className={styles.label}>Profiles</span>
             <ul className={styles.links}>
-              {socialLinks.map((social) => (
-                <li key={social.label}>
-                  <a href={social.url} target="_blank" rel="noreferrer">
-                    {social.label}
+              {profileLinks.map((link) => (
+                <li key={link.label}>
+                  <a href={link.url} target="_blank" rel="noreferrer">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className={styles.infoGroup}>
+            <span className={styles.label}>Socials</span>
+            <ul className={styles.links}>
+              {socialLinks.map((link) => (
+                <li key={link.label}>
+                  <a href={link.url} target="_blank" rel="noreferrer">
+                    {link.label}
                   </a>
                 </li>
               ))}
