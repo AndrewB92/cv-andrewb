@@ -8,11 +8,74 @@ export const dynamic = "force-dynamic";
 type ContactLink = {
   label: string;
   url: string;
+  icon: string;
+  external?: boolean;
 };
 
 const phone = "+380681025393";
-const telegramUrl = "https://t.me/pm4life";
-const whatsappUrl = "https://wa.me/380681025393";
+
+const contactGroups: {
+  title: string;
+  links: ContactLink[];
+}[] = [
+  {
+    title: "Messengers",
+    links: [
+      {
+        label: "Telegram",
+        url: "https://t.me/pm4life",
+        icon: "↗",
+        external: true,
+      },
+      {
+        label: "WhatsApp",
+        url: "https://wa.me/380681025393",
+        icon: "◌",
+        external: true,
+      },
+      {
+        label: "Cal.com",
+        url: "https://cal.com/andrew-bielous",
+        icon: "◷",
+        external: true,
+      },
+    ],
+  },
+  {
+    title: "Profiles",
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndrewB92",
+        icon: "{}",
+        external: true,
+      },
+      {
+        label: "CodePen",
+        url: "https://codepen.io/bielous-andrew",
+        icon: "</>",
+        external: true,
+      },
+      {
+        label: "Gravatar",
+        url: "https://gravatar.com/babujioh",
+        icon: "◎",
+        external: true,
+      },
+    ],
+  },
+  {
+    title: "Socials",
+    links: [
+      {
+        label: "LinkedIn",
+        url: "https://linkedin.com/in/yourname",
+        icon: "in",
+        external: true,
+      },
+    ],
+  },
+];
 
 export default async function ContactPage() {
   const profile = await getProfile();
@@ -24,47 +87,12 @@ export default async function ContactPage() {
     {
       label: email,
       url: `mailto:${email}`,
+      icon: "@",
     },
     {
       label: phone,
       url: `tel:${phone}`,
-    },
-  ];
-
-  const messengerLinks: ContactLink[] = [
-    {
-      label: "Telegram",
-      url: telegramUrl,
-    },
-    {
-      label: "WhatsApp",
-      url: whatsappUrl,
-    },
-    {
-      label: "Book a call",
-      url: "https://cal.com/andrew-bielous",
-    },
-  ];
-
-  const profileLinks: ContactLink[] = [
-    {
-      label: "GitHub",
-      url: "https://github.com/AndrewB92",
-    },
-    {
-      label: "CodePen",
-      url: "https://codepen.io/bielous-andrew",
-    },
-    {
-      label: "Gravatar",
-      url: "https://gravatar.com/babujioh",
-    },
-  ];
-
-  const socialLinks: ContactLink[] = [
-    {
-      label: "LinkedIn",
-      url: "https://linkedin.com/in/yourname",
+      icon: "☎",
     },
   ];
 
@@ -92,53 +120,44 @@ export default async function ContactPage() {
 
           <div className={styles.infoGroup}>
             <span className={styles.label}>Direct</span>
+
             <ul className={styles.links}>
               {directLinks.map((link) => (
                 <li key={link.label}>
-                  <a href={link.url}>{link.label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className={styles.infoGroup}>
-            <span className={styles.label}>Messengers</span>
-            <ul className={styles.links}>
-              {messengerLinks.map((link) => (
-                <li key={link.label}>
-                  <a href={link.url} target="_blank" rel="noreferrer">
-                    {link.label}
+                  <a className={styles.contactButton} href={link.url}>
+                    <span className={styles.contactIcon} aria-hidden="true">
+                      {link.icon}
+                    </span>
+                    <span>{link.label}</span>
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className={styles.infoGroup}>
-            <span className={styles.label}>Profiles</span>
-            <ul className={styles.links}>
-              {profileLinks.map((link) => (
-                <li key={link.label}>
-                  <a href={link.url} target="_blank" rel="noreferrer">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {contactGroups.map((group) => (
+            <div className={styles.infoGroup} key={group.title}>
+              <span className={styles.label}>{group.title}</span>
 
-          <div className={styles.infoGroup}>
-            <span className={styles.label}>Socials</span>
-            <ul className={styles.links}>
-              {socialLinks.map((link) => (
-                <li key={link.label}>
-                  <a href={link.url} target="_blank" rel="noreferrer">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+              <ul className={styles.links}>
+                {group.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      className={styles.contactButton}
+                      href={link.url}
+                      target={link.external ? "_blank" : undefined}
+                      rel={link.external ? "noreferrer" : undefined}
+                    >
+                      <span className={styles.contactIcon} aria-hidden="true">
+                        {link.icon}
+                      </span>
+                      <span>{link.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </Section>
     </main>

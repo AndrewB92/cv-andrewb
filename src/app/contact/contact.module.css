@@ -50,3 +50,45 @@
   color: var(--color-accent);
   font-weight: 600;
 }
+
+.contactButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    opacity 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.contactButton:hover {
+  opacity: 0.72;
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--color-text-primary) 34%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+}
+
+.contactIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text-primary) 9%, transparent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
