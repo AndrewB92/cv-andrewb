@@ -85,10 +85,10 @@ export default async function ContactPage() {
         description="Email gets the fastest response, but I’ll see messages across these channels."
       >
         <div className={styles.details}>
-          <div className={styles.infoGroup}>
+          {/* <div className={styles.infoGroup}>
             <span className={styles.label}>Location</span>
             <p>{location}</p>
-          </div>
+          </div> */}
 
           <div className={styles.infoGroup}>
             <span className={styles.label}>Direct</span>
