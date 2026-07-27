@@ -23,7 +23,7 @@ const DEFAULTS: Required<Options> = {
 const afterTwoFrames = () =>
   new Promise<void>((resolve) => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(resolve);
+      requestAnimationFrame(() => resolve());
     });
   });
 
