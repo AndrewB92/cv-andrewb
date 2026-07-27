@@ -1,32 +1,47 @@
 import { Db, MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI;
-
-if (!uri) {
-  throw new Error(
-    "MONGODB_URI is missing. Set it in your environment to load portfolio data.",
-  );
-}
-
-const dbName = process.env.MONGODB_DB ?? "cv-andrewb";
+const DEFAULT_DATABASE_NAME = "cv-andrewb";
 
 declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-const client = new MongoClient(uri, {
-  monitorCommands: false,
-});
+function getMongoUri(): string {
+  const uri = process.env.MONGODB_URI?.trim();
 
-const clientPromise =
-  global._mongoClientPromise ?? client.connect().catch((error) => {
+  if (!uri) {
+    throw new Error(
+      "MONGODB_URI is missing. Add it to .env.local or your deployment environment.",
+    );
+  }
+
+  return uri;
+}
+
+function getClientPromise(): Promise<MongoClient> {
+  if (global._mongoClientPromise) {
+    return global._mongoClientPromise;
+  }
+
+  const client = new MongoClient(getMongoUri(), {
+    monitorCommands: false,
+  });
+
+  global._mongoClientPromise = client.connect().catch((error) => {
+    global._mongoClientPromise = undefined;
+
     console.error("Failed to initialize MongoDB client", error);
+
     throw error;
   });
 
-global._mongoClientPromise = clientPromise;
+  return global._mongoClientPromise;
+}
 
 export async function getDatabase(): Promise<Db> {
-  const connectedClient = await clientPromise;
-  return connectedClient.db(dbName);
+  const client = await getClientPromise();
+  const databaseName =
+    process.env.MONGODB_DB?.trim() || DEFAULT_DATABASE_NAME;
+
+  return client.db(databaseName);
 }

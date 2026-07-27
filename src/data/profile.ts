@@ -64,8 +64,8 @@ const fallbackProfile: Profile = {
   title: "Full-Stack Engineer",
   summary:
     "I enjoy building resilient, accessible web experiences that stay fast even when product requirements grow. My current focus is on React, TypeScript, and serverless backends.",
-  location: "Remote • Open to onsite in the Bay Area",
-  email: "hello@andrewb.dev",
+  location: "Odessa • Remote",
+  email: "babujioh@gmail.com",
   resumeUrl: "https://example.com/resume.pdf",
   socials: [
     { label: "GitHub", url: "https://github.com/andrewb" },
