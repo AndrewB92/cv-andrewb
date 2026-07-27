@@ -95,7 +95,7 @@ export default async function ContactPage() {
         {
           label: "Schedule a call",
           description: "Choose a convenient time on Cal.com",
-          url: "/contact?meet=intro-call",
+          url: "https://cal.com/andrew-bielous",
           icon: <FaCalendarAlt />,
           featured: true,
         },
@@ -209,12 +209,12 @@ export default async function ContactPage() {
           <PixelPortrait
             src={PORTRAIT_URL}
             alt="Andrew Bielous"
-            blockSize={38}
+            blockSize={60}
             faceMask={{
               centerX: 0.5,
               centerY: 0.305,
-              radiusX: 0.19,
-              radiusY: 0.225,
+              radiusX: 0.35,
+              radiusY: 0.55,
               rotation: 0,
             }}
             revealDurationMs={2100}
