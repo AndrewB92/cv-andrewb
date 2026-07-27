@@ -1,325 +1,370 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
+
 import styles from "./CalPopup.module.css";
 
+const Cal = dynamic(
+  () => import("@calcom/embed-react").then((module) => module.default),
+  {
+    ssr: false,
+    loading: () => <CalSkeleton />,
+  }
+);
+
+const CAL_TABS = [
+  {
+    key: "intro-call",
+    label: "Intro call",
+    description: "A short call to discuss your project and requirements.",
+    calLink: "andrew-bielous/intro-call",
+  },
+  {
+    key: "career-conversation",
+    label: "Career conversation",
+    description: "A focused conversation about roles, experience, and fit.",
+    calLink: "andrew-bielous/career-conversation",
+  },
+] as const;
+
+type CalTabKey = (typeof CAL_TABS)[number]["key"];
+
 type CalPopupProps = {
-  /** URL param that triggers the modal. Example: ?meet=hour-meeting */
+  /** URL parameter used to open and select the popup tab. */
   paramKey?: string;
 
-  /** Map param value -> calLink */
-  linksByKey: Record<string, string>;
-
-  /** Default inline config */
-  defaultConfig?: Record<string, unknown>;
-
-  /** Default UI config */
-  ui?: Record<string, unknown>;
-
-  /** Cal origin */
-  origin?: string;
-
-  /** Optional label for aria */
+  /** Accessible label for the dialog. */
   ariaLabel?: string;
+
+  /** Tab selected when no supported URL value is provided. */
+  initialTab?: CalTabKey;
+
+  /**
+   * Kept for compatibility with the previous component API.
+   * The two supported Cal links are now defined by CAL_TABS above.
+   */
+  linksByKey?: Record<string, string>;
 };
 
-declare global {
-  interface Window {
-    Cal?: any;
-  }
+const TAB_ALIASES: Readonly<Record<string, CalTabKey>> = {
+  "intro-call": "intro-call",
+  "hour-meeting": "intro-call",
+  "career-conversation": "career-conversation",
+};
+
+const CAL_CONFIG = {
+  layout: "month_view",
+  useSlotsViewOnSmallScreen: "true",
+} as const;
+
+const CAL_STYLE: CSSProperties = {
+  width: "100%",
+  height: "100%",
+  overflow: "auto",
+};
+
+function isCalTabKey(value: string): value is CalTabKey {
+  return CAL_TABS.some((tab) => tab.key === value);
 }
 
-const CAL_SCRIPT_SRC = "https://app.cal.eu/embed/embed.js";
-
-/**
- * Type-safe Cal bootstrap.
- * This mirrors Cal’s embed snippet behavior, but avoids TS self-referential `api.q` issues.
- * It also avoids re-bootstrapping if already done.
- */
-function ensureCalBootstrapped() {
-  if (typeof window === "undefined") return;
-
-  const w = window as any;
-
-  // If already bootstrapped (or embed.js already set it up), do nothing.
-  if (w.Cal && w.Cal.loaded) return;
-
-  (function bootstrap(C: any, A: string, L: string) {
-    const d: Document = C.document;
-
-    const push = (fn: any, args: IArguments | unknown[]) => {
-      fn.q = fn.q || [];
-      fn.q.push(args);
-    };
-
-    C.Cal =
-      C.Cal ||
-      function calFn() {
-        const cal = C.Cal;
-        const ar = arguments;
-
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q || [];
-
-          const s = d.createElement("script");
-          s.src = A;
-          s.async = true;
-          d.head.appendChild(s);
-
-          cal.loaded = true;
-        }
-
-        if (ar[0] === L) {
-          // namespace init
-          const api: any = function apiFn() {
-            push(api, arguments);
-          };
-
-          const namespace = ar[1];
-
-          // TS-safe: avoid `api.q = api.q || []` on itself
-          if (!api.q) api.q = [];
-
-          if (typeof namespace === "string") {
-            cal.ns[namespace] = cal.ns[namespace] || api;
-            push(cal.ns[namespace], ar);
-            push(cal, ["initNamespace", namespace]);
-          } else {
-            push(cal, ar);
-          }
-          return;
-        }
-
-        push(cal, ar);
-      };
-  })(w, CAL_SCRIPT_SRC, "init");
+function resolveTabKey(value: string | null): CalTabKey | null {
+  if (!value) return null;
+  return TAB_ALIASES[value] ?? (isCalTabKey(value) ? value : null);
 }
 
-/** Wait until Cal namespace exists (embed.js might take a tick to attach ns/api). */
-async function waitForNamespace(key: string, timeoutMs = 8000): Promise<void> {
-  const start = performance.now();
-
-  while (performance.now() - start < timeoutMs) {
-    const Cal: any = window.Cal;
-    if (Cal?.ns && Cal.ns[key]) return;
-
-    await new Promise<void>((r) => requestAnimationFrame(() => r()));
-  }
-
-  throw new Error(`Cal namespace "${key}" not ready after ${timeoutMs}ms`);
+function CalSkeleton() {
+  return (
+    <div className={styles.skeleton} role="status" aria-live="polite">
+      <span className={styles.skeletonSpinner} aria-hidden="true" />
+      <span>Loading calendar…</span>
+    </div>
+  );
 }
 
-function lockBodyScroll(lock: boolean) {
+function lockPageScroll() {
   const html = document.documentElement;
+  const previousOverflow = html.style.overflow;
+  const previousPaddingRight = html.style.paddingRight;
+  const scrollbarWidth = window.innerWidth - html.clientWidth;
 
-  if (lock) {
-    const scrollBarCompensation = window.innerWidth - html.clientWidth;
-    html.style.overflow = "hidden";
-    if (scrollBarCompensation > 0) {
-      html.style.paddingRight = `${scrollBarCompensation}px`;
-    }
-  } else {
-    html.style.overflow = "";
-    html.style.paddingRight = "";
+  html.style.overflow = "hidden";
+
+  if (scrollbarWidth > 0) {
+    html.style.paddingRight = `${scrollbarWidth}px`;
   }
+
+  return () => {
+    html.style.overflow = previousOverflow;
+    html.style.paddingRight = previousPaddingRight;
+  };
 }
 
 export function CalPopup({
   paramKey = "meet",
-  linksByKey,
-  defaultConfig = { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-  ui = { hideEventTypeDetails: false, layout: "month_view" },
-  origin = "https://app.cal.eu",
   ariaLabel = "Schedule a meeting",
+  initialTab = "intro-call",
 }: CalPopupProps) {
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [open, setOpen] = useState(false);
-  const [activeKey, setActiveKey] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<CalTabKey>(initialTab);
 
-  const modalRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
-  // stable mount id per component instance
-  const mountId = useMemo(
-    () => `cal-inline-${Math.random().toString(16).slice(2)}`,
-    []
+  const activeTabData =
+    CAL_TABS.find((tab) => tab.key === activeTab) ?? CAL_TABS[0];
+
+  const updateUrl = useCallback(
+    (key: CalTabKey | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (key) {
+        params.set(paramKey, key);
+      } else {
+        params.delete(paramKey);
+      }
+
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+    },
+    [paramKey, pathname, router, searchParams]
   );
 
-  const activeCalLink = activeKey ? linksByKey[activeKey] : undefined;
+  const openWithTab = useCallback(
+    (key: CalTabKey) => {
+      previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+      setActiveTab(key);
+      setIsOpen(true);
+      updateUrl(key);
+    },
+    [updateUrl]
+  );
 
   const close = useCallback(() => {
-    setOpen(false);
-    setActiveKey(null);
+    setIsOpen(false);
+    updateUrl(null);
 
-    const sp = new URLSearchParams(searchParams?.toString());
-    sp.delete(paramKey);
-    const next = sp.toString();
-    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
-  }, [paramKey, pathname, router, searchParams]);
+    window.requestAnimationFrame(() => {
+      previouslyFocusedRef.current?.focus({ preventScroll: true });
+    });
+  }, [updateUrl]);
 
-  const openWithKey = useCallback(
-    (key: string) => {
-      if (!linksByKey[key]) return;
-
-      setActiveKey(key);
-      setOpen(true);
-
-      const sp = new URLSearchParams(searchParams?.toString());
-      sp.set(paramKey, key);
-      router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+  const selectTab = useCallback(
+    (key: CalTabKey) => {
+      if (key === activeTab) return;
+      setActiveTab(key);
+      updateUrl(key);
     },
-    [linksByKey, paramKey, pathname, router, searchParams]
+    [activeTab, updateUrl]
   );
 
-  // Open from URL param
   useEffect(() => {
-    const key = searchParams?.get(paramKey);
+    const requestedTab = resolveTabKey(searchParams.get(paramKey));
 
-    if (key && linksByKey[key]) {
-      setActiveKey(key);
-      setOpen(true);
+    if (requestedTab) {
+      setActiveTab(requestedTab);
+      setIsOpen(true);
       return;
     }
 
-    if (!key) {
-      setOpen(false);
-      setActiveKey(null);
-    }
-  }, [linksByKey, paramKey, searchParams]);
+    setIsOpen(false);
+  }, [paramKey, searchParams]);
 
-  // Open from special links/buttons:
-  // <a className="js-cal-open" data-cal-key="hour-meeting" href="/contact?meet=hour-meeting">
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const trigger = target?.closest<HTMLElement>(".js-cal-open");
 
-      const el = target.closest<HTMLElement>(".js-cal-open");
-      if (!el) return;
+      if (!trigger) return;
 
-      const key = el.getAttribute("data-cal-key");
-      if (!key) return;
+      const requestedTab = resolveTabKey(trigger.dataset.calKey ?? null);
+      if (!requestedTab) return;
 
-      e.preventDefault();
-      openWithKey(key);
+      event.preventDefault();
+      openWithTab(requestedTab);
     };
 
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
-  }, [openWithKey]);
+    document.addEventListener("click", handleDocumentClick);
+    return () => document.removeEventListener("click", handleDocumentClick);
+  }, [openWithTab]);
 
-  // ESC + scroll lock
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
 
-    lockBodyScroll(true);
+    const unlockPageScroll = lockPageScroll();
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+
+      if (event.key !== "Tab" || !panelRef.current) return;
+
+      const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], iframe, [tabindex]:not([tabindex="-1"])'
+      );
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
-    document.addEventListener("keydown", onKeyDown);
-
-    const t = window.setTimeout(() => {
-      modalRef.current?.focus();
-    }, 0);
+    document.addEventListener("keydown", handleKeyDown);
+    closeButtonRef.current?.focus({ preventScroll: true });
 
     return () => {
-      window.clearTimeout(t);
-      lockBodyScroll(false);
-      document.removeEventListener("keydown", onKeyDown);
+      unlockPageScroll();
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, close]);
+  }, [close, isOpen]);
 
-  // Mount Cal inline when open
   useEffect(() => {
-    if (!open || !activeKey || !activeCalLink) return;
-    if (typeof window === "undefined") return;
+    if (!isOpen) return;
 
     let cancelled = false;
 
-    const run = async () => {
-      setIsLoading(true);
-
-      // Official bootstrap (loads embed.js once and sets up Cal.ns/queue)
-      ensureCalBootstrapped();
-
-      // init namespace
-      window.Cal("init", activeKey, { origin });
-
-      // Wait until namespace api exists
-      await waitForNamespace(activeKey);
+    void import("@calcom/embed-react").then(async ({ getCalApi }) => {
       if (cancelled) return;
 
-      const mountEl = document.getElementById(mountId);
-      if (!mountEl) return;
+      const cal = await getCalApi({ namespace: activeTab });
+      if (cancelled) return;
 
-      // reset mount (important when switching keys)
-      mountEl.innerHTML = "";
-
-      // inline embed
-      window.Cal.ns[activeKey]("inline", {
-        elementOrSelector: `#${mountId}`,
-        config: defaultConfig,
-        calLink: activeCalLink,
+      cal("ui", {
+        cssVarsPerTheme: {
+          light: { "cal-brand": "#292929" },
+          dark: { "cal-brand": "#d357e6" },
+        },
+        hideEventTypeDetails: false,
+        layout: "month_view",
       });
-
-      // UI options
-      window.Cal.ns[activeKey]("ui", ui);
-
-      setIsLoading(false);
-    };
-
-    run().catch(() => {
-      if (!cancelled) setIsLoading(false);
     });
 
     return () => {
       cancelled = true;
-      const mountEl = document.getElementById(mountId);
-      if (mountEl) mountEl.innerHTML = "";
     };
-  }, [open, activeKey, activeCalLink, defaultConfig, ui, origin, mountId]);
+  }, [activeTab, isOpen]);
 
-  if (!open) return null;
+  const handleTabKeyDown = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+    currentIndex: number
+  ) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+    event.preventDefault();
+
+    const direction = event.key === "ArrowRight" ? 1 : -1;
+    const nextIndex =
+      (currentIndex + direction + CAL_TABS.length) % CAL_TABS.length;
+    const nextTab = CAL_TABS[nextIndex];
+
+    selectTab(nextTab.key);
+
+    document
+      .getElementById(`cal-tab-${nextTab.key}`)
+      ?.focus({ preventScroll: true });
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div
       className={styles.overlay}
-      role="dialog"
-      aria-modal="true"
-      aria-label={ariaLabel}
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) close();
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) close();
       }}
     >
-      <div className={styles.panel} ref={modalRef} tabIndex={-1}>
-        <div className={styles.header}>
-          <div className={styles.title}>Schedule</div>
+      <div
+        ref={panelRef}
+        className={styles.panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel}
+      >
+        <header className={styles.header}>
+          <div>
+            <p className={styles.eyebrow}>Schedule</p>
+            <h2 className={styles.title}>Choose a conversation</h2>
+          </div>
 
           <button
+            ref={closeButtonRef}
             type="button"
             className={styles.close}
             onClick={close}
-            aria-label="Close"
+            aria-label="Close scheduling dialog"
           >
-            ✕
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
+        </header>
+
+        <div className={styles.tabs} role="tablist" aria-label="Meeting type">
+          {CAL_TABS.map((tab, index) => {
+            const isActive = tab.key === activeTab;
+
+            return (
+              <button
+                key={tab.key}
+                id={`cal-tab-${tab.key}`}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-controls="cal-tab-panel"
+                tabIndex={isActive ? 0 : -1}
+                className={styles.tab}
+                data-active={isActive ? "true" : "false"}
+                onClick={() => selectTab(tab.key)}
+                onKeyDown={(event) => handleTabKeyDown(event, index)}
+              >
+                <span className={styles.tabLabel}>{tab.label}</span>
+                <span className={styles.tabDescription}>{tab.description}</span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className={styles.body}>
-          {isLoading ? (
-            <div className={styles.loading} aria-live="polite">
-              Loading…
-            </div>
-          ) : null}
-
-          <div className={styles.calWrap} id={mountId} />
+        <div
+          id="cal-tab-panel"
+          className={styles.body}
+          role="tabpanel"
+          aria-labelledby={`cal-tab-${activeTab}`}
+        >
+          <div className={styles.calWrap} key={activeTabData.key}>
+            <Cal
+              namespace={activeTabData.key}
+              calLink={activeTabData.calLink}
+              style={CAL_STYLE}
+              config={CAL_CONFIG}
+            />
+          </div>
         </div>
       </div>
     </div>
