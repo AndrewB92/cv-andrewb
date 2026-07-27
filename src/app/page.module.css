@@ -41,7 +41,7 @@
   font-size: clamp(2rem,3.4vw,3.6rem);
   font-weight: 900;
   line-height: 96%;
-  letter-spacing: -4px;
+  letter-spacing: -1px;
   word-spacing: -14px;
 }
 
@@ -713,7 +713,7 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding: var(--space-xl);
+    /* padding: var(--space-xl); */
   }
 
   .heroActions {

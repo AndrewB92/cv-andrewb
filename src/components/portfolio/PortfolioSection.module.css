@@ -1,37 +1,11 @@
 .portfolio {
-  /* keep neutral; you can merge with your theme */
+  width: 100%;
 }
 
 .container {
-  /* max-width: 1100px; */
-  /* margin: 0 auto; */
   padding: 0;
 }
 
-.sectionHeader {
-  margin-bottom: 40px;
-}
-
-.sectionKicker {
-  margin: 0 0 10px;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.6;
-}
-
-.sectionTitle {
-  margin: 0 0 10px;
-  font-size: 32px;
-}
-
-.sectionSubtitle {
-  margin: 0;
-  opacity: 0.7;
-  max-width: 60ch;
-}
-
-/* Stage */
 .cards {
   --gap: 20px;
   --side-gap: 0px;
@@ -44,105 +18,95 @@
   overflow: hidden;
 }
 
-
-
-/* Absolute cards */
 .card {
   --x: 0px;
   --w: 0px;
   --shift-x: 0px;
   --expand-w: 0px;
-  /*max-height: 420px;
-  */position: absolute;
+
+  position: absolute;
   top: 0;
   left: 0;
   width: var(--w);
-  transform: translateX(var(--x)) translateY(0);
-  opacity: 1;
-  background: #161b22;
-  border: 1px solid #2a2f3a;
-  border-radius: .6rem;
   overflow: hidden;
-  transition:    
-    transform 420ms cubic-bezier(.2,.8,.2,1),
-    width     420ms cubic-bezier(.2,.8,.2,1),
-    opacity   320ms ease;
-  will-change: transform, width, opacity;
-}
-
-.card {
+  border: 1px solid #2a2f3a;
+  border-radius: 0.6rem;
+  background: #161b22;
   opacity: 1;
+  transform: translate3d(var(--x), 0, 0);
+  transition:
+    transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 320ms ease;
 }
 
-.cards:hover .card {
-  opacity: 0.5;
+@media (hover: hover) and (pointer: fine) {
+  .cards:hover .card {
+    opacity: 0.5;
+  }
+
+  .cards:hover .card:hover {
+    opacity: 1;
+  }
 }
 
-.cards:hover .card:hover {
-  opacity: 1;
-}
-
-/* Default layout (stacked) */
 .cardLayout {
-  height: 100%;
   display: flex;
+  height: 100%;
   flex-direction: column;
 }
 
-/* Media */
 .cardMedia {
   width: 100%;
-  /* height: auto; */
-  /* min-height: 200px; */
   overflow: hidden;
-  background: #0b0e15;
-
   aspect-ratio: 16 / 9;
+  background: #0b0e15;
 }
 
-.cardMedia img {
-  width: 100%;
-  /* height: auto; */
-  /* object-fit: contain; */
+.cardMedia > img {
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .mediaPlaceholder {
   width: 100%;
-  height: auto;
-  background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
 }
 
-/* Content */
 .cardContent {
-  padding: 18px 18px 0px;
-  /* height: calc(100% - 250px); */
-  height: auto;
   display: flex;
+  min-height: 0;
+  height: auto;
+  flex: 1;
   flex-direction: column;
   gap: 12px;
-  min-height: 0; /* critical for scroll containers in flex */
+  padding: 18px 18px 0;
 }
 
 .cardTop {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 10px;
 }
 
 .cardHead {
   display: flex;
   flex-direction: column-reverse;
-  justify-content: flex-start;
   align-items: flex-start;
-  gap: 0px;
-  flex-wrap: nowrap;
 }
 
 .cardTitle {
   margin: 0;
   font-size: 18px;
+  line-height: 1.3;
 }
 
 .cardYear {
@@ -151,30 +115,28 @@
 }
 
 .cardStack {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .cardStack li {
-  font-size: 12px;
   padding: 4px 8px;
   border: 1px solid #2a2f3a;
   border-radius: 6px;
+  font-size: 12px;
 }
 
-/* Text blocks */
 .cardText {
   transition: opacity 220ms ease;
-  will-change: opacity;
 }
 
 .cardTextCompact {
-  opacity: 1;
   display: block;
+  opacity: 1;
 }
 
 .cardDescription {
@@ -186,14 +148,18 @@
 
 .cardTextExpanded {
   display: none;
+  height: 0;
   opacity: 0;
-  height: 0px;
+}
+
+.expandedInner {
+  min-height: 0;
 }
 
 .expandedScroll {
+  min-height: 0;
   overflow: auto;
   padding-right: 6px;
-  min-height: 0;
   line-height: 1.6;
   opacity: 0.9;
 }
@@ -206,95 +172,99 @@
   margin-bottom: 0;
 }
 
-/* Actions */
-.cardActions {
-  margin-top: auto;
+.cardActions,
+.cardActionsExpanded {
   display: flex;
-  gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-  padding: 0px 18px 18px;
+  gap: 10px;
+}
+
+.cardActions {
+  margin-top: auto;
+  padding: 0 18px 18px;
 }
 
 .cardActionsExpanded {
   display: none;
+  height: 0;
+  margin-top: 0;
+  padding: 0;
   opacity: 0;
-  margin-top: 0px;
-  padding: 0px;
-  height: 0px;
+}
+
+.btn,
+.cardToggle,
+.cardClose {
+  min-height: 40px;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  color: #fff;
+  font: inherit;
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 12px;
+  background: #2a2f3a;
   font-size: 13px;
   text-decoration: none;
-  color: #ffffff;
-  background: #2a2f3a;
-  border: 1px solid #2a2f3a;
-  border-radius: 8px;
 }
 
 .btnOutline {
   background: transparent;
 }
 
-.cardToggle{
-  font-family: var(--font-geist-mono);
-  color: #fff;
-  background: transparent;
-  border: 1px solid #2a2f3a;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  line-height: 1.6;
-  cursor: pointer;
-  text-decoration: none;
+.cardToggle {
   margin-left: auto;
-}
-
-.cardClose {
-  padding: 5px 10px;
-  font-size: 20px;
-  border-radius: 8px;
-  border: 1px solid #2a2f3a;
-  background: #0f1117;
-  color: #fff;
+  padding: 8px 12px;
+  background: transparent;
   cursor: pointer;
+  font-family: var(--font-geist-mono);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
-/* Close hidden until expanded */
 .cardClose {
+  display: grid;
+  width: 40px;
+  padding: 0;
+  place-items: center;
+  background: #0f1117;
+  cursor: pointer;
+  font-size: 22px;
   opacity: 0;
   pointer-events: none;
 }
 
-/* =========================
-   Sequencing & states
-   ========================= */
-
-.isOpen .card { pointer-events: none; }
-.isOpen .isActive { pointer-events: auto; z-index: 5; }
-
-/* During open (others moving): fade compact + actions on active card */
-.isOpen .isActive .cardTextCompact{
-  opacity: 0;
-  display: none;
+.btn:focus-visible,
+.cardToggle:focus-visible,
+.cardClose:focus-visible {
+  outline: 2px solid #d357e6;
+  outline-offset: 3px;
 }
 
-.isOpen .isActive .cardActionsExpanded {
-  opacity: 1;
-  display: flex;
-  gap: 8px;
-  margin-top: auto;
-  height: auto !important;
+.isOpen .card {
+  pointer-events: none;
+}
+
+.isOpen .isActive {
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.isOpen .isActive .cardTextCompact {
+  display: none;
+  opacity: 0;
 }
 
 .isOpen .isActive .cardActions {
-  opacity: 0;
   display: none;
+  opacity: 0;
 }
 
-/* Expanded: active card becomes 2-col layout */
 .isOpen.phaseExpand .isActive .cardLayout {
   display: grid;
   grid-template-columns: minmax(260px, 40%) 1fr;
@@ -302,32 +272,36 @@
 }
 
 .isOpen.phaseExpand .isActive .cardMedia {
+  width: 100%;
   height: auto;
-}
-
-.isOpen.phaseExpand .isActive .cardMedia {
-    aspect-ratio: unset;
-    background: transparent;
-    width: 100%;
-    overflow: hidden;
-    border-right: 1px solid #2a2f3a;
-}
-
-.isOpen.phaseExpand .isActive .cardContent {
-  height: auto;
+  border-right: 1px solid #2a2f3a;
+  aspect-ratio: auto;
+  background: transparent;
 }
 
 .isOpen.phaseExpand .isActive .cardTextExpanded {
   display: flex;
-  opacity: 1;
-  flex: 1;
-  min-height: 0px;
+  min-height: 0;
   height: auto;
-
+  flex: 1;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
   padding-bottom: 18px;
+  opacity: 1;
+}
+
+.isOpen.phaseExpand .isActive .expandedInner {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex: 1;
+  flex-direction: column;
+}
+
+.isOpen.phaseExpand .isActive .cardActionsExpanded {
+  display: flex;
+  height: auto;
+  margin-top: auto;
+  opacity: 1;
 }
 
 .isOpen.phaseExpand .isActive .cardClose {
@@ -335,62 +309,215 @@
   pointer-events: auto;
 }
 
-/* Closing: expanded fades out immediately */
 .isClosing .isActive .cardTextExpanded {
-  opacity: 0;
   display: none;
-  height: 0px;
+  height: 0;
+  opacity: 0;
 }
 
-/* Movement: away cards */
 .isOpen .card[data-away="up"] {
-  transform: translateX(var(--x)) translateY(-520px);
-}
-.isOpen .card[data-away="down"] {
-  transform: translateX(var(--x)) translateY(520px);
+  transform: translate3d(var(--x), -520px, 0);
 }
 
-/* Expanded: hide others, expand active */
-.isOpen.phaseExpand .card:not(.isActive) {
+.isOpen .card[data-away="down"] {
+  transform: translate3d(var(--x), 520px, 0);
+}
+
+.isOpen.phaseExpand .card:not(.isActive),
+.isClosing .card:not(.isActive) {
   opacity: 0;
   pointer-events: none;
 }
 
 .isOpen.phaseExpand .isActive {
   width: var(--expand-w);
-  transform: translateX(calc(var(--x) + var(--shift-x))) translateY(0);
-}
-
-/* Closing: keep others hidden while active shrinks back */
-.isClosing .card:not(.isActive) {
-  opacity: 0;
-  pointer-events: none;
+  transform: translate3d(calc(var(--x) + var(--shift-x)), 0, 0);
 }
 
 .isClosing .isActive {
   width: var(--w);
-  transform: translateX(var(--x)) translateY(0);
+  transform: translate3d(var(--x), 0, 0);
 }
 
-/* Active marker for module */
-.isActive {}
+.cards[data-measuring="true"] .cardTextExpanded {
+  display: none !important;
+}
 
-/* Measuring mode: force compact-only reliably */
-.cards[data-measuring="true"] .cardTextExpanded { display: none !important; }
-.cards[data-measuring="true"] .cardTextCompact { opacity: 1 !important; }
-.cards[data-measuring="true"] .cardActions { opacity: 1 !important; }
-.cards[data-measuring="true"] .cardClose { opacity: 0 !important; pointer-events: none !important; }
+.cards[data-measuring="true"] .cardTextCompact,
+.cards[data-measuring="true"] .cardActions {
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+.cards[data-measuring="true"] .cardClose {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .cards[data-measuring="true"] .cardLayout {
   display: flex !important;
   flex-direction: column !important;
 }
-.cards[data-measuring="true"] .cardMedia { height: 250px !important; }
-.cards[data-measuring="true"] .cardContent { height: auto !important; }
+
+.cards[data-measuring="true"] .cardMedia {
+  height: auto !important;
+  aspect-ratio: 16 / 9 !important;
+}
+
+@media (max-width: 1080px) {
+  .cards,
+  .cards.isCompact {
+    display: grid;
+    height: auto !important;
+    min-height: 0;
+    gap: 20px;
+    overflow: visible;
+  }
+
+  .card,
+  .isOpen .card,
+  .isClosing .card,
+  .isOpen.phaseExpand .isActive,
+  .isClosing .isActive,
+  .isOpen .card[data-away="up"],
+  .isOpen .card[data-away="down"] {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100% !important;
+    height: auto !important;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .isOpen.phaseExpand .card:not(.isActive),
+  .isClosing .card:not(.isActive) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cardLayout,
+  .isOpen.phaseExpand .isActive .cardLayout {
+    display: flex;
+    height: auto;
+    flex-direction: column;
+  }
+
+  .cardMedia,
+  .isOpen.phaseExpand .isActive .cardMedia {
+    width: 100%;
+    height: auto;
+    border-right: 0;
+    aspect-ratio: 16 / 9;
+    background: #0b0e15;
+  }
+
+  .cardContent {
+    padding: 20px 20px 0;
+  }
+
+  .isOpen .isActive .cardTextCompact {
+    display: block;
+    opacity: 1;
+  }
+
+  .cardTextExpanded,
+  .isOpen.phaseExpand .isActive .cardTextExpanded {
+    display: grid;
+    height: auto;
+    min-height: 0;
+    grid-template-rows: 0fr;
+    padding: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      grid-template-rows 220ms ease,
+      opacity 180ms ease;
+  }
+
+  .isOpen.phaseExpand .isActive .cardTextExpanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .expandedInner,
+  .isOpen.phaseExpand .isActive .expandedInner {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .expandedScroll {
+    overflow: visible;
+    padding: 2px 0 0;
+  }
+
+  .cardActionsExpanded,
+  .isOpen.phaseExpand .isActive .cardActionsExpanded {
+    display: none;
+  }
+
+  .cardActions,
+  .isOpen .isActive .cardActions {
+    display: flex;
+    padding: 16px 20px 20px;
+    opacity: 1;
+  }
+
+  .cardClose,
+  .isOpen.phaseExpand .isActive .cardClose {
+    display: none;
+  }
+
+  .btn,
+  .cardToggle {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cards,
+  .cards.isCompact {
+    gap: 16px;
+  }
+
+  .cardContent {
+    gap: 10px;
+    padding: 16px 16px 0;
+  }
+
+  .cardTitle {
+    font-size: 17px;
+  }
+
+  .cardActions,
+  .isOpen .isActive .cardActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 14px 16px 16px;
+  }
+
+  .cardToggle {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .card,
   .cardText,
-  .cardActions {
+  .cardActions,
+  .cardTextExpanded {
     transition: none !important;
   }
 }

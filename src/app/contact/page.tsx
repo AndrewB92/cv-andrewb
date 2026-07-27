@@ -69,7 +69,7 @@ const contactGroups: {
     links: [
       {
         label: "LinkedIn",
-        url: "https://linkedin.com/in/yourname",
+        url: "https://linkedin.com/in/bielousandrew",
         icon: "in",
         external: true,
       },
