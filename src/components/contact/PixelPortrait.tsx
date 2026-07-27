@@ -10,11 +10,20 @@ import {
 
 import styles from "./PixelPortrait.module.css";
 
-type FaceMask = {
+export type FaceMask = {
+  /** Horizontal face centre as a fraction of canvas width. */
   centerX: number;
+
+  /** Vertical face centre as a fraction of canvas height. */
   centerY: number;
+
+  /** Horizontal ellipse radius as a fraction of canvas width. */
   radiusX: number;
+
+  /** Vertical ellipse radius as a fraction of canvas height. */
   radiusY: number;
+
+  /** Optional clockwise rotation in radians. */
   rotation?: number;
 };
 
@@ -23,6 +32,12 @@ type PixelPortraitProps = {
   alt: string;
   blockSize?: number;
   faceMask?: FaceMask;
+
+  /** Time used to reveal the clear face on hover/focus. */
+  revealDurationMs?: number;
+
+  /** Time used to restore the pixelated face. */
+  pixelateDurationMs?: number;
 };
 
 type PixelBlock = {
@@ -33,22 +48,30 @@ type PixelBlock = {
   color: string;
 };
 
+type PixelMask = {
+  centerX: number;
+  centerY: number;
+  radiusX: number;
+  radiusY: number;
+  rotation: number;
+};
+
 const MAX_CANVAS_EDGE = 720;
-const BLOCKS_PER_FRAME = 7;
 
 const DEFAULT_FACE_MASK: FaceMask = {
   centerX: 0.5,
-  centerY: 0.245,
-  radiusX: 0.205,
-  radiusY: 0.23,
+  centerY: 0.31,
+  radiusX: 0.2,
+  radiusY: 0.235,
   rotation: 0,
 };
 
-function shuffle<T>(items: T[]) {
+function shuffle<T>(items: T[]): T[] {
   const result = [...items];
 
   for (let index = result.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
+
     [result[index], result[swapIndex]] = [
       result[swapIndex],
       result[index],
@@ -88,45 +111,77 @@ function getCoverSourceRect(
   };
 }
 
-function isInsideRotatedEllipse(
-  x: number,
-  y: number,
+function toPixelMask(
   canvasWidth: number,
   canvasHeight: number,
   mask: FaceMask,
-) {
-  const centerX = canvasWidth * mask.centerX;
-  const centerY = canvasHeight * mask.centerY;
-  const radiusX = canvasWidth * mask.radiusX;
-  const radiusY = canvasHeight * mask.radiusY;
-  const rotation = mask.rotation ?? 0;
+): PixelMask {
+  return {
+    centerX: canvasWidth * mask.centerX,
+    centerY: canvasHeight * mask.centerY,
+    radiusX: canvasWidth * mask.radiusX,
+    radiusY: canvasHeight * mask.radiusY,
+    rotation: mask.rotation ?? 0,
+  };
+}
 
-  const translatedX = x - centerX;
-  const translatedY = y - centerY;
+function isInsideRotatedEllipse(
+  x: number,
+  y: number,
+  mask: PixelMask,
+): boolean {
+  const translatedX = x - mask.centerX;
+  const translatedY = y - mask.centerY;
 
-  const cos = Math.cos(-rotation);
-  const sin = Math.sin(-rotation);
+  const cos = Math.cos(-mask.rotation);
+  const sin = Math.sin(-mask.rotation);
 
   const rotatedX = translatedX * cos - translatedY * sin;
   const rotatedY = translatedX * sin + translatedY * cos;
 
   return (
-    (rotatedX * rotatedX) / (radiusX * radiusX) +
-      (rotatedY * rotatedY) / (radiusY * radiusY) <=
+    (rotatedX * rotatedX) / (mask.radiusX * mask.radiusX) +
+      (rotatedY * rotatedY) / (mask.radiusY * mask.radiusY) <=
     1
   );
+}
+
+function withFaceClip(
+  context: CanvasRenderingContext2D,
+  mask: PixelMask,
+  draw: () => void,
+) {
+  context.save();
+  context.beginPath();
+  context.ellipse(
+    mask.centerX,
+    mask.centerY,
+    mask.radiusX,
+    mask.radiusY,
+    mask.rotation,
+    0,
+    Math.PI * 2,
+  );
+  context.clip();
+
+  draw();
+
+  context.restore();
 }
 
 export function PixelPortrait({
   src,
   alt,
-  blockSize = 34,
+  blockSize = 36,
   faceMask = DEFAULT_FACE_MASK,
+  revealDurationMs = 1900,
+  pixelateDurationMs = 1500,
 }: PixelPortraitProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const blocksRef = useRef<PixelBlock[]>([]);
+  const pixelMaskRef = useRef<PixelMask | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const modeRef = useRef<"pixelated" | "clear">("pixelated");
   const isReadyRef = useRef(false);
@@ -165,32 +220,39 @@ export function PixelPortrait({
     const context = contextRef.current;
     const image = imageRef.current;
     const canvas = canvasRef.current;
+    const mask = pixelMaskRef.current;
 
-    if (!context || !image || !canvas) return;
+    if (!context || !image || !canvas || !mask) return;
 
     const source = sourceRectRef.current;
     const scaleX = source.sw / canvas.width;
     const scaleY = source.sh / canvas.height;
 
-    context.drawImage(
-      image,
-      source.sx + block.x * scaleX,
-      source.sy + block.y * scaleY,
-      block.width * scaleX,
-      block.height * scaleY,
-      block.x,
-      block.y,
-      block.width,
-      block.height,
-    );
+    withFaceClip(context, mask, () => {
+      context.drawImage(
+        image,
+        source.sx + block.x * scaleX,
+        source.sy + block.y * scaleY,
+        block.width * scaleX,
+        block.height * scaleY,
+        block.x,
+        block.y,
+        block.width,
+        block.height,
+      );
+    });
   }, []);
 
   const drawPixelBlock = useCallback((block: PixelBlock) => {
     const context = contextRef.current;
-    if (!context) return;
+    const mask = pixelMaskRef.current;
 
-    context.fillStyle = block.color;
-    context.fillRect(block.x, block.y, block.width, block.height);
+    if (!context || !mask) return;
+
+    withFaceClip(context, mask, () => {
+      context.fillStyle = block.color;
+      context.fillRect(block.x, block.y, block.width, block.height);
+    });
   }, []);
 
   const renderPixelatedFace = useCallback(() => {
@@ -204,31 +266,62 @@ export function PixelPortrait({
   }, [drawFullImage, drawPixelBlock]);
 
   const animateTo = useCallback(
-    (nextMode: "pixelated" | "clear") => {
+    (
+      nextMode: "pixelated" | "clear",
+      durationMs: number,
+    ) => {
       if (!isReadyRef.current || modeRef.current === nextMode) return;
 
       cancelAnimation();
       modeRef.current = nextMode;
 
+      /*
+       * Always rebuild the stable starting frame. This prevents visual holes
+       * when the pointer changes direction before an animation has completed.
+       */
       if (nextMode === "pixelated") {
         drawFullImage();
+      } else {
+        renderPixelatedFace();
+        modeRef.current = "clear";
       }
 
       const blocks = shuffle(blocksRef.current);
-      let index = 0;
 
-      const renderFrame = () => {
-        const end = Math.min(index + BLOCKS_PER_FRAME, blocks.length);
+      if (!blocks.length) return;
 
-        for (; index < end; index += 1) {
-          if (nextMode === "clear") {
-            drawOriginalBlock(blocks[index]);
-          } else {
-            drawPixelBlock(blocks[index]);
-          }
+      const safeDuration = Math.max(120, durationMs);
+      let drawnCount = 0;
+      let startedAt: number | null = null;
+
+      const renderFrame = (timestamp: number) => {
+        if (startedAt === null) {
+          startedAt = timestamp;
         }
 
-        if (index < blocks.length) {
+        const progress = Math.min(
+          1,
+          (timestamp - startedAt) / safeDuration,
+        );
+
+        const targetCount = Math.min(
+          blocks.length,
+          Math.ceil(progress * blocks.length),
+        );
+
+        while (drawnCount < targetCount) {
+          const block = blocks[drawnCount];
+
+          if (nextMode === "clear") {
+            drawOriginalBlock(block);
+          } else {
+            drawPixelBlock(block);
+          }
+
+          drawnCount += 1;
+        }
+
+        if (progress < 1) {
           animationFrameRef.current = requestAnimationFrame(renderFrame);
         } else {
           animationFrameRef.current = null;
@@ -242,12 +335,14 @@ export function PixelPortrait({
       drawFullImage,
       drawOriginalBlock,
       drawPixelBlock,
+      renderPixelatedFace,
     ],
   );
 
   const initialiseCanvas = useCallback(
     (image: HTMLImageElement) => {
       const canvas = canvasRef.current;
+
       if (!canvas) return;
 
       const context = canvas.getContext("2d", {
@@ -257,15 +352,16 @@ export function PixelPortrait({
 
       if (!context) return;
 
-      const sourceRatio = image.naturalWidth / image.naturalHeight;
+      /*
+       * The canvas uses the same 4:5 ratio as its CSS container. This is
+       * important: face-mask coordinates now match what is actually visible,
+       * even when the source image has a different aspect ratio.
+       */
       const canvasWidth = Math.min(
         MAX_CANVAS_EDGE,
         Math.max(320, image.naturalWidth),
       );
-      const canvasHeight = Math.min(
-        MAX_CANVAS_EDGE,
-        Math.round(canvasWidth / sourceRatio),
-      );
+      const canvasHeight = Math.round(canvasWidth * 1.25);
 
       canvas.width = canvasWidth;
       canvas.height = canvasHeight;
@@ -275,6 +371,12 @@ export function PixelPortrait({
         image.naturalHeight,
         canvas.width,
         canvas.height,
+      );
+
+      pixelMaskRef.current = toPixelMask(
+        canvas.width,
+        canvas.height,
+        faceMask,
       );
 
       contextRef.current = context;
@@ -287,25 +389,17 @@ export function PixelPortrait({
         canvas.height,
       );
 
+      const mask = pixelMaskRef.current;
       const blocks: PixelBlock[] = [];
 
       for (let y = 0; y < canvas.height; y += blockSize) {
         for (let x = 0; x < canvas.width; x += blockSize) {
           const width = Math.min(blockSize, canvas.width - x);
           const height = Math.min(blockSize, canvas.height - y);
-
           const blockCenterX = x + width / 2;
           const blockCenterY = y + height / 2;
 
-          if (
-            !isInsideRotatedEllipse(
-              blockCenterX,
-              blockCenterY,
-              canvas.width,
-              canvas.height,
-              faceMask,
-            )
-          ) {
+          if (!mask || !isInsideRotatedEllipse(blockCenterX, blockCenterY, mask)) {
             continue;
           }
 
@@ -316,15 +410,7 @@ export function PixelPortrait({
 
           for (let sampleY = y; sampleY < y + height; sampleY += 4) {
             for (let sampleX = x; sampleX < x + width; sampleX += 4) {
-              if (
-                !isInsideRotatedEllipse(
-                  sampleX,
-                  sampleY,
-                  canvas.width,
-                  canvas.height,
-                  faceMask,
-                )
-              ) {
+              if (!isInsideRotatedEllipse(sampleX, sampleY, mask)) {
                 continue;
               }
 
@@ -382,15 +468,18 @@ export function PixelPortrait({
       imageRef.current = null;
       contextRef.current = null;
       blocksRef.current = [];
+      pixelMaskRef.current = null;
       isReadyRef.current = false;
     };
   }, [cancelAnimation, initialiseCanvas, src]);
 
-  const reveal = (_event?: PointerEvent | FocusEvent) =>
-    animateTo("clear");
+  const reveal = (_event?: PointerEvent | FocusEvent) => {
+    animateTo("clear", revealDurationMs);
+  };
 
-  const pixelate = (_event?: PointerEvent | FocusEvent) =>
-    animateTo("pixelated");
+  const pixelate = (_event?: PointerEvent | FocusEvent) => {
+    animateTo("pixelated", pixelateDurationMs);
+  };
 
   return (
     <figure

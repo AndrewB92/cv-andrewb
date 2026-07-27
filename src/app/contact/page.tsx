@@ -209,7 +209,16 @@ export default async function ContactPage() {
           <PixelPortrait
             src={PORTRAIT_URL}
             alt="Andrew Bielous"
-            blockSize={42}
+            blockSize={38}
+            faceMask={{
+              centerX: 0.5,
+              centerY: 0.305,
+              radiusX: 0.19,
+              radiusY: 0.225,
+              rotation: 0,
+            }}
+            revealDurationMs={2100}
+            pixelateDurationMs={1650}
           />
 
           <div className={styles.availability}>
@@ -219,7 +228,10 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className={styles.connections} aria-labelledby="ways-to-connect">
+      <section
+        className={styles.connections}
+        aria-labelledby="ways-to-connect"
+      >
         <header className={styles.sectionHeader}>
           <p className={styles.eyebrow}>Ways to connect</p>
           <h2 id="ways-to-connect">Choose the channel that fits.</h2>
@@ -239,7 +251,10 @@ export default async function ContactPage() {
 
               <div className={styles.links}>
                 {group.links.map((link) => (
-                  <ContactLinkCard key={`${group.title}-${link.label}`} link={link} />
+                  <ContactLinkCard
+                    key={`${group.title}-${link.label}`}
+                    link={link}
+                  />
                 ))}
               </div>
             </article>
