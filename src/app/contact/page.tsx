@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 
 const PHONE = "+380681025393";
 const PORTRAIT_URL =
-  "https://res.cloudinary.com/dnefeqtp4/image/upload/v1781864794/IMG_7666_mc2hk3.webp";
+  "https://res.cloudinary.com/dnefeqtp4/image/upload/v1785161524/avatar-3_hyb5me.webp";
 
 type ContactLink = {
   label: string;
