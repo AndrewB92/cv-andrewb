@@ -179,3 +179,9 @@
 .tok_punct {
   color: rgba(180, 196, 198, 0.9);
 }
+
+@media screen and (max-width: 1080px){
+  .terminal{
+    display: none;
+  }
+}
