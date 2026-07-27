@@ -53,10 +53,10 @@
   text-wrap: balance;
 }
 .hero h1 {
-  max-width: 11ch;
-  font-size: clamp(2.5rem, 6vw, 5.75rem);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  letter-spacing: -1px;
+  /* max-width: 11ch; */
+  font-size: clamp(2rem,4vw,4rem);
+  line-height: 1;
 }
 .intro {
   max-width: 62ch;
@@ -139,7 +139,7 @@
   justify-self: end;
 }
 .availability {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
