@@ -140,9 +140,46 @@ export function ProjectsGallery({ categories, initialData }: Props) {
 
                     <div className={styles.projectFooter}>
                       <div className={styles.projectLinks}>
-                        <a href={project.link} target="_blank" rel="noreferrer">Visit site <span aria-hidden="true">↗</span></a>
-                        {project.github ? <a href={project.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a> : null}
-                        {project.codepen ? <a href={project.codepen} target="_blank" rel="noreferrer">CodePen <span aria-hidden="true">↗</span></a> : null}
+                        {project.link ? (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Visit site
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : null}
+
+                        {project.github ? (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            GitHub
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : null}
+
+                        {project.codepen ? (
+                          <a
+                            href={project.codepen}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            CodePen
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : null}
+
+                        {!project.link &&
+                        !project.github &&
+                        !project.codepen ? (
+                          <span className={styles.noPublicLink}>
+                            No public version available
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   </div>

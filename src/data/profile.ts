@@ -47,7 +47,7 @@ export type Project = {
   cms?: string;
   pageBuilder?: string;
   stack: string[];
-  link: string;
+  link?: string;
   github?: string;
   codepen?: string;
   img?: ProjectImage[];
@@ -436,7 +436,7 @@ const mapProject = (
 
   const link = sanitizeString(payload.link) ?? sanitizeString(payload.url);
 
-  if (!name || !link) return undefined;
+  if (!name) return undefined;
 
   const stack = sanitizeStringArray(payload.stack);
   const year = normalizeYear(payload.year);
@@ -488,7 +488,7 @@ const mapProject = (
     ...(cms ? { cms } : {}),
     ...(pageBuilder ? { pageBuilder } : {}),
     stack,
-    link,
+    ...(link ? { link } : {}),
     ...(github ? { github } : {}),
     ...(codepen ? { codepen } : {}),
     ...(img.length ? { img } : {}),
