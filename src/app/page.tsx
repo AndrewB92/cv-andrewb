@@ -3,7 +3,10 @@ import Link from "next/link";
 import Script from "next/script";
 import styles from "./page.module.css";
 import { Section } from "@/components/Section";
-import { getPortfolioContent } from "@/data/profile";
+import {
+  getPortfolioContent,
+  type Project,
+} from "@/data/profile";
 // import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
@@ -33,12 +36,35 @@ export function formatWelcome({ title, uses }: Welcome): string {
   return \`\${title} — I use this site to \${uses}.\`;
 }`;
 
+type HomepageFeaturedProject = Project & {
+  link: string;
+};
+
+const isHomepageFeaturedProject = (
+  project: Project,
+): project is HomepageFeaturedProject =>
+  typeof project.link === "string" &&
+  project.link.trim().length > 0 &&
+  (project.status === "production" ||
+    project.status === "maintenance");
+
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // Single fetch (avoid calling getPortfolioContent() twice)
-  const { profile, skills, projects, experiences } = await getPortfolioContent();
-  const featuredProjects = projects.slice(0, 3);
+  // Single fetch: avoid calling getPortfolioContent() more than once.
+  const { profile, skills, projects, experiences } =
+    await getPortfolioContent();
+
+  /**
+   * Homepage cards always include a "Live Site" action, so only projects
+   * with a valid public link can be passed to PortfolioSection.
+   *
+   * Archived, offline, and private projects remain available in the
+   * complete project archive but are excluded from homepage highlights.
+   */
+  const featuredProjects = projects
+    .filter(isHomepageFeaturedProject)
+    .slice(0, 3);
 
   return (
     <main>
@@ -94,22 +120,30 @@ export default async function HomePage() {
               <strong>Short facts:</strong>
 
               <p>
-                <strong>Preferred roles:</strong> Frontend / WordPress / Web developer
+                <strong>Preferred roles:</strong> Frontend / WordPress / Web
+                developer
               </p>
+
               <p>
                 <strong>Current Location:</strong> {profile.location}
               </p>
+
               <p>
                 <strong>Languages:</strong> English, Ukrainian, Russian
               </p>
+
               <p>
-                <strong>Engagement:</strong> Remote • Full-time or Contract • Project-based OK
+                <strong>Engagement:</strong> Remote • Full-time or Contract •
+                Project-based OK
               </p>
+
               <p>
                 <strong>Timezone:</strong> EET (UTC+2)
               </p>
+
               <p>
-                <strong>Email:</strong> <a href={`mailto:${profile.email}`}>{profile.email}</a>
+                <strong>Email:</strong>{" "}
+                <a href={`mailto:${profile.email}`}>{profile.email}</a>
               </p>
             </div>
           </HeroMetaPopover>
@@ -137,10 +171,13 @@ export default async function HomePage() {
         className="glow-border"
         eyebrow="Highlights"
         title="My last works"
-        description="Several samplings of recent launches. If you want to see them all - browse the full archive on the projects page."
+        description="Several samples of recent launches. Browse the full archive on the projects page to see the complete selection."
       >
-
-        <PortfolioSection featuredProjects={featuredProjects} />
+        {featuredProjects.length > 0 ? (
+          <PortfolioSection featuredProjects={featuredProjects} />
+        ) : (
+          <p>No public featured projects are currently available.</p>
+        )}
 
         <RainbowGlowLink
           href="/projects"
@@ -153,7 +190,6 @@ export default async function HomePage() {
         >
           View all projects
         </RainbowGlowLink>
-
       </Section>
 
       <CalPopup
