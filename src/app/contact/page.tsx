@@ -19,6 +19,7 @@ import { PixelPortrait } from "@/components/contact/PixelPortrait";
 import { getProfile } from "@/data/profile";
 import { contactDefaults } from "@/config/site";
 import styles from "./contact.module.css";
+import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 
 export const dynamic = "force-dynamic";
 
@@ -86,15 +87,15 @@ export default async function ContactPage() {
           icon: <HiOutlineEnvelope />,
           featured: true,
         },
-        {
-          label: "Phone",
-          description: PHONE,
-          url: `tel:${PHONE}`,
-          icon: <HiOutlinePhone />,
-        },
+        // {
+        //   label: "Phone",
+        //   description: PHONE,
+        //   url: `tel:${PHONE}`,
+        //   icon: <HiOutlinePhone />,
+        // },
         {
           label: "Schedule a call",
-          description: "Choose a convenient time on Cal.com",
+          description: "on Cal.com",
           url: "https://cal.com/andrew-bielous",
           icon: <FaCalendarAlt />,
           featured: true,
@@ -107,14 +108,14 @@ export default async function ContactPage() {
       links: [
         {
           label: "Telegram",
-          description: "@pm4life",
+          description: "",
           url: "https://t.me/pm4life",
           icon: <FaTelegramPlane />,
           external: true,
         },
         {
           label: "WhatsApp",
-          description: "Chat or voice call",
+          description: "",
           url: "https://wa.me/380681025393",
           icon: <FaWhatsapp />,
           external: true,
@@ -123,32 +124,32 @@ export default async function ContactPage() {
     },
     {
       title: "Profiles",
-      description: "Code, professional history, and frontend experiments.",
+      description: "",
       links: [
         {
           label: "GitHub",
-          description: "Repositories and open-source work",
+          description: "Repositories and work",
           url: "https://github.com/AndrewB92",
           icon: <FaGithub />,
           external: true,
         },
         {
           label: "LinkedIn",
-          description: "Professional background and experience",
+          description: "Background and experience",
           url: "https://linkedin.com/in/bielousandrew",
           icon: <FaLinkedinIn />,
           external: true,
         },
         {
           label: "CodePen",
-          description: "Frontend concepts and UI experiments",
+          description: "Concepts & experiments",
           url: "https://codepen.io/bielous-andrew",
           icon: <FaCodepen />,
           external: true,
         },
         {
           label: "Gravatar",
-          description: "Public developer profile",
+          description: "Public profile",
           url: "https://gravatar.com/babujioh",
           icon: <SiGravatar />,
           external: true,
@@ -172,18 +173,29 @@ export default async function ContactPage() {
           </p>
 
           <div className={styles.primaryActions}>
-            <a className={styles.primaryButton} href={`mailto:${email}`}>
-              <HiOutlineEnvelope aria-hidden="true" />
-              Email me
-            </a>
-
-            <a
-              className={styles.secondaryButton}
-              href="/contact?meet=intro-call"
+            <RainbowGlowLink
+              href="mailto:${email}"
+              blob
+              variant="flat"
+              className={styles.flatButton}
+              iconPosition="end"
+              iconName="mail"
+              iconDirection="right"
             >
-              <FaCalendarAlt aria-hidden="true" />
-              Schedule a call
-            </a>
+              Email me
+            </RainbowGlowLink>
+
+            <RainbowGlowLink
+              href="https://t.me/pm4life"
+              blob
+              variant="glow"
+              className={styles.flatButton}
+              iconPosition="end"
+              iconName="telegram"
+              iconDirection="right"
+            >
+              Write me
+            </RainbowGlowLink>
           </div>
 
           <dl className={styles.meta}>

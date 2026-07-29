@@ -4,6 +4,7 @@ import { getProjects, type Project, type ProjectCategory } from "@/data/profile"
 import { ProjectsGallery } from "@/components/ProjectsGallery";
 import { ProjectImageSlider } from "@/components/portfolio/ProjectImageSlider";
 import { PROJECTS_PAGE_SIZE } from "@/config/ui";
+import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 
 export const dynamic = "force-dynamic";
 
@@ -145,7 +146,18 @@ export default async function ProjectsPage({ searchParams }: Props) {
 
       <section className={styles.contactCta} aria-labelledby="projects-contact-title">
         <div><p className={styles.eyebrow}>Work together</p><h2 id="projects-contact-title">Need help modernizing a frontend or WordPress project?</h2><p>I work on production interfaces, legacy refactoring, performance improvements, and content-driven websites.</p></div>
-        <Link href="/contact" className={styles.contactLink}>Discuss a project <span aria-hidden="true">→</span></Link>
+        {/* <Link href="/contact" className={styles.contactLink}>Discuss a project <span aria-hidden="true">→</span></Link> */}
+        <RainbowGlowLink
+          href="/contact"
+          blob
+          variant="flat"
+          className={styles.flatButton}
+          iconPosition="end"
+          iconName="arrow"
+          iconDirection="right"
+        >
+          Discuss a project
+        </RainbowGlowLink>
       </section>
     </main>
   );

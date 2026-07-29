@@ -1,63 +1,101 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import {
+  FaArrowUpRightFromSquare,
+  FaCalendarDays,
+  FaCodepen,
+  FaDownload,
+  FaEnvelope,
+  FaFilePdf,
+  FaLinkedin,
+  FaPhone,
+} from "react-icons/fa6";
+import {
+  SiGithub,
+  SiGravatar,
+  SiTelegram,
+  SiWhatsapp,
+  SiYoutube,
+} from "react-icons/si";
 import styles from "./RainbowGlowLink.module.css";
 
-/* ---------- Icons ---------- */
+export type RainbowGlowLinkIconName =
+  | "arrow"
+  | "external"
+  | "download"
+  | "mail"
+  | "phone"
+  | "calendar"
+  | "telegram"
+  | "whatsapp"
+  | "github"
+  | "codepen"
+  | "linkedin"
+  | "gravatar"
+  | "youtube"
+  | "pdf";
 
-type IconName = "arrow" | "download" | "mail" | "phone";
 type ArrowDirection = "up" | "right" | "down" | "left";
+type IconKind = "custom-arrow" | "ui" | "brand";
+
+type IconDefinition = {
+  glyph: ReactNode;
+  kind: IconKind;
+};
 
 function ArrowIcon() {
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path d="M7 10l5 5 5-5" />
     </svg>
   );
 }
-function DownloadIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <path d="M12 3v10" />
-      <path d="M8 11l4 4 4-4" />
-      <path d="M5 21h14" />
-    </svg>
-  );
-}
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <path d="M4 6h16v12H4z" />
-      <path d="M4 7l8 6 8-6" />
-    </svg>
-  );
-}
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <path d="M6.5 3.5l3.2 3.2-1.7 2.1c1.4 2.6 3.5 4.7 6.1 6.1l2.1-1.7 3.2 3.2-1.6 2.2c-.5.7-1.4 1.1-2.3.9-7.3-1.5-13-7.2-14.5-14.5-.2-.9.2-1.8.9-2.3z" />
-    </svg>
-  );
-}
 
-function IconGlyph({ name }: { name: IconName }) {
+function getIconDefinition(name: RainbowGlowLinkIconName): IconDefinition {
   switch (name) {
+    case "external":
+      return { glyph: <FaArrowUpRightFromSquare />, kind: "ui" };
     case "download":
-      return <DownloadIcon />;
+      return { glyph: <FaDownload />, kind: "ui" };
     case "mail":
-      return <MailIcon />;
+      return { glyph: <FaEnvelope />, kind: "ui" };
     case "phone":
-      return <PhoneIcon />;
+      return { glyph: <FaPhone />, kind: "ui" };
+    case "calendar":
+      return { glyph: <FaCalendarDays />, kind: "ui" };
+    case "telegram":
+      return { glyph: <SiTelegram />, kind: "brand" };
+    case "whatsapp":
+      return { glyph: <SiWhatsapp />, kind: "brand" };
+    case "github":
+      return { glyph: <SiGithub />, kind: "brand" };
+    case "codepen":
+      return { glyph: <FaCodepen />, kind: "brand" };
+    case "linkedin":
+      return { glyph: <FaLinkedin />, kind: "brand" };
+    case "gravatar":
+      return { glyph: <SiGravatar />, kind: "brand" };
+    case "youtube":
+      return { glyph: <SiYoutube />, kind: "brand" };
+    case "pdf":
+      return { glyph: <FaFilePdf />, kind: "ui" };
     case "arrow":
     default:
-      return <ArrowIcon />;
+      return { glyph: <ArrowIcon />, kind: "custom-arrow" };
   }
 }
 
-function directionToDeg(dir: ArrowDirection): number {
-  // base arrow points DOWN (0deg)
-  switch (dir) {
+function directionToDeg(direction: ArrowDirection): number {
+  switch (direction) {
     case "down":
       return 0;
     case "left":
@@ -76,25 +114,18 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 }
 
-/* ---------- Component ---------- */
-
 type RainbowGlowLinkProps = {
   href: string;
   children: ReactNode;
   className?: string;
-
   variant?: "glow" | "flat";
-
   glow?: boolean;
   blob?: boolean;
-
   icon?: ReactNode | false;
-  iconName?: IconName;
+  iconName?: RainbowGlowLinkIconName;
   iconDirection?: ArrowDirection;
   iconPosition?: "start" | "end";
   iconAriaLabel?: string;
-
-  /** Viewport tuning */
   threshold?: number;
   rootMargin?: string;
 };
@@ -106,14 +137,11 @@ export function RainbowGlowLink({
   variant = "glow",
   glow,
   blob,
-
   icon,
   iconName = "arrow",
   iconDirection = "right",
-
   iconPosition = "end",
   iconAriaLabel,
-
   threshold = 0.15,
   rootMargin = "120px",
 }: RainbowGlowLinkProps) {
@@ -125,9 +153,8 @@ export function RainbowGlowLink({
     const isFlat = variant === "flat";
     const enableGlow = glow ?? !isFlat;
     const enableBlob = blob ?? !isFlat;
-
-    const resolvedIcon = icon === false ? null : (icon ?? <IconGlyph name={iconName} />);
-    const iconRotate = iconName === "arrow" ? directionToDeg(iconDirection) : 0;
+    const definition = getIconDefinition(iconName);
+    const resolvedIcon = icon === false ? null : (icon ?? definition.glyph);
 
     return {
       glow: enableGlow,
@@ -136,89 +163,75 @@ export function RainbowGlowLink({
       hasIcon: Boolean(resolvedIcon),
       iconPosition,
       iconAriaLabel,
-      iconRotate,
+      iconRotate: iconName === "arrow" ? directionToDeg(iconDirection) : 0,
       iconName,
+      iconKind: icon === undefined ? definition.kind : "ui" as IconKind,
     };
   }, [variant, glow, blob, icon, iconName, iconDirection, iconPosition, iconAriaLabel]);
 
-  // Observe visibility (and disable animation entirely if reduced motion)
   useEffect(() => {
     reduceMotionRef.current = prefersReducedMotion();
-
-    const el = wrapRef.current;
-    if (!el) return;
+    const element = wrapRef.current;
+    if (!element) return;
 
     if (reduceMotionRef.current) {
       setInView(false);
-      el.dataset.paused = "1";
+      element.dataset.paused = "1";
       return;
     }
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setInView(!!entry?.isIntersecting);
-      },
-      { threshold, rootMargin }
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(Boolean(entry?.isIntersecting)),
+      { threshold, rootMargin },
     );
 
-    io.observe(el);
-    return () => io.disconnect();
+    observer.observe(element);
+    return () => observer.disconnect();
   }, [rootMargin, threshold]);
 
-  // Pointer blob logic: attach listeners ONLY when (blob enabled + in view)
   useEffect(() => {
     if (!flags.blob) return;
+    const element = wrapRef.current;
+    if (!element) return;
 
-    const el = wrapRef.current;
-    if (!el) return;
-
-    // keep CSS in sync
-    el.dataset.paused = inView ? "0" : "1";
-
-    if (!inView || reduceMotionRef.current) {
-      // when out of view, ensure we stop any pending raf and skip listeners
-      return;
-    }
+    element.dataset.paused = inView ? "0" : "1";
+    if (!inView || reduceMotionRef.current) return;
 
     let rect: DOMRect | null = null;
     let raf = 0;
-
-    let tx = 0,
-      ty = 0;
-    let x = 0,
-      y = 0;
-
-    const SMOOTH = 0.22;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    const smooth = 0.22;
 
     const readRect = () => {
-      rect = el.getBoundingClientRect();
+      rect = element.getBoundingClientRect();
     };
 
-    const recache = () => {
+    const resetPosition = () => {
       if (!rect) readRect();
       if (!rect) return;
 
-      tx = rect.width * 0.5;
-      ty = rect.height * 0.5;
-      x = tx;
-      y = ty;
+      targetX = rect.width * 0.5;
+      targetY = rect.height * 0.5;
+      currentX = targetX;
+      currentY = targetY;
 
-      el.style.setProperty("--pointer-x", `${Math.round(x)}px`);
-      el.style.setProperty("--pointer-y", `${Math.round(y)}px`);
-      el.style.setProperty("--blob-mix", "0.5");
+      element.style.setProperty("--pointer-x", `${Math.round(currentX)}px`);
+      element.style.setProperty("--pointer-y", `${Math.round(currentY)}px`);
+      element.style.setProperty("--blob-mix", "0.5");
     };
 
     const loop = () => {
       raf = 0;
+      currentX += (targetX - currentX) * smooth;
+      currentY += (targetY - currentY) * smooth;
 
-      x += (tx - x) * SMOOTH;
-      y += (ty - y) * SMOOTH;
+      element.style.setProperty("--pointer-x", `${Math.round(currentX)}px`);
+      element.style.setProperty("--pointer-y", `${Math.round(currentY)}px`);
 
-      el.style.setProperty("--pointer-x", `${Math.round(x)}px`);
-      el.style.setProperty("--pointer-y", `${Math.round(y)}px`);
-
-      if (Math.abs(tx - x) > 0.6 || Math.abs(ty - y) > 0.6) {
+      if (Math.abs(targetX - currentX) > 0.6 || Math.abs(targetY - currentY) > 0.6) {
         raf = requestAnimationFrame(loop);
       }
     };
@@ -227,27 +240,22 @@ export function RainbowGlowLink({
       if (!raf) raf = requestAnimationFrame(loop);
     };
 
-    const clamp = (v: number, min: number, max: number) => (v < min ? min : v > max ? max : v);
+    const clamp = (value: number, min: number, max: number) =>
+      value < min ? min : value > max ? max : value;
 
     const onEnter = () => {
       readRect();
-      recache();
+      resetPosition();
       requestLoop();
     };
 
-    const onMove = (e: PointerEvent) => {
+    const onMove = (event: PointerEvent) => {
       if (!rect) readRect();
       if (!rect) return;
 
-      const nx = e.clientX - rect.left;
-      const ny = e.clientY - rect.top;
-
-      tx = clamp(nx, 0, rect.width);
-      ty = clamp(ny, 0, rect.height);
-
-      const mix = rect.width ? tx / rect.width : 0.5;
-      el.style.setProperty("--blob-mix", mix.toFixed(3));
-
+      targetX = clamp(event.clientX - rect.left, 0, rect.width);
+      targetY = clamp(event.clientY - rect.top, 0, rect.height);
+      element.style.setProperty("--blob-mix", (rect.width ? targetX / rect.width : 0.5).toFixed(3));
       requestLoop();
     };
 
@@ -255,40 +263,36 @@ export function RainbowGlowLink({
       if (!rect) readRect();
       if (!rect) return;
 
-      tx = rect.width * 0.5;
-      ty = rect.height * 0.5;
-      el.style.setProperty("--blob-mix", "0.5");
+      targetX = rect.width * 0.5;
+      targetY = rect.height * 0.5;
+      element.style.setProperty("--blob-mix", "0.5");
       requestLoop();
     };
 
-    // Prefer ResizeObserver over global resize
-    const ro = new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       rect = null;
     });
-    ro.observe(el);
 
-    el.addEventListener("pointerenter", onEnter, { passive: true });
-    el.addEventListener("pointermove", onMove, { passive: true });
-    el.addEventListener("pointerleave", onLeave, { passive: true });
+    resizeObserver.observe(element);
+    element.addEventListener("pointerenter", onEnter, { passive: true });
+    element.addEventListener("pointermove", onMove, { passive: true });
+    element.addEventListener("pointerleave", onLeave, { passive: true });
 
-    // init once (helps first hover feel instant)
     readRect();
-    recache();
+    resetPosition();
 
     return () => {
-      ro.disconnect();
-      el.removeEventListener("pointerenter", onEnter);
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
+      resizeObserver.disconnect();
+      element.removeEventListener("pointerenter", onEnter);
+      element.removeEventListener("pointermove", onMove);
+      element.removeEventListener("pointerleave", onLeave);
       if (raf) cancelAnimationFrame(raf);
     };
   }, [flags.blob, inView]);
 
-  // Always set paused dataset so glow animation can freeze offscreen even if blob is off
   useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    el.dataset.paused = inView ? "0" : "1";
+    const element = wrapRef.current;
+    if (element) element.dataset.paused = inView ? "0" : "1";
   }, [inView]);
 
   const wrapperClass = [
@@ -298,31 +302,36 @@ export function RainbowGlowLink({
     flags.hasIcon ? styles.withIcon : "",
     flags.hasIcon && flags.iconPosition === "start" ? styles.iconStart : styles.iconEnd,
     className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  ].filter(Boolean).join(" ");
 
-  const iconStyle =
-    flags.iconName === "arrow"
-      ? ({ ["--icon-rotate" as any]: `${flags.iconRotate}deg` } as React.CSSProperties)
-      : undefined;
+  const iconClass = [
+    styles.icon,
+    flags.iconKind === "brand" ? styles.brandIcon : "",
+    flags.iconKind === "ui" ? styles.uiIcon : "",
+    flags.iconKind === "custom-arrow" ? styles.customArrowIcon : "",
+  ].filter(Boolean).join(" ");
+
+  const iconStyle = flags.iconName === "arrow"
+    ? ({ "--icon-rotate": `${flags.iconRotate}deg` } as CSSProperties)
+    : undefined;
+
+  const iconElement = flags.hasIcon ? (
+    <span
+      className={iconClass}
+      aria-hidden={iconAriaLabel ? undefined : true}
+      aria-label={iconAriaLabel}
+      style={iconStyle}
+    >
+      {flags.icon}
+    </span>
+  ) : null;
 
   return (
     <span ref={wrapRef} className={wrapperClass} data-paused={inView ? "0" : "1"}>
       <Link href={href} className={styles.link}>
-        {flags.hasIcon && flags.iconPosition === "start" ? (
-          <span className={styles.icon} aria-label={flags.iconAriaLabel} style={iconStyle}>
-            {flags.icon}
-          </span>
-        ) : null}
-
+        {flags.iconPosition === "start" ? iconElement : null}
         <span className={styles.text}>{children}</span>
-
-        {flags.hasIcon && flags.iconPosition === "end" ? (
-          <span className={styles.icon} aria-label={flags.iconAriaLabel} style={iconStyle}>
-            {flags.icon}
-          </span>
-        ) : null}
+        {flags.iconPosition === "end" ? iconElement : null}
       </Link>
 
       <span className={styles.bg} aria-hidden="true" />

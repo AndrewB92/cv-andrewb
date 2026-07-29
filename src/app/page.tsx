@@ -96,10 +96,10 @@ export default async function HomePage() {
               glow
               blob
               iconPosition="end"
-              iconName="mail"
+              iconName="calendar"
               iconDirection="up"
             >
-              Write a message
+              Schedule a meeting
             </RainbowGlowLink>
 
             <RainbowGlowLink

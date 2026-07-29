@@ -60,6 +60,7 @@
   display: flex;
   min-width: 0;
   flex-direction: column-reverse;
+  align-items: center;
   gap: 4px;
   padding: var(--space-md);
 }

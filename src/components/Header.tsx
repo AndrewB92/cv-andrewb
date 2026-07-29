@@ -248,7 +248,7 @@ type MeetingLinkProps = {
 function MeetingLink({ className, tabIndex, onClick }: MeetingLinkProps) {
   return (
     <Link
-      href="/?meet=hour-meeting"
+      href="https://cal.com/andrew-bielous"
       className={`${styles.meetingLink} ${className ?? ""}`}
       tabIndex={tabIndex}
       onClick={onClick}
