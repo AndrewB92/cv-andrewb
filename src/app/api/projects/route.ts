@@ -12,14 +12,10 @@ type CategoryCount = {
 };
 
 const PROJECT_CATEGORIES: ReadonlySet<ProjectCategory> = new Set([
-  "wordpress",
   "ecommerce",
-  "frontend",
-  "content-platform",
-  "interactive",
   "corporate",
+  "content-platform",
   "education",
-  "other",
 ]);
 
 const normalizeCategory = (

@@ -15,14 +15,10 @@ export type Experience = {
 };
 
 export type ProjectCategory =
-  | "wordpress"
   | "ecommerce"
-  | "frontend"
-  | "content-platform"
-  | "interactive"
   | "corporate"
-  | "education"
-  | "other";
+  | "content-platform"
+  | "education";
 
 export type ProjectStatus =
   | "production"
@@ -48,6 +44,8 @@ export type Project = {
   contribution?: string;
   outcome?: string;
   role?: string;
+  cms?: string;
+  pageBuilder?: string;
   stack: string[];
   link: string;
   github?: string;
@@ -88,14 +86,10 @@ const PROJECT_COLLECTIONS = ["_portfolio", "portfolio", "projects"];
 const PROJECT_DOC_IDS = ["projects", "_projects"];
 
 const PROJECT_CATEGORIES: ReadonlySet<ProjectCategory> = new Set([
-  "wordpress",
   "ecommerce",
-  "frontend",
-  "content-platform",
-  "interactive",
   "corporate",
+  "content-platform",
   "education",
-  "other",
 ]);
 
 const PROJECT_STATUSES: ReadonlySet<ProjectStatus> = new Set([
@@ -168,7 +162,7 @@ const fallbackProjects: Project[] = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    category: "other",
+    category: "corporate",
     status: "production",
     stack: ["Framework A", "Service B", "Platform C"],
     link: "https://example.com/project-alpha",
@@ -181,7 +175,7 @@ const fallbackProjects: Project[] = [
       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     description:
       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    category: "other",
+    category: "corporate",
     status: "production",
     stack: ["Library X", "Backend Y", "Database Z"],
     link: "https://example.com/project-beta",
@@ -194,7 +188,7 @@ const fallbackProjects: Project[] = [
       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     description:
       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    category: "other",
+    category: "corporate",
     status: "production",
     stack: ["Tool One", "Tool Two", "Tool Three"],
     link: "https://example.com/project-gamma",
@@ -280,22 +274,32 @@ const normalizeCategoryValue = (
   value: unknown,
 ): ProjectCategory | undefined => {
   const normalized = sanitizeString(value)?.toLowerCase();
-  if (!normalized) return undefined;
+
+  if (!normalized) {
+    return undefined;
+  }
 
   const aliases: Record<string, ProjectCategory> = {
-    "content platform": "content-platform",
-    content_platform: "content-platform",
-    content: "content-platform",
+    ecommerce: "ecommerce",
     "e-commerce": "ecommerce",
     woocommerce: "ecommerce",
-    wp: "wordpress",
+
+    corporate: "corporate",
+    wordpress: "corporate",
+    frontend: "corporate",
+    interactive: "corporate",
+    other: "corporate",
+
+    content: "content-platform",
+    "content platform": "content-platform",
+    content_platform: "content-platform",
+    "content-platform": "content-platform",
+
+    education: "education",
+    educational: "education",
   };
 
-  const resolved = aliases[normalized] ?? normalized;
-
-  return PROJECT_CATEGORIES.has(resolved as ProjectCategory)
-    ? (resolved as ProjectCategory)
-    : undefined;
+  return aliases[normalized];
 };
 
 const normalizeStatusValue = (
@@ -327,6 +331,7 @@ const inferProjectCategory = (
   const normalizedStack = new Set(
     stack.map((item) => item.trim().toLowerCase()),
   );
+
   const normalizedName = name.toLowerCase();
 
   if (
@@ -338,36 +343,24 @@ const inferProjectCategory = (
   }
 
   if (
-    normalizedStack.has("three.js") ||
-    normalizedStack.has("webgl") ||
-    normalizedStack.has("gsap")
-  ) {
-    return "interactive";
-  }
-
-  if (
-    normalizedStack.has("next.js") ||
-    normalizedStack.has("react") ||
-    normalizedStack.has("astro") ||
-    normalizedStack.has("typescript")
-  ) {
-    return "frontend";
-  }
-
-  if (
     normalizedName.includes("news") ||
     normalizedName.includes("bible") ||
     normalizedName.includes("faithlead") ||
-    normalizedName.includes("making waves")
+    normalizedName.includes("making waves") ||
+    normalizedName.includes("association")
   ) {
     return "content-platform";
   }
 
-  if (normalizedStack.has("wordpress")) {
-    return "wordpress";
+  if (
+    normalizedName.includes("education") ||
+    normalizedName.includes("school") ||
+    normalizedName.includes("course")
+  ) {
+    return "education";
   }
 
-  return "other";
+  return "corporate";
 };
 
 const normalizeYear = (value: unknown): number | undefined => {
@@ -458,6 +451,11 @@ const mapProject = (
     sanitizeString(payload.contribution) ?? sanitizeString(payload.details);
   const outcome = sanitizeString(payload.outcome);
   const role = sanitizeString(payload.role);
+  const cms = sanitizeString(payload.cms) ?? sanitizeString(payload.CMS);
+  const pageBuilder =
+    sanitizeString(payload.pageBuilder) ??
+    sanitizeString(payload.page_builder) ??
+    sanitizeString(payload.PageBuilder);
 
   const category =
     normalizeCategoryValue(payload.category) ?? inferProjectCategory(stack, name);
@@ -487,6 +485,8 @@ const mapProject = (
     ...(contribution ? { contribution } : {}),
     ...(outcome ? { outcome } : {}),
     ...(role ? { role } : {}),
+    ...(cms ? { cms } : {}),
+    ...(pageBuilder ? { pageBuilder } : {}),
     stack,
     link,
     ...(github ? { github } : {}),
