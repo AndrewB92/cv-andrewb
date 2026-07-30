@@ -1,58 +1,99 @@
-# Andrew B. — Portfolio
+<div align="center">
 
-Personal portfolio website for Andrew Bielous, built with Next.js, React, TypeScript, MongoDB, and Vercel.
+# Andrew Bielous — Developer Portfolio
 
-The site presents professional experience, technical skills, selected projects, and direct contact options through a responsive, performance-focused interface.
+A production-focused personal portfolio built with **Next.js**, **React**, **TypeScript**, **Tailwind CSS**, and **MongoDB**.
 
-## Live website
+It presents professional experience, technical expertise, selected projects, and direct contact options through a responsive, accessible, and performance-oriented interface.
 
-[cv-andrewb.vercel.app](https://cv-andrewb.vercel.app/)
+[![Live Website](https://img.shields.io/badge/Live%20Website-cv--andrewb.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://cv-andrewb.vercel.app/)
 
-## Repository
+[![Deployment](https://img.shields.io/github/deployments/AndrewB92/cv-andrewb/Production?style=flat-square&logo=vercel&label=deployment)](https://github.com/AndrewB92/cv-andrewb/deployments)
+[![Last Commit](https://img.shields.io/github/last-commit/AndrewB92/cv-andrewb?style=flat-square&logo=github)](https://github.com/AndrewB92/cv-andrewb/commits/main)
+[![Repository Size](https://img.shields.io/github/repo-size/AndrewB92/cv-andrewb?style=flat-square)](https://github.com/AndrewB92/cv-andrewb)
+[![Open Issues](https://img.shields.io/github/issues/AndrewB92/cv-andrewb?style=flat-square)](https://github.com/AndrewB92/cv-andrewb/issues)
+[![License](https://img.shields.io/github/license/AndrewB92/cv-andrewb?style=flat-square)](LICENSE)
 
-[github.com/AndrewB92/cv-andrewb](https://github.com/AndrewB92/cv-andrewb)
+</div>
 
-## Features
+---
 
-- Responsive portfolio built with the Next.js App Router
-- Server-rendered profile, skills, experience, and project data
-- MongoDB-backed portfolio content with local fallback data
+## Overview
+
+This repository contains the source code for my professional developer portfolio. The project is designed as more than a static résumé: it is a full-stack portfolio platform with database-backed project content, filtering, pagination, reusable UI architecture, responsive interaction patterns, and production deployment through Vercel.
+
+The website focuses on the areas most relevant to my work as a frontend and WordPress developer transitioning toward modern React and Next.js engineering:
+
+- Production frontend architecture
+- Responsive and accessible interfaces
+- Performance-conscious interaction design
+- Structured project presentation
+- WordPress and WooCommerce experience
+- React, Next.js, TypeScript, and API development
+
+## Live Demo
+
+**Production:** [https://cv-andrewb.vercel.app](https://cv-andrewb.vercel.app/)
+
+## Core Features
+
+- Next.js App Router architecture
+- React Server Components by default
+- Type-safe implementation with TypeScript
+- MongoDB-backed portfolio and project data
+- Local fallback data when MongoDB is unavailable
 - Filterable and paginated project archive
-- Responsive featured-project cards
-- Animated desktop project-card expansion
-- Lightweight accordion behavior for tablets and mobile devices
-- Responsive desktop, tablet, and mobile navigation
-- Inline Cal.com scheduling popup with separate event tabs
-- Professional contact page with real service and brand icons
-- Canvas-based portrait effect with selective face pixelation
-- Accessible keyboard interactions and focus states
+- Technology usage counts and stack-based filtering
+- Responsive featured-project interactions
+- Desktop staged card expansion
+- Mobile-friendly accordion behavior
+- Lazy-loaded Cal.com scheduling integration
+- Responsive contact and professional-profile sections
+- Canvas-based interactive portrait effect
+- SEO metadata and social sharing configuration
+- Keyboard-accessible navigation and dialogs
 - Reduced-motion support
-- SEO metadata and deploy-ready Vercel configuration
+- Vercel production and preview deployments
 
-## Technology stack
+## Technology Stack
 
-### Core
+<div align="center">
 
-- [Next.js 16](https://nextjs.org/)
-- [React 19](https://react.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [MongoDB](https://www.mongodb.com/)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
+</div>
+
+### Application
+
+- Next.js 16
+- React 19
+- TypeScript 5
+- Next.js App Router
+- React Server Components
+- REST-style API routes
 
 ### Interface
 
-- CSS Modules
 - Tailwind CSS 4
-- [React Icons](https://react-icons.github.io/react-icons/)
-- Custom canvas animations
-- Responsive CSS layouts and design tokens
+- CSS Modules
+- React Icons
+- Canvas API
+- Responsive CSS layouts
+- Centralized design tokens
 
-### Integrations
+### Data and Integrations
 
-- [Cal.com React Embed](https://cal.com/docs/platform/embeds/embed-react)
-- [Cloudinary](https://cloudinary.com/) for hosted media
-- [Vercel](https://vercel.com/) for deployment
+- MongoDB
+- Cal.com React Embed
+- Cloudinary-hosted media
+- Vercel deployments
 
-## Project structure
+## Architecture
 
 ```text
 src/
@@ -68,22 +109,80 @@ src/
 │   ├── portfolio/
 │   ├── CalPopup/
 │   ├── Header/
-│   └── ...
+│   └── shared UI
 ├── config/
 ├── data/
 ├── lib/
 └── styles/
 ```
 
-The exact component paths may evolve as the project is refactored, but the main responsibilities remain separated between application routes, reusable components, configuration, data mapping, and infrastructure helpers.
+The application separates routing, reusable interface components, configuration, data normalization, and infrastructure concerns. Database documents are normalized before reaching presentation components, while local fallback data keeps supported pages available when the external data source cannot be reached.
 
-## Local development
+## Project Data API
+
+The project archive is powered by:
+
+```http
+GET /api/projects
+```
+
+Supported query parameters include:
+
+```text
+?page=1
+?stack=Next.js
+```
+
+Example response:
+
+```json
+{
+  "projects": [],
+  "totalPages": 1,
+  "totalItems": 0,
+  "currentPage": 1,
+  "stackCounts": []
+}
+```
+
+The endpoint supports paginated results, technology filtering, total project counts, and stack usage statistics.
+
+## Performance Strategy
+
+The project applies several performance-oriented implementation decisions:
+
+- Server Components are used unless client-side interactivity is required.
+- External scheduling embeds are loaded only when opened.
+- Only the active Cal.com tab mounts an iframe.
+- Project media and third-party resources are lazy-loaded.
+- Mobile layouts avoid unnecessary desktop measurements and animation calculations.
+- UI animations primarily use transforms and opacity.
+- Obsolete animation frames are cancelled during rapid interaction changes.
+- MongoDB-backed content has resilient local fallbacks.
+- Responsive behavior is handled primarily through CSS rather than runtime JavaScript.
+
+## Accessibility
+
+Accessibility considerations include:
+
+- Semantic document landmarks
+- Logical heading structure
+- Keyboard-accessible navigation
+- Visible focus indicators
+- Accessible dialog and tab semantics
+- `aria-current` for active navigation
+- Descriptive labels for controls and external links
+- Alternative text for portfolio media
+- Escape-key handling for overlays and navigation
+- `prefers-reduced-motion` support
+
+## Local Development
 
 ### Requirements
 
-- Node.js 20 or newer
+- Node.js 22.12 or newer
 - npm
-- A MongoDB connection string for live portfolio data
+- MongoDB connection credentials for database-backed content
 
 ### Installation
 
@@ -96,10 +195,10 @@ npm install
 Create a local environment file:
 
 ```bash
-touch .env.local
+cp .env.example .env.local
 ```
 
-Add the required variables:
+When `.env.example` is unavailable, create `.env.local` manually:
 
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.example.mongodb.net/
@@ -112,234 +211,56 @@ Start the development server:
 npm run dev
 ```
 
-Open:
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-```text
-http://localhost:3000
-```
+## Available Scripts
 
-## Environment variables
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Starts the local development server |
+| `npm run build` | Creates an optimized production build and validates the application |
+| `npm run start` | Runs the production server after a successful build |
+| `npm run lint` | Runs ESLint across the project |
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `MONGODB_URI` | Recommended | MongoDB connection string used to load portfolio data |
-| `MONGODB_DB` | Optional | Database name; defaults to `cv-andrewb` |
+## Quality Checks
 
-The application contains fallback profile, skills, experience, and project data. This allows supported pages to render when MongoDB is unavailable, while database-backed features should still be tested with a valid local environment.
-
-Do not commit `.env.local` or production credentials.
-
-## Available scripts
-
-```bash
-npm run dev
-```
-
-Starts the local Next.js development server.
-
-```bash
-npm run build
-```
-
-Creates an optimized production build and runs TypeScript validation.
-
-```bash
-npm run start
-```
-
-Runs the production server after a successful build.
-
-```bash
-npm run lint
-```
-
-Runs ESLint across the project.
-
-## Quality checks
-
-Before pushing changes:
+Run the following checks before submitting changes:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-When dependencies change, commit both files:
-
-```text
-package.json
-package-lock.json
-```
-
-Avoid using `npm audit fix --force` without reviewing the proposed dependency changes, because it may install incompatible major versions.
-
-## MongoDB data
-
-Portfolio data is loaded through the data layer in:
-
-```text
-src/data/profile.ts
-```
-
-MongoDB access is handled through:
-
-```text
-src/lib/mongodb.ts
-```
-
-The data layer normalizes database documents and falls back to local values when a query fails.
-
-Supported content includes:
-
-- Profile information
-- Skills
-- Work experience
-- Portfolio projects
-- Project screenshots
-- Technology stacks
-- Live-site, GitHub, and CodePen links
-
-## Project API
-
-The project archive uses:
-
-```text
-GET /api/projects
-```
-
-Supported query parameters include:
-
-```text
-?page=1
-?stack=Next.js
-```
-
-The response contains:
-
-```json
-{
-  "projects": [],
-  "totalPages": 1,
-  "totalItems": 0,
-  "currentPage": 1,
-  "stackCounts": []
-}
-```
-
-## Cal.com scheduling
-
-The scheduling popup uses `@calcom/embed-react` and currently supports:
-
-- Intro call
-- Career conversation
-
-The embed package is loaded only when the scheduling interface is opened. Only the active tab's embed is mounted, reducing unnecessary iframe and memory usage.
-
-Example URLs:
-
-```text
-/?meet=intro-call
-/?meet=career-conversation
-```
-
-## Responsive behavior
-
-### Header
-
-- Desktop navigation with an animated active indicator
-- Compact menu for tablets and mobile devices
-- Keyboard and Escape-key support
-- Reduced-motion support
-
-### Featured portfolio
-
-Above the desktop breakpoint, project cards use the interactive staged expansion layout.
-
-At tablet and mobile widths:
-
-- Cards switch to one column
-- Expansion reveals text inside the current card
-- Other cards remain in normal document flow
-- Expensive desktop measurements and movement animations are disabled
-- The page uses natural scrolling rather than nested card scrolling
-
-### Contact page
-
-The contact page includes:
-
-- Clear primary actions for email and scheduling
-- Direct, messenger, and professional-profile groups
-- Real icons for services and platforms
-- LinkedIn inside the Profiles group
-- Responsive contact cards
-- Cloudinary-hosted portrait media
-- Canvas-based selective face pixelation
-- Configurable face mask and animation duration
-
-## Canvas portrait effect
-
-The portrait component:
-
-```text
-src/components/contact/PixelPortrait.tsx
-```
-
-uses the Canvas API to:
-
-1. Draw the complete portrait.
-2. Calculate average colors for blocks inside a configurable elliptical face mask.
-3. Pixelate only the masked face area.
-4. Reveal or restore blocks through `requestAnimationFrame`.
-5. Cancel obsolete animation frames when pointer direction changes.
-6. Cap canvas resolution to control CPU and memory usage.
-
-The face region, block size, reveal duration, and reverse-animation duration can be configured from the contact page.
+When dependencies change, commit both `package.json` and `package-lock.json`.
 
 ## Deployment
 
-The project is configured for Vercel.
+The production website is deployed with Vercel.
 
-1. Push the repository to GitHub.
-2. Import the repository into Vercel.
-3. Add `MONGODB_URI` and, when needed, `MONGODB_DB`.
-4. Select the branch to deploy.
-5. Deploy with the standard Next.js preset.
+1. Import the GitHub repository into Vercel.
+2. Configure `MONGODB_URI` and `MONGODB_DB`.
+3. Use the standard Next.js framework preset.
+4. Deploy the production branch.
 
-Vercel automatically creates preview deployments for connected branches and pull requests.
-
-## Performance principles
-
-The project favors:
-
-- Server Components by default
-- Client Components only where interaction requires them
-- Lazy loading for external embeds and project images
-- One active Cal.com iframe at a time
-- Responsive layouts that avoid unnecessary JavaScript measurements
-- Transform- and opacity-based UI animation
-- Cancelled animation frames when interactions change
-- Reduced-motion support
-- Fallback content when external services are unavailable
-- Reusable configuration and centralized data normalization
-
-## Accessibility
-
-The interface includes:
-
-- Semantic landmarks and headings
-- Keyboard-accessible navigation
-- Visible focus states
-- `aria-current` for active navigation links
-- Accessible dialog and tab semantics
-- Descriptive labels for external links and controls
-- Alternative text for project screenshots and portrait media
-- `prefers-reduced-motion` handling
+Connected branches and pull requests can generate isolated preview deployments for validation before production release.
 
 ## Branches
 
-- `main` — stable production work
-- `stage` — active development and preview testing
+- `main` — production-ready code
+- `stage` — active development and preview validation
 
-## License
+## Author
 
-This repository contains a personal portfolio and its associated content. Reuse of the implementation should preserve third-party package licenses. Personal text, images, branding, and project data are not provided as reusable public assets.
+**Andrew Bielous**
+
+Frontend and WordPress developer focused on responsive interfaces, maintainable architecture, practical performance optimization, and modern JavaScript development.
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-000000?style=flat-square&logo=vercel)](https://cv-andrewb.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-AndrewB92-181717?style=flat-square&logo=github)](https://github.com/AndrewB92)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Andrew_Bielous-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/bielousandrew)
+
+## License and Content Usage
+
+The implementation is available for review and educational reference. Third-party dependencies remain subject to their respective licenses.
+
+Personal text, branding, project data, screenshots, and portrait media are not provided as reusable public assets without permission.
