@@ -13,68 +13,73 @@ export type ProjectImage = {
 type Props = {
   images: ProjectImage[];
   altBase: string;
-  showArrows?: boolean; // default: false
+  showArrows?: boolean;
+  fit?: "cover" | "contain";
 };
 
-const normalize = (s?: string) => (typeof s === "string" ? s.trim() : "");
-const isNonEmpty = (s?: string) => normalize(s).length > 0;
+const normalize = (value?: string) =>
+  typeof value === "string" ? value.trim() : "";
 
-// Optional ordering: prioritize likely "hero/featured" variants.
-// Tune this list to your DB naming style.
-const variantRank = (v?: string) => {
-  const key = normalize(v).toLowerCase();
-  if (!key) return 999;
-
+const variantRank = (value?: string) => {
+  const key = normalize(value).toLowerCase();
   if (["featured", "hero", "main", "homepage"].includes(key)) return 0;
   if (["shop", "product", "catalog"].includes(key)) return 1;
   if (["mobile", "responsive"].includes(key)) return 2;
-
   return 50;
 };
 
-export function ProjectImageSlider({ images, altBase, showArrows = false }: Props) {
+export function ProjectImageSlider({
+  images,
+  altBase,
+  showArrows = false,
+  fit = "cover",
+}: Props) {
   const id = useId();
 
   const slides = useMemo(() => {
-    const cleaned = (Array.isArray(images) ? images : [])
-      .filter((i): i is ProjectImage => Boolean(i && typeof i.url === "string" && i.url.trim()))
-      .map((i) => ({
-        url: i.url.trim(),
-        variant: isNonEmpty(i.variant) ? normalize(i.variant) : undefined,
-        alt: isNonEmpty(i.alt) ? normalize(i.alt) : undefined,
-        caption: isNonEmpty(i.caption) ? normalize(i.caption) : undefined,
+    const cleaned = images
+      .filter(
+        (image): image is ProjectImage =>
+          Boolean(image?.url?.trim()),
+      )
+      .map((image, originalIndex) => ({
+        url: image.url.trim(),
+        variant: normalize(image.variant) || undefined,
+        alt: normalize(image.alt) || undefined,
+        caption: normalize(image.caption) || undefined,
+        originalIndex,
       }));
 
-    // dedupe by URL (keep first)
     const seen = new Set<string>();
-    const deduped: typeof cleaned = [];
-    for (const item of cleaned) {
-      if (seen.has(item.url)) continue;
-      seen.add(item.url);
-      deduped.push(item);
-    }
 
-    // stable ordering: rank by variant priority, preserve original order inside same rank
-    return deduped
-      .map((s, idx) => ({ ...s, __idx: idx }))
-      .sort((a, b) => {
-        const r = variantRank(a.variant) - variantRank(b.variant);
-        return r !== 0 ? r : a.__idx - b.__idx;
+    return cleaned
+      .filter((image) => {
+        if (seen.has(image.url)) return false;
+        seen.add(image.url);
+        return true;
       })
-      .map(({ __idx, ...s }) => s);
+      .sort((a, b) => {
+        const rankDifference =
+          variantRank(a.variant) - variantRank(b.variant);
+        return rankDifference || a.originalIndex - b.originalIndex;
+      });
   }, [images]);
 
   const [index, setIndex] = useState(0);
 
-  // Keep index valid when slides count changes (e.g. different project opened / DB updates)
   useEffect(() => {
-    setIndex((cur) => (slides.length ? Math.min(cur, slides.length - 1) : 0));
+    setIndex((current) =>
+      slides.length ? Math.min(current, slides.length - 1) : 0,
+    );
   }, [slides.length]);
 
   if (!slides.length) return null;
 
   const go = (delta: number) => {
-    setIndex((cur) => (cur + delta + slides.length) % slides.length);
+    setIndex(
+      (current) =>
+        (current + delta + slides.length) % slides.length,
+    );
   };
 
   const canNavigate = slides.length > 1;
@@ -82,36 +87,51 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
   return (
     <div
       className={styles.root}
+      data-fit={fit}
       aria-roledescription="carousel"
       aria-label={`${altBase} screenshots`}
     >
       <div className={styles.frame}>
         <div
-          className={styles.track}
-          style={{ transform: `translate3d(${-index * 100}%, 0, 0)` }}
-          aria-live="polite"
           id={id}
+          className={styles.track}
+          style={{
+            transform: `translate3d(${-index * 100}%, 0, 0)`,
+          }}
+          aria-live="polite"
         >
-          {slides.map((s, i) => {
-            const altText = s.alt || `${altBase} screenshot ${i + 1}`;
-            const caption = s.caption || s.variant;
+          {slides.map((slide, slideIndex) => {
+            const caption = slide.caption || slide.variant;
 
             return (
-              <div className={styles.slide} key={`${s.url}-${i}`}>
+              <figure
+                className={styles.slide}
+                key={slide.url}
+                aria-hidden={slideIndex !== index}
+              >
                 <img
                   className={styles.img}
-                  src={s.url}
-                  alt={altText}
-                  loading="lazy"
+                  src={slide.url}
+                  alt={
+                    slide.alt ||
+                    `${altBase} screenshot ${slideIndex + 1}`
+                  }
+                  loading={slideIndex === 0 ? "eager" : "lazy"}
+                  decoding="async"
                   draggable={false}
                 />
-                {caption ? <div className={styles.caption}>{caption}</div> : null}
-              </div>
+
+                {caption ? (
+                  <figcaption className={styles.caption}>
+                    {caption}
+                  </figcaption>
+                ) : null}
+              </figure>
             );
           })}
         </div>
 
-        {showArrows && canNavigate && (
+        {showArrows && canNavigate ? (
           <>
             <button
               type="button"
@@ -133,22 +153,24 @@ export function ProjectImageSlider({ images, altBase, showArrows = false }: Prop
               ›
             </button>
           </>
-        )}
+        ) : null}
 
-        {canNavigate && (
-          <div className={styles.dots} role="tablist" aria-label="Screenshots">
-            {slides.map((_, i) => (
+        {canNavigate ? (
+          <div className={styles.dots} aria-label="Screenshot navigation">
+            {slides.map((slide, slideIndex) => (
               <button
-                key={`dot-${i}`}
+                key={slide.url}
                 type="button"
-                className={`${styles.dot} ${i === index ? styles.dotActive : ""}`}
-                onClick={() => setIndex(i)}
-                aria-label={`Show screenshot ${i + 1}`}
-                aria-pressed={i === index}
+                className={`${styles.dot} ${
+                  slideIndex === index ? styles.dotActive : ""
+                }`}
+                onClick={() => setIndex(slideIndex)}
+                aria-label={`Show screenshot ${slideIndex + 1}`}
+                aria-current={slideIndex === index ? "true" : undefined}
               />
             ))}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

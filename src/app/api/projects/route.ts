@@ -1,88 +1,132 @@
 import { NextResponse } from "next/server";
 import { PROJECTS_PAGE_SIZE } from "@/config/ui";
-import { getProjects } from "@/data/profile";
+import {
+  getProjects,
+  type Project,
+  type ProjectCategory,
+} from "@/data/profile";
 
-type StackCount = {
-  name: string;
+type CategoryCount = {
+  name: ProjectCategory;
   count: number;
 };
 
-const normalizeStack = (value: string) => value.trim().toLowerCase();
+const PROJECT_CATEGORIES: ReadonlySet<ProjectCategory> = new Set([
+  "ecommerce",
+  "corporate",
+  "content-platform",
+  "education",
+]);
 
-const getStackCounts = (projects: Awaited<ReturnType<typeof getProjects>>): StackCount[] => {
-  const counts = new Map<string, StackCount>();
+const normalizeCategory = (
+  value: string | null,
+): ProjectCategory | undefined => {
+  const normalized = value?.trim().toLowerCase();
 
-  for (const project of projects) {
-    for (const stackItem of project.stack) {
-      const name = stackItem.trim();
-
-      if (!name) {
-        continue;
-      }
-
-      const key = normalizeStack(name);
-      const current = counts.get(key);
-
-      counts.set(key, {
-        name: current?.name ?? name,
-        count: (current?.count ?? 0) + 1,
-      });
-    }
+  if (!normalized) {
+    return undefined;
   }
 
-  return [...counts.values()].sort((a, b) => {
-    if (b.count !== a.count) {
-      return b.count - a.count;
-    }
+  return PROJECT_CATEGORIES.has(normalized as ProjectCategory)
+    ? (normalized as ProjectCategory)
+    : undefined;
+};
 
-    return a.name.localeCompare(b.name);
-  });
+const getCategoryCounts = (projects: Project[]): CategoryCount[] => {
+  const counts = new Map<ProjectCategory, number>();
+
+  for (const project of projects) {
+    counts.set(
+      project.category,
+      (counts.get(project.category) ?? 0) + 1,
+    );
+  }
+
+  return [...counts.entries()]
+    .map(([name, count]) => ({
+      name,
+      count,
+    }))
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+
+      return a.name.localeCompare(b.name);
+    });
+};
+
+const getSafePage = (
+  value: string | null,
+  totalPages: number,
+): number => {
+  const parsed = Number(value ?? "1");
+
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return 1;
+  }
+
+  return Math.min(Math.floor(parsed), totalPages);
 };
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const stackFilter = searchParams.get("stack")?.trim();
-    const pageParam = Number(searchParams.get("page") ?? "1");
-    const page = Number.isFinite(pageParam) && pageParam > 0 ? Math.floor(pageParam) : 1;
+    const category = normalizeCategory(
+      searchParams.get("category"),
+    );
 
     const projects = await getProjects();
-    const stackCounts = getStackCounts(projects);
+    const categoryCounts = getCategoryCounts(projects);
 
-    const filtered =
-      stackFilter && stackFilter !== "All"
-        ? projects.filter((project) =>
-            project.stack.some(
-              (item) => normalizeStack(item) === normalizeStack(stackFilter),
-            ),
-          )
-        : projects;
+    const filteredProjects = category
+      ? projects.filter(
+          (project) => project.category === category,
+        )
+      : projects;
 
-    const totalItems = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / PROJECTS_PAGE_SIZE));
-    const safePage = Math.min(page, totalPages);
-    const start = (safePage - 1) * PROJECTS_PAGE_SIZE;
-    const paged = filtered.slice(start, start + PROJECTS_PAGE_SIZE);
+    const totalItems = filteredProjects.length;
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalItems / PROJECTS_PAGE_SIZE),
+    );
+    const currentPage = getSafePage(
+      searchParams.get("page"),
+      totalPages,
+    );
+
+    const start =
+      (currentPage - 1) * PROJECTS_PAGE_SIZE;
+    const pagedProjects = filteredProjects.slice(
+      start,
+      start + PROJECTS_PAGE_SIZE,
+    );
 
     return NextResponse.json({
-      projects: paged,
+      projects: pagedProjects,
       totalPages,
       totalItems,
-      currentPage: safePage,
-      stackCounts,
+      currentPage,
+      activeCategory: category ?? null,
+      categoryCounts,
     });
-  } catch {
+  } catch (error) {
+    console.error("Failed to load projects", error);
+
     return NextResponse.json(
       {
         projects: [],
         totalPages: 1,
         totalItems: 0,
         currentPage: 1,
-        stackCounts: [],
+        activeCategory: null,
+        categoryCounts: [],
         error: "Failed to load projects",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

@@ -1,241 +1,203 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import styles from "./ProjectsGallery.module.css";
-import type { Project } from "@/data/profile";
+import type { Project, ProjectCategory } from "@/data/profile";
 
-type StackCount = {
-  name: string;
-  count: number;
-};
-
-type ProjectsResponse = {
+type CategoryCount = { name: ProjectCategory; count: number };
+type ProjectsData = {
   projects: Project[];
   totalPages: number;
   totalItems: number;
-  stackCounts: StackCount[];
+  currentPage: number;
+  activeCategory: ProjectCategory | null;
 };
 
-type ProjectsGalleryProps = {
-  filters: string[];
-  initialData: ProjectsResponse;
+type Props = {
+  categories: CategoryCount[];
+  initialData: ProjectsData;
 };
 
-const TOP_TAGS_LIMIT = 5;
+const CATEGORY_LABELS: Record<ProjectCategory, string> = {
+  ecommerce: "E-commerce",
+  corporate: "Corporate",
+  "content-platform": "Content platforms",
+  education: "Education",
+};
 
-export function ProjectsGallery({ filters, initialData }: ProjectsGalleryProps) {
-  const [activeFilter, setActiveFilter] = useState(filters[0] ?? "All");
-  const [page, setPage] = useState(1);
-  const [data, setData] = useState<ProjectsResponse>(initialData);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const isFirstLoad = useRef(true);
+const STATUS_LABELS: Record<Project["status"], string> = {
+  production: "Production",
+  maintenance: "Ongoing maintenance",
+  archived: "Archived",
+  offline: "Offline",
+  private: "Private",
+};
 
-  const stackCountMap = useMemo(() => {
-    return new Map(data.stackCounts.map((item) => [item.name, item.count]));
-  }, [data.stackCounts]);
+const STACK_LIMIT = 4;
 
-  const topTags = useMemo(() => {
-    const totalTagUsage = data.stackCounts.reduce((sum, item) => sum + item.count, 0);
+export function ProjectsGallery({ categories, initialData }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
-    return [...data.stackCounts]
-      .filter((item) => item.name !== "All")
-      .sort((a, b) => b.count - a.count)
-      .slice(0, TOP_TAGS_LIMIT)
-      .map((item) => ({
-        ...item,
-        percentage: totalTagUsage > 0 ? Math.round((item.count / totalTagUsage) * 100) : 0,
-      }));
-  }, [data.stackCounts]);
+  const totalArchiveItems = useMemo(
+    () => categories.reduce((total, item) => total + item.count, 0),
+    [categories],
+  );
 
-  useEffect(() => {
-    if (isFirstLoad.current) {
-      isFirstLoad.current = false;
-      return;
-    }
+  const navigate = (category: ProjectCategory | null, page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
 
-    const controller = new AbortController();
+    category ? params.set("category", category) : params.delete("category");
+    page > 1 ? params.set("page", String(page)) : params.delete("page");
 
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams();
-        params.set("page", String(page));
-
-        if (activeFilter !== "All") {
-          params.set("stack", activeFilter);
-        }
-
-        const response = await fetch(`/api/projects?${params.toString()}`, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load projects");
-        }
-
-        const payload = (await response.json()) as ProjectsResponse;
-        setData(payload);
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
-          setError((err as Error).message);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchProjects();
-
-    return () => {
-      controller.abort();
-    };
-  }, [activeFilter, page]);
-
-  const handleFilterChange = (filter: string) => {
-    if (filter === activeFilter) return;
-
-    setActiveFilter(filter);
-    setPage(1);
+    const query = params.toString();
+    startTransition(() => {
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    });
   };
 
+  const activeLabel = initialData.activeCategory
+    ? CATEGORY_LABELS[initialData.activeCategory]
+    : "All projects";
+
   return (
-    <section className={styles.panel} aria-live="polite">
-      <div className={styles.summary}>
-        <p>
-          Total projects: <strong>{data.totalItems}</strong>
-        </p>
-
-        <p>
-          Most used tags:
-        </p>
-        {topTags.length > 0 && (
-          <div className={styles.topTags} aria-label="Most used tags">
-            {topTags.map((tag) => (
-              <span key={tag.name}>
-                {tag.name} — {tag.percentage}%
-              </span>
-            ))}
+    <section className={styles.archive} aria-labelledby="projects-archive-title" aria-busy={isPending}>
+      <div className={styles.toolbar}>
+        <div className={styles.toolbarIntro}>
+          <p className={styles.toolbarEyebrow}>Browse the archive</p>
+          <div className={styles.toolbarHeading}>
+            <h2 id="projects-archive-title">{activeLabel}</h2>
+            <span>{initialData.totalItems} {initialData.totalItems === 1 ? "project" : "projects"}</span>
           </div>
-        )}
-      </div>
+        </div>
 
-      <button
-        type="button"
-        className={styles.filtersToggle}
-        aria-expanded={filtersOpen}
-        aria-controls="project-filters"
-        onClick={() => setFiltersOpen((prev) => !prev)}
-      >
-        Filter by tags
-        <span>{filtersOpen ? "−" : "+"}</span>
-      </button>
-
-      {filtersOpen && (
-        <ul
-          id="project-filters"
-          className={styles.filters}
-          aria-label="Filter projects by stack"
-        >
-          {filters.map((filter) => {
-            const count =
-              filter === "All" ? data.totalItems : stackCountMap.get(filter) ?? 0;
-
-            return (
-              <li key={filter}>
-                <button
-                  type="button"
-                  className={styles.filterButton}
-                  aria-pressed={activeFilter === filter}
-                  onClick={() => handleFilterChange(filter)}
-                  disabled={loading}
-                >
-                  {filter}
-                  <span>{count}</span>
-                </button>
-              </li>
-            );
-          })}
+        <ul className={styles.filters} aria-label="Filter projects by category">
+          <li>
+            <button type="button" className={styles.filterButton} aria-pressed={initialData.activeCategory === null} onClick={() => navigate(null, 1)} disabled={isPending}>
+              <span>All</span><small>{totalArchiveItems}</small>
+            </button>
+          </li>
+          {categories.map((category) => (
+            <li key={category.name}>
+              <button type="button" className={styles.filterButton} aria-pressed={initialData.activeCategory === category.name} onClick={() => navigate(category.name, 1)} disabled={isPending}>
+                <span>{CATEGORY_LABELS[category.name]}</span><small>{category.count}</small>
+              </button>
+            </li>
+          ))}
         </ul>
-      )}
+      </div>
 
-      <div className={styles.projectsStage} aria-busy={loading}>
-        {error ? (
-          <div className={styles.emptyState}>{error}</div>
-        ) : data.projects.length === 0 ? (
-          <div className={styles.emptyState}>No projects match that filter yet.</div>
+      <div className={styles.projectsStage}>
+        {initialData.projects.length === 0 ? (
+          <div className={styles.emptyState}>No projects are assigned to this category yet.</div>
         ) : (
-          <div className={`${styles.projectsGrid} ${loading ? styles.projectsGridLoading : ""}`}>
-            {data.projects.map((project) => (
-              <article key={project.name} className={styles.project}>
-                <div className={styles.wrapper}>
-                  <h3>{project.name}</h3>
-                  <p>{project.description}</p>
+          <div className={`${styles.projectsGrid} ${isPending ? styles.projectsGridLoading : ""}`}>
+            {initialData.projects.map((project) => {
+              const visibleStack = project.stack.slice(0, STACK_LIMIT);
+              const remainingStack = project.stack.length - visibleStack.length;
 
-                  <div className={styles.stack}>
-                    {project.stack.map((item) => (
-                      <span key={`${project.name}-${item}`}>{item}</span>
-                    ))}
+              return (
+                <article key={project.id} className={styles.project}>
+                  <div className={styles.projectIdentity} aria-hidden="true">
+                    <span>{CATEGORY_LABELS[project.category]}</span>
+                    <strong>{project.name.slice(0, 2).toUpperCase()}</strong>
                   </div>
-                </div>
 
-                <div className={styles.projectLinks}>
-                  <a href={project.link} target="_blank" rel="noreferrer">
-                    Visit site →
-                  </a>
+                  <div className={styles.projectBody}>
+                    <div className={styles.projectMeta}>
+                      <span>{STATUS_LABELS[project.status]}</span>
+                      {project.year ? <time dateTime={String(project.year)}>{project.year}</time> : null}
+                    </div>
 
-                  {project.github && (
-                    <a href={project.github} target="_blank" rel="noreferrer">
-                      Check GitHub →
-                    </a>
-                  )}
+                    <div className={styles.projectCopy}>
+                      <h3>{project.name}</h3>
+                      <p>{project.summary}</p>
+                    </div>
 
-                  {project.codepen && (
-                    <a href={project.codepen} target="_blank" rel="noreferrer">
-                      View CodePen →
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
+                    {project.contribution ? (
+                      <div className={styles.projectContribution}>
+                        <span>Contribution</span>
+                        <p>{project.contribution}</p>
+                      </div>
+                    ) : null}
+
+                    {project.cms || project.pageBuilder ? (
+                      <dl className={styles.projectPlatform}>
+                        {project.cms ? <div><dt>CMS</dt><dd>{project.cms}</dd></div> : null}
+                        {project.pageBuilder ? <div><dt>Page builder</dt><dd>{project.pageBuilder}</dd></div> : null}
+                      </dl>
+                    ) : null}
+
+                    {visibleStack.length ? (
+                      <ul className={styles.stack} aria-label={`${project.name} technology stack`}>
+                        {visibleStack.map((item) => <li key={`${project.id}-${item}`}>{item}</li>)}
+                        {remainingStack > 0 ? <li aria-label={`${remainingStack} more technologies`}>+{remainingStack}</li> : null}
+                      </ul>
+                    ) : null}
+
+                    <div className={styles.projectFooter}>
+                      <div className={styles.projectLinks}>
+                        {project.link ? (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Visit site
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : null}
+
+                        {project.github ? (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            GitHub
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : null}
+
+                        {project.codepen ? (
+                          <a
+                            href={project.codepen}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            CodePen
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : null}
+
+                        {!project.link &&
+                        !project.github &&
+                        !project.codepen ? (
+                          <span className={styles.noPublicLink}>
+                            No public version available
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
-
-        {loading && (
-          <div className={styles.loaderOverlay} role="status" aria-label="Loading projects">
-            <span className={styles.spinner} />
-          </div>
-        )}
+        {isPending ? <div className={styles.loaderOverlay} role="status" aria-label="Loading projects"><span className={styles.spinner} /></div> : null}
       </div>
 
-      <div className={styles.pagination}>
-        <button
-          type="button"
-          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-          disabled={page === 1 || loading}
-        >
-          Previous
-        </button>
-
-        <p className={styles.status}>
-          Page {page} of {Math.max(1, data.totalPages)}
-        </p>
-
-        <button
-          type="button"
-          onClick={() =>
-            setPage((prev) => (prev < data.totalPages ? prev + 1 : prev))
-          }
-          disabled={page >= data.totalPages || loading}
-        >
-          Next
-        </button>
-      </div>
+      {initialData.totalPages > 1 ? (
+        <nav className={styles.pagination} aria-label="Projects pagination">
+          <button type="button" onClick={() => navigate(initialData.activeCategory, initialData.currentPage - 1)} disabled={initialData.currentPage === 1 || isPending}>Previous</button>
+          <p className={styles.status}>Page {initialData.currentPage} of {initialData.totalPages}</p>
+          <button type="button" onClick={() => navigate(initialData.activeCategory, initialData.currentPage + 1)} disabled={initialData.currentPage === initialData.totalPages || isPending}>Next</button>
+        </nav>
+      ) : null}
     </section>
   );
 }
