@@ -31,26 +31,23 @@ export function Footer() {
       <div className={styles.inner}>
         <div className={styles.main}>
           <section className={styles.intro} aria-labelledby="footer-heading">
-            <Link className={styles.brand} href="/" aria-label="Go to homepage">
-              <span className={styles.brandMark} aria-hidden="true">
-                &lt;/&gt;
-              </span>
-              <span>{siteMetadata.siteName}</span>
-            </Link>
-
-            <h2 id="footer-heading" className={styles.heading}>
-              Let&apos;s build something useful.
-            </h2>
 
             <p className={styles.description}>
               Frontend-focused web development with an emphasis on performance,
               accessibility, maintainability, and polished interaction.
             </p>
 
-            <Link className={styles.contactCta} href="/contact">
-              Start a conversation
-              <span aria-hidden="true">↗</span>
-            </Link>
+            <RainbowGlowLink
+              href="https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link"
+              blob
+              variant="flat"
+              className={styles.flatButton}
+              iconPosition="end"
+              iconName="download"
+              iconDirection="up"
+            >
+              Check my CV
+            </RainbowGlowLink>
           </section>
 
           <section
@@ -80,7 +77,7 @@ export function Footer() {
                   >
                     <span className={styles.socialText}>
                       <strong>{item.label}</strong>
-                      <small>{item.description}</small>
+                      {/* <small>{item.description}</small> */}
                     </span>
                   </RainbowGlowLink>
                 </li>
