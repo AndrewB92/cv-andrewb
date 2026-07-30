@@ -103,7 +103,7 @@ export default async function HomePage() {
             </RainbowGlowLink>
 
             <RainbowGlowLink
-              href="#"
+              href="https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link"
               blob
               variant="flat"
               className={styles.flatButton}
