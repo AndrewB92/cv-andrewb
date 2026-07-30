@@ -1,14 +1,9 @@
 import Link from "next/link";
-import {
-  FaCalendarAlt,
-  FaCodepen,
-  FaGithub,
-  FaLinkedinIn,
-  FaTelegramPlane,
-  FaWhatsapp,
-} from "react-icons/fa";
-import { HiOutlineArrowUpRight, HiOutlineEnvelope } from "react-icons/hi2";
 
+import {
+  RainbowGlowLink,
+  type RainbowGlowLinkIconName,
+} from "@/components/RainbowGlowLink/RainbowGlowLink";
 import {
   footerNavigation,
   siteMetadata,
@@ -17,18 +12,17 @@ import {
 
 import styles from "./Footer.module.css";
 
-const socialIcons = {
-  github: FaGithub,
-  codepen: FaCodepen,
-  linkedin: FaLinkedinIn,
-  email: HiOutlineEnvelope,
-  telegram: FaTelegramPlane,
-  cal: FaCalendarAlt,
-  whatsapp: FaWhatsapp,
-} as const;
+type FooterSocialLink = {
+  label: string;
+  description: string;
+  href: string;
+  icon: RainbowGlowLinkIconName;
+  external: boolean;
+};
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const footerSocialLinks = socialLinks satisfies readonly FooterSocialLink[];
 
   return (
     <footer className={styles.footer}>
@@ -55,43 +49,42 @@ export function Footer() {
 
             <Link className={styles.contactCta} href="/contact">
               Start a conversation
-              <HiOutlineArrowUpRight aria-hidden="true" />
+              <span aria-hidden="true">↗</span>
             </Link>
           </section>
 
-          <section className={styles.linksSection} aria-label="Contact and profiles">
+          <section
+            className={styles.linksSection}
+            aria-label="Contact and professional profiles"
+          >
             <p className={styles.sectionLabel}>Connect</p>
 
             <ul className={styles.socialGrid}>
-              {socialLinks.map((item) => {
-                const Icon = socialIcons[item.icon];
-
-                return (
-                  <li key={item.label}>
-                    <a
-                      className={styles.socialLink}
-                      href={item.href}
-                      target={item.external ? "_blank" : undefined}
-                      rel={item.external ? "noopener noreferrer" : undefined}
-                      aria-label={`${item.label}${item.external ? " — opens in a new tab" : ""}`}
-                    >
-                      <span className={styles.socialIcon} aria-hidden="true">
-                        <Icon />
-                      </span>
-
-                      <span className={styles.socialText}>
-                        <strong>{item.label}</strong>
-                        <small>{item.description}</small>
-                      </span>
-
-                      <HiOutlineArrowUpRight
-                        className={styles.socialArrow}
-                        aria-hidden="true"
-                      />
-                    </a>
-                  </li>
-                );
-              })}
+              {footerSocialLinks.map((item) => (
+                <li key={item.label}>
+                  <RainbowGlowLink
+                    href={item.href}
+                    className={styles.socialLink}
+                    variant="flat"
+                    glow={false}
+                    blob={false}
+                    iconName={item.icon}
+                    iconPosition="start"
+                    target={item.external ? "_blank" : undefined}
+                    rel={
+                      item.external ? "noopener noreferrer" : undefined
+                    }
+                    aria-label={`${item.label}${
+                      item.external ? " — opens in a new tab" : ""
+                    }`}
+                  >
+                    <span className={styles.socialText}>
+                      <strong>{item.label}</strong>
+                      <small>{item.description}</small>
+                    </span>
+                  </RainbowGlowLink>
+                </li>
+              ))}
             </ul>
           </section>
         </div>
@@ -104,7 +97,9 @@ export function Footer() {
                   <Link
                     href={item.href}
                     target={item.external ? "_blank" : undefined}
-                    rel={item.external ? "noopener noreferrer" : undefined}
+                    rel={
+                      item.external ? "noopener noreferrer" : undefined
+                    }
                   >
                     {item.label}
                   </Link>
@@ -115,6 +110,7 @@ export function Footer() {
 
           <p className={styles.credit}>
             <span>© {currentYear} Andrew Bielous.</span>
+
             <span className={styles.madeBy}>
               Made with
               <span className={styles.heartWrap} aria-label="love">

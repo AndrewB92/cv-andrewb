@@ -1,3 +1,5 @@
+import type { RainbowGlowLinkIconName } from "@/components/RainbowGlowLink/RainbowGlowLink";
+
 export const siteMetadata = {
   siteName: "<Andrew_Dev/>",
   tagline: "Product-focused web developer",
@@ -16,17 +18,24 @@ export const footerNavigation = [
   { label: "About", href: "/" },
   { label: "Projects", href: "/projects" },
   { label: "Contact", href: "/contact" },
-  { label: "Download CV", href: "/resume.pdf", external: true },
+  { label: "Download CV", href: "https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link", external: true },
 ];
 
 export const contactDefaults = {
-  // Confirm the local part before publishing if this is not your current address.
   email: "babujoh@gmail.com",
   location: "Remote",
   socials: [
     { label: "GitHub", url: "https://github.com/AndrewB92" },
     { label: "LinkedIn", url: "https://linkedin.com/in/bielousandrew" },
   ],
+};
+
+type SocialLink = {
+  label: string;
+  description: string;
+  href: string;
+  icon: RainbowGlowLinkIconName;
+  external: boolean;
 };
 
 export const socialLinks = [
@@ -55,7 +64,7 @@ export const socialLinks = [
     label: "Email",
     description: contactDefaults.email,
     href: `mailto:${contactDefaults.email}`,
-    icon: "email",
+    icon: "mail",
     external: false,
   },
   {
@@ -69,7 +78,7 @@ export const socialLinks = [
     label: "Cal.com",
     description: "Schedule an introductory call",
     href: "https://cal.com/andrew-bielous",
-    icon: "cal",
+    icon: "calendar",
     external: true,
   },
   {
@@ -79,4 +88,4 @@ export const socialLinks = [
     icon: "whatsapp",
     external: true,
   },
-] as const;
+] satisfies readonly SocialLink[];
