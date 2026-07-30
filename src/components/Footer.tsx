@@ -61,7 +61,7 @@ export function Footer() {
                 <li key={item.label}>
                   <RainbowGlowLink
                     href={item.href}
-                    className={styles.socialLink}
+                    className={styles.flatButton}
                     variant="flat"
                     blob
                     iconName={item.icon}
