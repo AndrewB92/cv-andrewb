@@ -107,7 +107,7 @@ const fallbackProfile: Profile = {
     "I enjoy building resilient, accessible web experiences that stay fast even when product requirements grow. My current focus is on React, TypeScript, and serverless backends.",
   location: "Odessa • Remote",
   email: "babujioh@gmail.com",
-  resumeUrl: "https://example.com/resume.pdf",
+  resumeUrl: "https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=sharing",
   socials: [
     { label: "GitHub", url: "https://github.com/andrewb" },
     { label: "LinkedIn", url: "https://linkedin.com/in/andrewb" },

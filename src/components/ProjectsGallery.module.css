@@ -479,7 +479,8 @@
 
 
   .projectIdentity {
-    min-height: 150px;
+    /* min-height: 150px; */
+    min-height: unset;
     flex-direction: row;
     align-items: flex-start;
   }
