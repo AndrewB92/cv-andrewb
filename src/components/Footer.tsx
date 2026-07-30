@@ -61,11 +61,12 @@ export function Footer() {
                 <li key={item.label}>
                   <RainbowGlowLink
                     href={item.href}
-                    className={styles.flatButton}
+                    className={styles.socialLink}
                     variant="flat"
-                    blob
+                    glow={false}
+                    blob={false}
                     iconName={item.icon}
-                    iconPosition="end"
+                    iconPosition="start"
                     target={item.external ? "_blank" : undefined}
                     rel={
                       item.external ? "noopener noreferrer" : undefined
@@ -76,7 +77,7 @@ export function Footer() {
                   >
                     <span className={styles.socialText}>
                       <strong>{item.label}</strong>
-                      {/* <small>{item.description}</small> */}
+                      <small>{item.description}</small>
                     </span>
                   </RainbowGlowLink>
                 </li>
