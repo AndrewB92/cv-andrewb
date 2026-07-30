@@ -63,10 +63,9 @@ export function Footer() {
                     href={item.href}
                     className={styles.socialLink}
                     variant="flat"
-                    glow={false}
-                    blob={false}
+                    blob
                     iconName={item.icon}
-                    iconPosition="start"
+                    iconPosition="end"
                     target={item.external ? "_blank" : undefined}
                     rel={
                       item.external ? "noopener noreferrer" : undefined
