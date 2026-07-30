@@ -36,7 +36,7 @@ export function Footer() {
               Frontend-focused web development with an emphasis on performance,
               accessibility, maintainability, and polished interaction.
             </p>
-
+            <br />
             <RainbowGlowLink
               href="https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link"
               blob
