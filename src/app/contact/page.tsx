@@ -160,7 +160,7 @@ export default async function ContactPage() {
 
   return (
     <main className={styles.page}>
-      <section className={styles.hero} aria-labelledby="contact-title">
+      <section className={`${styles.hero} glow-border`} aria-labelledby="contact-title">
         <div className={styles.heroContent}>
           {/* <p className={styles.eyebrow}>Contact</p> */}
 
@@ -241,7 +241,7 @@ export default async function ContactPage() {
       </section>
 
       <section
-        className={styles.connections}
+        className={`${styles.connections} glow-border`}
         aria-labelledby="ways-to-connect"
       >
         <header className={styles.sectionHeader}>
