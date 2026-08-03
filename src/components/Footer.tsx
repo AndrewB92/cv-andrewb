@@ -33,10 +33,10 @@ export function Footer() {
           <section className={styles.intro} aria-labelledby="footer-heading">
 
             <p className={styles.description}>
-              Frontend-focused web development with an emphasis on performance,
-              accessibility, maintainability, and polished interaction.
+              Frontend-focused web developer with an emphasis on performance,
+              accessibility, maintainability, and polished interactions
             </p>
-            <br />
+            <br /><br />
             <RainbowGlowLink
               href="https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link"
               blob

@@ -144,8 +144,12 @@ export default async function ProjectsPage({ searchParams }: Props) {
 
       <ProjectsGallery categories={categoryCounts} initialData={{ projects: initialProjects, totalPages, totalItems, currentPage, activeCategory }} />
 
-      <section className={styles.contactCta} aria-labelledby="projects-contact-title">
-        <div><p className={styles.eyebrow}>Work together</p><h2 id="projects-contact-title">Need help modernizing a frontend or WordPress project?</h2><p>I work on production interfaces, legacy refactoring, performance improvements, and content-driven websites.</p></div>
+      <section className={`${styles.contactCta} glow-border`} aria-labelledby="projects-contact-title">
+        <div>
+          {/* <p className={styles.eyebrow}>Work together</p> */}
+          <h2 id="projects-contact-title">Need some help?</h2>
+          <p>Working on production interfaces, legacy refactoring, performance improvements, and content-driven websites.</p>
+        </div>
         {/* <Link href="/contact" className={styles.contactLink}>Discuss a project <span aria-hidden="true">→</span></Link> */}
         <RainbowGlowLink
           href="/contact"

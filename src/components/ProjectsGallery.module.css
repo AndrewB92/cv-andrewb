@@ -476,7 +476,13 @@
     border-bottom: 1px solid var(--color-border);
   }
 
-
+  .filterButton:hover:not(:disabled) {
+    transform: translateY(0px);
+    -webkit-transform: translateY(0px);
+    -moz-transform: translateY(0px);
+    -ms-transform: translateY(0px);
+    -o-transform: translateY(0px);
+}
 
   .projectIdentity {
     /* min-height: 150px; */

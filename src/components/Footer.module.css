@@ -220,7 +220,7 @@
 }
 
 .navigation a:hover {
-  color: var(--color-accent);
+  color: var(--header-accent);
 }
 
 .credit {
@@ -322,7 +322,7 @@
 
 @media (max-width: 640px) {
   .inner {
-    width: min(100% - 1.25rem, 1200px);
+    width: min(100% - 2rem, 1200px);
     padding-top: 2.75rem;
   }
 

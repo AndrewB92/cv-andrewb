@@ -19,9 +19,9 @@
   align-items: center;
   min-height: min(42rem, calc(100svh - 8rem));
   padding: clamp(1.5rem, 5vw, 4.5rem);
-  overflow: hidden;
+  /* overflow: hidden; */
 }
-.hero::before {
+/* .hero::before {
   content: "";
   position: absolute;
   z-index: -1;
@@ -33,7 +33,7 @@
   background: color-mix(in srgb, var(--color-accent) 15%, transparent);
   filter: blur(5rem);
   pointer-events: none;
-}
+} */
 .heroContent {
   max-width: 44rem;
 }
