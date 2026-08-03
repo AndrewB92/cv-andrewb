@@ -77,8 +77,8 @@ export default async function ContactPage() {
 
   const groups: ContactGroup[] = [
     {
-      title: "Direct",
-      description: "The clearest ways to discuss a project or arrange a call.",
+      title: "Contact",
+      description: "ways to discuss a project or arrange a call:",
       links: [
         {
           label: "Email",
@@ -104,7 +104,7 @@ export default async function ContactPage() {
     },
     {
       title: "Messengers",
-      description: "Useful for quick questions and direct communication.",
+      description: "fastest direct communication:",
       links: [
         {
           label: "Telegram",
@@ -124,7 +124,7 @@ export default async function ContactPage() {
     },
     {
       title: "Profiles",
-      description: "",
+      description: "more info about me and my work:",
       links: [
         {
           label: "GitHub",
@@ -162,9 +162,9 @@ export default async function ContactPage() {
     <main className={styles.page}>
       <section className={styles.hero} aria-labelledby="contact-title">
         <div className={styles.heroContent}>
-          <p className={styles.eyebrow}>Contact</p>
+          {/* <p className={styles.eyebrow}>Contact</p> */}
 
-          <h1 id="contact-title">Let&apos;s build something useful.</h1>
+          <h1 id="contact-title">Ready to talk</h1>
 
           <p className={styles.intro}>
             I work with founders, agencies, and product teams on dependable,
@@ -245,8 +245,8 @@ export default async function ContactPage() {
         aria-labelledby="ways-to-connect"
       >
         <header className={styles.sectionHeader}>
-          <p className={styles.eyebrow}>Ways to connect</p>
-          <h2 id="ways-to-connect">Choose the channel that fits.</h2>
+          {/* <p className={styles.eyebrow}>Ways to connect</p> */}
+          <h2 id="ways-to-connect">Choose the channel that fits</h2>
           <p>
             Email is best for detailed project enquiries. Messenger and profile
             links are available for everything else.

@@ -73,8 +73,8 @@ export default async function ProjectsPage({ searchParams }: Props) {
     <main className={styles.page}>
       <header className={styles.intro}>
         <div className={styles.introContent}>
-          <p className={styles.eyebrow}>Project archive</p>
-          <h1>Production websites and frontend systems</h1>
+          {/* <p className={styles.eyebrow}>Project archive</p> */}
+          <h1>Project archive</h1>
           <p className={styles.description}>Commercial websites, content platforms, interactive interfaces, and modernization projects built across WordPress, WooCommerce, React, Next.js, and custom frontend architecture.</p>
         </div>
         <dl className={styles.stats} aria-label="Project archive statistics">

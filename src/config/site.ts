@@ -10,8 +10,8 @@ export const siteMetadata = {
 
 export const primaryNavigation = [
   { label: "About", href: "/" },
-  { label: "My works", href: "/projects" },
-  { label: "Ways to contact", href: "/contact" },
+  { label: "Projects", href: "/projects" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const footerNavigation = [
