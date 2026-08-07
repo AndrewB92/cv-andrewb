@@ -21,11 +21,20 @@ const DEFAULT_CONFIG: ConsoleIntroConfig = {
   name: "Andrew",
   role: "Frontend Developer",
   status: "available for opportunities",
-  stack: ["Next.js", "React", "TypeScript", "WordPress"],
   email: "babujjioh@gmail.com",
+
+  stack: [
+    "Next.js",
+    "React",
+    "TypeScript",
+    "WordPress",
+  ],
+
   githubUrl: "https://github.com/AndrewB92",
   linkedinUrl: "https://www.linkedin.com/in/bielousandrew",
+
   version: "1.0.0",
+
   deployment: {
     environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? null,
     region: process.env.NEXT_PUBLIC_VERCEL_REGION ?? null,
@@ -34,52 +43,84 @@ const DEFAULT_CONFIG: ConsoleIntroConfig = {
 };
 
 const SIGNATURE = String.raw`
-   ___            __
-  / _ | ___  ___/ /______ _    __
- / __ |/ _ \/ _  / __/ -_) |/|/ /
-/_/ |_/ .__/\_,_/_/  \__/|__,__/
-     /_/
+ ___         _                  
+| . |._ _  _| | _ _  ___  _ _ _ 
+|   || ' |/ . || '_>/ ._>| | | |
+|_|_||_|_|\___||_|  \___.|__/_/ 
+                                
 `;
 
-function open(url?: string | null) {
+function openExternalUrl(url?: string | null): void {
   if (!url) {
-    console.warn("Not configured.");
+    console.warn("URL is not configured.");
     return;
   }
 
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer",
+  );
 }
 
-function inspect(config: ConsoleIntroConfig) {
+function inspect(config: ConsoleIntroConfig): void {
   const navigation = performance.getEntriesByType(
     "navigation",
   )[0] as PerformanceNavigationTiming | undefined;
 
-  console.table({
+  const data: Record<string, string> = {
     route: window.location.pathname,
-    environment: config.deployment?.environment ?? "unknown",
-    region: config.deployment?.region ?? "unknown",
-    commit: config.deployment?.commit?.slice(0, 7) ?? "unknown",
-    ttfb: navigation
-      ? `${Math.round(
-          navigation.responseStart - navigation.requestStart,
-        )} ms`
-      : "unknown",
-    domInteractive: navigation
-      ? `${Math.round(navigation.domInteractive)} ms`
-      : "unknown",
-  });
+  };
+
+  if (config.deployment?.environment) {
+    data.environment =
+      config.deployment.environment;
+  }
+
+  if (config.deployment?.region) {
+    data.region =
+      config.deployment.region;
+  }
+
+  if (config.deployment?.commit) {
+    data.commit =
+      config.deployment.commit.slice(0, 7);
+  }
+
+  if (navigation) {
+    const ttfb =
+      navigation.responseStart -
+      navigation.requestStart;
+
+    if (ttfb >= 0) {
+      data.ttfb = `${Math.round(ttfb)} ms`;
+    }
+
+    if (navigation.domInteractive > 0) {
+      data.domInteractive =
+        `${Math.round(
+          navigation.domInteractive,
+        )} ms`;
+    }
+  }
+
+  console.table(data);
 }
 
-export default function ConsoleIntro({ config }: Props) {
+export default function ConsoleIntro({
+  config,
+}: Props) {
   useEffect(() => {
-    if (window.__ANDREW_CONSOLE_INIT__) return;
+    if (window.__ANDREW_CONSOLE_INIT__) {
+      return;
+    }
 
     window.__ANDREW_CONSOLE_INIT__ = true;
 
     const settings: ConsoleIntroConfig = {
       ...DEFAULT_CONFIG,
       ...config,
+
       deployment: {
         ...DEFAULT_CONFIG.deployment,
         ...config?.deployment,
@@ -88,57 +129,76 @@ export default function ConsoleIntro({ config }: Props) {
 
     const prompt = "andrew@portfolio:~$";
 
-    const help = () => {
+    const help = (): void => {
       console.log(`
 Available commands
 
-  andrew.help()      show available commands
   andrew.stack()     show development stack
   andrew.github()    open GitHub
   andrew.linkedin()  open LinkedIn
   andrew.email()     start an email
-  andrew.inspect()   inspect this deployment
+  andrew.inspect()   inspect current page
 `);
     };
 
     window.andrew = Object.freeze({
       help,
 
-      stack() {
-        console.log(settings.stack.join(" · "));
+      stack(): void {
+        console.log(
+          settings.stack.join(" · "),
+        );
       },
 
-      github() {
-        open(settings.githubUrl);
+      github(): void {
+        openExternalUrl(
+          settings.githubUrl,
+        );
       },
 
-      linkedin() {
-        open(settings.linkedinUrl);
+      linkedin(): void {
+        openExternalUrl(
+          settings.linkedinUrl,
+        );
       },
 
-      email() {
-        window.location.href = `mailto:${settings.email}`;
+      email(): void {
+        window.location.href =
+          `mailto:${settings.email}`;
       },
 
-      inspect() {
+      inspect(): void {
         inspect(settings);
       },
     });
 
     console.log(SIGNATURE);
 
-    console.log(`${prompt} whoami`);
+    console.log(
+      `${prompt} whoami`,
+    );
+
     console.log(
       `${settings.name} · ${settings.role}\n${settings.stack
         .slice(0, 4)
         .join(" · ")}`,
     );
 
-    console.log(`\n${prompt} status`);
-    console.log(`✓ ${settings.status}`);
+    console.log(
+      `\n${prompt} status`,
+    );
 
-    console.log(`\n${prompt} help`);
-    console.log("Run andrew.help()");
+    console.log(
+      `✓ ${settings.status}`,
+    );
+
+    console.log(
+      `\n${prompt} help`,
+    );
+
+    console.log(
+      "Try: andrew.help()",
+    );
   }, [config]);
 
   return null;

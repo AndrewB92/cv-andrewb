@@ -4,9 +4,9 @@ export type ConsoleIntroConfig = {
   status: string;
   email: string;
 
-  version?: string;
   stack: string[];
 
+  version?: string;
   githubUrl?: string;
   linkedinUrl?: string;
 
