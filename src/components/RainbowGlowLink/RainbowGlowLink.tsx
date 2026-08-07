@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type AnchorHTMLAttributes,
   type CSSProperties,
   type ReactNode,
 } from "react";
@@ -26,6 +27,7 @@ import {
   SiWhatsapp,
   SiYoutube,
 } from "react-icons/si";
+
 import styles from "./RainbowGlowLink.module.css";
 
 export type RainbowGlowLinkIconName =
@@ -60,7 +62,9 @@ function ArrowIcon() {
   );
 }
 
-function getIconDefinition(name: RainbowGlowLinkIconName): IconDefinition {
+function getIconDefinition(
+  name: RainbowGlowLinkIconName,
+): IconDefinition {
   switch (name) {
     case "external":
       return { glyph: <FaArrowUpRightFromSquare />, kind: "ui" };
@@ -111,8 +115,17 @@ function directionToDeg(direction: ArrowDirection): number {
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+  return (
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ??
+    false
+  );
 }
+
+type ForwardedAnchorProps = Pick<
+  AnchorHTMLAttributes<HTMLAnchorElement>,
+  "target" | "rel" | "aria-label" | "title" | "download"
+>;
 
 type RainbowGlowLinkProps = {
   href: string;
@@ -128,7 +141,7 @@ type RainbowGlowLinkProps = {
   iconAriaLabel?: string;
   threshold?: number;
   rootMargin?: string;
-};
+} & ForwardedAnchorProps;
 
 export function RainbowGlowLink({
   href,
@@ -144,6 +157,11 @@ export function RainbowGlowLink({
   iconAriaLabel,
   threshold = 0.15,
   rootMargin = "120px",
+  target,
+  rel,
+  "aria-label": ariaLabel,
+  title,
+  download,
 }: RainbowGlowLinkProps) {
   const wrapRef = useRef<HTMLSpanElement | null>(null);
   const [inView, setInView] = useState(true);
@@ -154,7 +172,8 @@ export function RainbowGlowLink({
     const enableGlow = glow ?? !isFlat;
     const enableBlob = blob ?? !isFlat;
     const definition = getIconDefinition(iconName);
-    const resolvedIcon = icon === false ? null : (icon ?? definition.glyph);
+    const resolvedIcon =
+      icon === false ? null : (icon ?? definition.glyph);
 
     return {
       glow: enableGlow,
@@ -163,18 +182,32 @@ export function RainbowGlowLink({
       hasIcon: Boolean(resolvedIcon),
       iconPosition,
       iconAriaLabel,
-      iconRotate: iconName === "arrow" ? directionToDeg(iconDirection) : 0,
+      iconRotate:
+        iconName === "arrow" ? directionToDeg(iconDirection) : 0,
       iconName,
-      iconKind: icon === undefined ? definition.kind : "ui" as IconKind,
+      iconKind:
+        icon === undefined
+          ? definition.kind
+          : ("ui" as IconKind),
     };
-  }, [variant, glow, blob, icon, iconName, iconDirection, iconPosition, iconAriaLabel]);
+  }, [
+    variant,
+    glow,
+    blob,
+    icon,
+    iconName,
+    iconDirection,
+    iconPosition,
+    iconAriaLabel,
+  ]);
 
   useEffect(() => {
     reduceMotionRef.current = prefersReducedMotion();
+
     const element = wrapRef.current;
     if (!element) return;
 
-    if (reduceMotionRef.current) {
+    if (reduceMotionRef.current || (!flags.glow && !flags.blob)) {
       setInView(false);
       element.dataset.paused = "1";
       return;
@@ -186,15 +219,18 @@ export function RainbowGlowLink({
     );
 
     observer.observe(element);
+
     return () => observer.disconnect();
-  }, [rootMargin, threshold]);
+  }, [flags.blob, flags.glow, rootMargin, threshold]);
 
   useEffect(() => {
     if (!flags.blob) return;
+
     const element = wrapRef.current;
     if (!element) return;
 
     element.dataset.paused = inView ? "0" : "1";
+
     if (!inView || reduceMotionRef.current) return;
 
     let rect: DOMRect | null = null;
@@ -218,8 +254,14 @@ export function RainbowGlowLink({
       currentX = targetX;
       currentY = targetY;
 
-      element.style.setProperty("--pointer-x", `${Math.round(currentX)}px`);
-      element.style.setProperty("--pointer-y", `${Math.round(currentY)}px`);
+      element.style.setProperty(
+        "--pointer-x",
+        `${Math.round(currentX)}px`,
+      );
+      element.style.setProperty(
+        "--pointer-y",
+        `${Math.round(currentY)}px`,
+      );
       element.style.setProperty("--blob-mix", "0.5");
     };
 
@@ -228,10 +270,19 @@ export function RainbowGlowLink({
       currentX += (targetX - currentX) * smooth;
       currentY += (targetY - currentY) * smooth;
 
-      element.style.setProperty("--pointer-x", `${Math.round(currentX)}px`);
-      element.style.setProperty("--pointer-y", `${Math.round(currentY)}px`);
+      element.style.setProperty(
+        "--pointer-x",
+        `${Math.round(currentX)}px`,
+      );
+      element.style.setProperty(
+        "--pointer-y",
+        `${Math.round(currentY)}px`,
+      );
 
-      if (Math.abs(targetX - currentX) > 0.6 || Math.abs(targetY - currentY) > 0.6) {
+      if (
+        Math.abs(targetX - currentX) > 0.6 ||
+        Math.abs(targetY - currentY) > 0.6
+      ) {
         raf = requestAnimationFrame(loop);
       }
     };
@@ -240,7 +291,11 @@ export function RainbowGlowLink({
       if (!raf) raf = requestAnimationFrame(loop);
     };
 
-    const clamp = (value: number, min: number, max: number) =>
+    const clamp = (
+      value: number,
+      min: number,
+      max: number,
+    ): number =>
       value < min ? min : value > max ? max : value;
 
     const onEnter = () => {
@@ -255,7 +310,12 @@ export function RainbowGlowLink({
 
       targetX = clamp(event.clientX - rect.left, 0, rect.width);
       targetY = clamp(event.clientY - rect.top, 0, rect.height);
-      element.style.setProperty("--blob-mix", (rect.width ? targetX / rect.width : 0.5).toFixed(3));
+
+      element.style.setProperty(
+        "--blob-mix",
+        (rect.width ? targetX / rect.width : 0.5).toFixed(3),
+      );
+
       requestLoop();
     };
 
@@ -265,6 +325,7 @@ export function RainbowGlowLink({
 
       targetX = rect.width * 0.5;
       targetY = rect.height * 0.5;
+
       element.style.setProperty("--blob-mix", "0.5");
       requestLoop();
     };
@@ -274,9 +335,15 @@ export function RainbowGlowLink({
     });
 
     resizeObserver.observe(element);
-    element.addEventListener("pointerenter", onEnter, { passive: true });
-    element.addEventListener("pointermove", onMove, { passive: true });
-    element.addEventListener("pointerleave", onLeave, { passive: true });
+    element.addEventListener("pointerenter", onEnter, {
+      passive: true,
+    });
+    element.addEventListener("pointermove", onMove, {
+      passive: true,
+    });
+    element.addEventListener("pointerleave", onLeave, {
+      passive: true,
+    });
 
     readRect();
     resetPosition();
@@ -286,13 +353,17 @@ export function RainbowGlowLink({
       element.removeEventListener("pointerenter", onEnter);
       element.removeEventListener("pointermove", onMove);
       element.removeEventListener("pointerleave", onLeave);
+
       if (raf) cancelAnimationFrame(raf);
     };
   }, [flags.blob, inView]);
 
   useEffect(() => {
     const element = wrapRef.current;
-    if (element) element.dataset.paused = inView ? "0" : "1";
+
+    if (element) {
+      element.dataset.paused = inView ? "0" : "1";
+    }
   }, [inView]);
 
   const wrapperClass = [
@@ -300,20 +371,31 @@ export function RainbowGlowLink({
     flags.glow ? styles.withGlow : styles.noGlow,
     flags.blob ? styles.withBlob : styles.noBlob,
     flags.hasIcon ? styles.withIcon : "",
-    flags.hasIcon && flags.iconPosition === "start" ? styles.iconStart : styles.iconEnd,
+    flags.hasIcon && flags.iconPosition === "start"
+      ? styles.iconStart
+      : styles.iconEnd,
     className,
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const iconClass = [
     styles.icon,
     flags.iconKind === "brand" ? styles.brandIcon : "",
     flags.iconKind === "ui" ? styles.uiIcon : "",
-    flags.iconKind === "custom-arrow" ? styles.customArrowIcon : "",
-  ].filter(Boolean).join(" ");
+    flags.iconKind === "custom-arrow"
+      ? styles.customArrowIcon
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const iconStyle = flags.iconName === "arrow"
-    ? ({ "--icon-rotate": `${flags.iconRotate}deg` } as CSSProperties)
-    : undefined;
+  const iconStyle =
+    flags.iconName === "arrow"
+      ? ({
+          "--icon-rotate": `${flags.iconRotate}deg`,
+        } as CSSProperties)
+      : undefined;
 
   const iconElement = flags.hasIcon ? (
     <span
@@ -327,15 +409,30 @@ export function RainbowGlowLink({
   ) : null;
 
   return (
-    <span ref={wrapRef} className={wrapperClass} data-paused={inView ? "0" : "1"}>
-      <Link href={href} className={styles.link}>
+    <span
+      ref={wrapRef}
+      className={wrapperClass}
+      data-paused={inView ? "0" : "1"}
+    >
+      <Link
+        href={href}
+        className={styles.link}
+        target={target}
+        rel={rel}
+        aria-label={ariaLabel}
+        title={title}
+        download={download}
+      >
         {flags.iconPosition === "start" ? iconElement : null}
         <span className={styles.text}>{children}</span>
         {flags.iconPosition === "end" ? iconElement : null}
       </Link>
 
       <span className={styles.bg} aria-hidden="true" />
-      {flags.glow ? <span className={styles.glow} aria-hidden="true" /> : null}
+
+      {flags.glow ? (
+        <span className={styles.glow} aria-hidden="true" />
+      ) : null}
     </span>
   );
 }

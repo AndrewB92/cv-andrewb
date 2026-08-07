@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 import styles from "./layout.module.css";
+
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import ConsoleIntro from "@/components/ConsoleIntro/ConsoleIntro";
+
+import GlowBorderProvider from "./GlowBorderProvider";
+
 // import { CustomCursor } from "@/components/CustomCursor/CustomCursor";
 // import RouteLoader from "@/components/RouteLoader";
-
-import GlowBorderProvider from './GlowBorderProvider';
-
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,30 +24,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Andrew Bielous • Web Developer",
+  title: "Andrew Bielous • Frontend Developer",
+
   description:
-    "Portfolio for Andrew Bielous, a frontend-focused engineer crafting WordPress and React experiences.",
-  metadataBase: new URL("https://cv-andrewb.vercel.app"),
+    "Frontend developer building performant web experiences with Next.js, React, TypeScript, and WordPress.",
+
+  metadataBase: new URL("https://andrew-b.is-a.dev"),
+
   openGraph: {
-    title: "Andrew Bielous • Web Developer",
+    title: "Andrew Bielous • Frontend Developer",
     description:
-      "Explore Andrew Bielous' client work, skills, and preferred tools.",
-    url: "https://cv-andrewb.vercel.app",
+      "Frontend developer focused on performant, maintainable web experiences.",
+    url: "https://andrew-b.is-a.dev",
     siteName: "Andrew Bielous",
+    type: "website",
+
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Andrew Bielous portfolio preview",
+        alt: "Andrew Bielous — Frontend Developer",
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Andrew Bielous • Web Developer",
+    title: "Andrew Bielous • Frontend Developer",
     description:
-      "Client-ready WordPress and React experiences built by Andrew Bielous.",
+      "Frontend developer focused on performant, maintainable web experiences.",
+    images: ["/og-image.png"],
   },
 };
 
@@ -59,31 +67,46 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {/* <RouteLoader /> */}
+
         <div className={styles.shell}>
           <a href="#main-content" className={styles.skipLink}>
             Skip to content
           </a>
+
           {/* <CustomCursor particleCount={7} /> */}
+
           <Header />
-          <div className={styles.mainContent} id="main-content">
+
+          <main className={styles.mainContent} id="main-content">
             <GlowBorderProvider />
             {children}
-          </div>
+          </main>
+
           <Footer />
         </div>
+
         <ConsoleIntro
           config={{
-            brand: "Andrew.dev",
-            tagline: "Frontend Engineer / WordPress / UI-focused development",
-            version: "1.0.0",
-            contactEmail: "babujjioh@gmail.com",
-            techStack: ["Next.js", "React", "TypeScript", "Vercel"],
+            name: "Andrew Bielous",
+            role: "Frontend Developer",
+            status: "available for opportunities",
+
+            email: "babujjioh@gmail.com",
+
+            stack: [
+              "Next.js",
+              "React",
+              "TypeScript",
+              "WordPress",
+            ],
+
             githubUrl: "https://github.com/AndrewB92",
-            linkedinUrl: "https://www.linkedin.com/in/your-linkedin/",
+            linkedinUrl: "https://www.linkedin.com/in/bielousandrew",
+
+            version: "1.0.0",
           }}
         />
       </body>
     </html>
   );
 }
-

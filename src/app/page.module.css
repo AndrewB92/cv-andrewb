@@ -31,7 +31,7 @@
 @media screen and (max-width: 1080px){
   .heroContent{
     width: 100%;
-    padding: 2rem;
+    padding: calc(2rem + 20px) 2rem 2rem;
   }
 }
 

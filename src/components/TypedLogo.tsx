@@ -20,7 +20,7 @@ function isHTMLElement(v: Element | null): v is HTMLElement {
 }
 
 export default function TypedLogo({
-  text = "andrew.dev",
+  text = "andrew-b.is-a.dev",
   startDelay = 450,
   baseSpeed = 120,
   variance = 35,
