@@ -1,20 +1,27 @@
 export type ConsoleIntroConfig = {
-  brand: string;
-  tagline?: string;
+  name: string;
+  role: string;
+  status: string;
+  email: string;
+
   version?: string;
-  environment?: string;
-  contactEmail: string;
-  techStack?: string[];
+  stack: string[];
+
   githubUrl?: string;
   linkedinUrl?: string;
-  enableContactPrompt?: boolean;
-  vercel?: {
-    enabled?: boolean;
-    env?: string | null;
-    url?: string | null;
+
+  deployment?: {
+    environment?: string | null;
     region?: string | null;
     commit?: string | null;
   };
 };
 
-export type ConsoleReply = "Y" | "N" | "YES" | "NO";
+export type DeveloperConsole = Readonly<{
+  help: () => void;
+  stack: () => void;
+  github: () => void;
+  linkedin: () => void;
+  email: () => void;
+  inspect: () => void;
+}>;

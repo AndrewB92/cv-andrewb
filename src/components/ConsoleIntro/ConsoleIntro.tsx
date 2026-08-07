@@ -1,41 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import type { ConsoleIntroConfig, ConsoleReply } from "./types";
+import type {
+  ConsoleIntroConfig,
+  DeveloperConsole,
+} from "./types";
 
 declare global {
   interface Window {
-    __ANDREW_DEV_CONSOLE_INIT__?: boolean;
-    andrewConsole?: {
-      reply: (answer: ConsoleReply | string) => boolean | null;
-      email: () => boolean;
-      emailWithMessage: () => boolean;
-      config: Readonly<{
-        brand: string;
-        version: string;
-        email: string;
-      }>;
-    };
-  }
-
-  interface Navigator {
-    deviceMemory?: number;
-    connection?: {
-      effectiveType?: string;
-      downlink?: number;
-      rtt?: number;
-      saveData?: boolean;
-    };
-    mozConnection?: Navigator["connection"];
-    webkitConnection?: Navigator["connection"];
-  }
-
-  interface Performance {
-    memory?: {
-      jsHeapSizeLimit: number;
-      totalJSHeapSize: number;
-      usedJSHeapSize: number;
-    };
+    __ANDREW_CONSOLE_INIT__?: boolean;
+    andrew?: DeveloperConsole;
   }
 }
 
@@ -44,313 +18,127 @@ type Props = {
 };
 
 const DEFAULT_CONFIG: ConsoleIntroConfig = {
-  brand: "Andrew.dev",
-  tagline: "Frontend / WordPress / Product-minded development",
+  name: "Andrew",
+  role: "Frontend Developer",
+  status: "available for opportunities",
+  stack: ["Next.js", "React", "TypeScript", "WordPress"],
+  email: "babujjioh@gmail.com",
+  githubUrl: "https://github.com/AndrewB92",
+  linkedinUrl: "https://www.linkedin.com/in/bielousandrew",
   version: "1.0.0",
-  environment: process.env.NODE_ENV ?? "production",
-  contactEmail: "babujjioh@gmail.com",
-  techStack: ["Next.js", "React", "TypeScript", "Vercel"],
-  githubUrl: "",
-  linkedinUrl: "",
-  enableContactPrompt: true,
-  vercel: {
-    enabled: true,
-    env: process.env.NEXT_PUBLIC_VERCEL_ENV ?? null,
-    url: process.env.NEXT_PUBLIC_VERCEL_URL ?? null,
+  deployment: {
+    environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? null,
     region: process.env.NEXT_PUBLIC_VERCEL_REGION ?? null,
     commit: process.env.NEXT_PUBLIC_COMMIT_SHA ?? null,
   },
 };
 
-const ASCII = String.raw`
-  AAA                dd                                   dd                
- AAAAA  nn nnn       dd rr rr    eee  ww      ww          dd   eee  vv   vv 
-AA   AA nnn  nn  dddddd rrr  r ee   e ww      ww      dddddd ee   e  vv vv  
-AAAAAAA nn   nn dd   dd rr     eeeee   ww ww ww  ... dd   dd eeeee    vvv   
-AA   AA nn   nn  dddddd rr      eeeee   ww  ww   ...  dddddd  eeeee    v    
-                Andrew.dev
+const SIGNATURE = String.raw`
+   ___            __
+  / _ | ___  ___/ /______ _    __
+ / __ |/ _ \/ _  / __/ -_) |/|/ /
+/_/ |_/ .__/\_,_/_/  \__/|__,__/
+     /_/
 `;
 
-function safeGet<T>(getter: () => T, fallback: T): T {
-  try {
-    const value = getter();
-    return value ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "n/a";
-
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  let value = bytes;
-  let index = 0;
-
-  while (value >= 1024 && index < units.length - 1) {
-    value /= 1024;
-    index += 1;
+function open(url?: string | null) {
+  if (!url) {
+    console.warn("Not configured.");
+    return;
   }
 
-  const precision = value >= 100 ? 0 : value >= 10 ? 1 : 2;
-  return `${value.toFixed(precision)} ${units[index]}`;
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
-function formatMs(ms: number): string {
-  if (!Number.isFinite(ms)) return "n/a";
-  return `${Math.round(ms)} ms`;
-}
+function inspect(config: ConsoleIntroConfig) {
+  const navigation = performance.getEntriesByType(
+    "navigation",
+  )[0] as PerformanceNavigationTiming | undefined;
 
-function getNavigationTiming() {
-  const nav = performance.getEntriesByType?.("navigation")?.[0] as PerformanceNavigationTiming | undefined;
-  if (!nav) return null;
-
-  return {
-    type: nav.type || "n/a",
-    dns: nav.domainLookupEnd - nav.domainLookupStart,
-    tcp: nav.connectEnd - nav.connectStart,
-    ttfb: nav.responseStart - nav.requestStart,
-    download: nav.responseEnd - nav.responseStart,
-    domInteractive: nav.domInteractive,
-    domComplete: nav.domComplete,
-    loadEvent: nav.loadEventEnd,
-  };
-}
-
-function getConnectionInfo() {
-  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-
-  if (!connection) {
-    return {
-      effectiveType: "unsupported",
-      downlink: "unsupported",
-      rtt: "unsupported",
-      saveData: "unsupported",
-    };
-  }
-
-  return {
-    effectiveType: connection.effectiveType || "n/a",
-    downlink: typeof connection.downlink === "number" ? `${connection.downlink} Mb/s` : "n/a",
-    rtt: typeof connection.rtt === "number" ? `${connection.rtt} ms` : "n/a",
-    saveData: String(Boolean(connection.saveData)),
-  };
-}
-
-function getMemoryInfo() {
-  const perfMemory = performance.memory;
-
-  return {
-    deviceMemory: safeGet(() => (navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "unsupported"), "unsupported"),
-    jsHeapLimit: perfMemory ? formatBytes(perfMemory.jsHeapSizeLimit) : "unsupported",
-    totalJSHeap: perfMemory ? formatBytes(perfMemory.totalJSHeapSize) : "unsupported",
-    usedJSHeap: perfMemory ? formatBytes(perfMemory.usedJSHeapSize) : "unsupported",
-  };
-}
-
-function getSystemInfo() {
-  return {
-    platform: safeGet(() => navigator.platform || "n/a", "n/a"),
-    language: safeGet(() => navigator.language || "n/a", "n/a"),
-    timezone: safeGet(() => Intl.DateTimeFormat().resolvedOptions().timeZone || "n/a", "n/a"),
-    online: String(navigator.onLine),
-    cores: safeGet(() => String(navigator.hardwareConcurrency || "unsupported"), "unsupported"),
-    touchPoints: safeGet(() => String(navigator.maxTouchPoints ?? "n/a"), "n/a"),
-    screen: `${window.screen.width}x${window.screen.height}`,
-    viewport: `${window.innerWidth}x${window.innerHeight}`,
-    pixelRatio: safeGet(() => String(window.devicePixelRatio || 1), "1"),
-  };
-}
-
-function getPageInfo() {
-  return {
-    title: document.title || "n/a",
-    url: window.location.href,
-    path: window.location.pathname,
-    referrer: document.referrer || "direct / none",
-    colorScheme: safeGet(
-      () => (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
-      "n/a",
-    ),
-  };
-}
-
-function buildMailto(contactEmail: string, withPromptBody = false): string | null {
-  const appName = document.title?.trim() || window.location.hostname || "your website";
-  const subject = `Hello Andrew, it's ${appName}`;
-
-  let body = "";
-  if (withPromptBody) {
-    const message = window.prompt("Write a short message for Andrew:", "");
-    if (message === null) return null;
-
-    body = message.trim();
-  }
-
-  const params = new URLSearchParams({
-    subject,
-    ...(body ? { body } : {}),
+  console.table({
+    route: window.location.pathname,
+    environment: config.deployment?.environment ?? "unknown",
+    region: config.deployment?.region ?? "unknown",
+    commit: config.deployment?.commit?.slice(0, 7) ?? "unknown",
+    ttfb: navigation
+      ? `${Math.round(
+          navigation.responseStart - navigation.requestStart,
+        )} ms`
+      : "unknown",
+    domInteractive: navigation
+      ? `${Math.round(navigation.domInteractive)} ms`
+      : "unknown",
   });
-
-  return `mailto:${contactEmail}?${params.toString()}`;
-}
-
-function openEmailClient(contactEmail: string, withPromptBody = false): boolean {
-  const mailto = buildMailto(contactEmail, withPromptBody);
-  if (!mailto) return false;
-
-  window.location.href = mailto;
-  return true;
 }
 
 export default function ConsoleIntro({ config }: Props) {
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.__ANDREW_DEV_CONSOLE_INIT__) return;
+    if (window.__ANDREW_CONSOLE_INIT__) return;
 
-    window.__ANDREW_DEV_CONSOLE_INIT__ = true;
+    window.__ANDREW_CONSOLE_INIT__ = true;
 
-    const mergedConfig: ConsoleIntroConfig = {
+    const settings: ConsoleIntroConfig = {
       ...DEFAULT_CONFIG,
       ...config,
-      vercel: {
-        ...DEFAULT_CONFIG.vercel,
-        ...config?.vercel,
+      deployment: {
+        ...DEFAULT_CONFIG.deployment,
+        ...config?.deployment,
       },
     };
 
-    const styles = {
-      block: `
-        background:#1e1f29;
-        color:#f8f8f2;
-        padding:8px 12px;
-        border-radius:8px;
-        font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size:11px;
-        font-weight:700;
-        line-height:1.1;
-        white-space:pre;
-      `,
-      title: "color:#8be9fd;font-weight:bold;font-size:14px;",
-      label: "color:#bd93f9;font-weight:bold;",
-      value: "color:#f8f8f2;",
-      ok: "color:#50fa7b;font-weight:bold;",
-      warn: "color:#ffb86c;font-weight:bold;",
-      link: "color:#1e1f29;background:#50fa7b;padding:3px 8px;border-radius:999px;font-weight:bold;",
+    const prompt = "andrew@portfolio:~$";
+
+    const help = () => {
+      console.log(`
+Available commands
+
+  andrew.help()      show available commands
+  andrew.stack()     show development stack
+  andrew.github()    open GitHub
+  andrew.linkedin()  open LinkedIn
+  andrew.email()     start an email
+  andrew.inspect()   inspect this deployment
+`);
     };
 
-    const printGroup = (title: string, data: Record<string, string>) => {
-      console.groupCollapsed(`%c${title}`, styles.title);
-      Object.entries(data).forEach(([key, value]) => {
-        console.log(`%c${key}: %c${value}`, styles.label, styles.value);
-      });
-      console.groupEnd();
-    };
+    window.andrew = Object.freeze({
+      help,
 
-    const vercelInfo =
-      mergedConfig.vercel?.enabled
-        ? {
-            env: mergedConfig.vercel.env || "not exposed",
-            region: mergedConfig.vercel.region || "not exposed",
-            deploymentUrl: mergedConfig.vercel.url || "not exposed",
-            commit: mergedConfig.vercel.commit || "not exposed",
-          }
-        : null;
+      stack() {
+        console.log(settings.stack.join(" · "));
+      },
 
-    const reply = (answer: string): boolean | null => {
-      const normalized = String(answer).trim().toUpperCase();
+      github() {
+        open(settings.githubUrl);
+      },
 
-      if (normalized === "Y" || normalized === "YES") {
-        console.log("%cOpening your default email app…", styles.ok);
-        return openEmailClient(mergedConfig.contactEmail);
-      }
+      linkedin() {
+        open(settings.linkedinUrl);
+      },
 
-      if (normalized === "N" || normalized === "NO") {
-        console.log("%cNo problem. Maybe another time.", styles.warn);
-        return false;
-      }
+      email() {
+        window.location.href = `mailto:${settings.email}`;
+      },
 
-      console.log("%cUse andrewConsole.reply('Y') or andrewConsole.reply('N')", styles.label);
-      return null;
-    };
+      inspect() {
+        inspect(settings);
+      },
+    });
 
-    window.andrewConsole = {
-      reply,
-      email: () => openEmailClient(mergedConfig.contactEmail),
-      emailWithMessage: () => openEmailClient(mergedConfig.contactEmail, true),
-      config: Object.freeze({
-        brand: mergedConfig.brand,
-        version: mergedConfig.version || "1.0.0",
-        email: mergedConfig.contactEmail,
-      }),
-    };
+    console.log(SIGNATURE);
 
-    const pageInfo = getPageInfo();
-    const systemInfo = getSystemInfo();
-    const connectionInfo = getConnectionInfo();
-    const memoryInfo = getMemoryInfo();
-    const navTiming = getNavigationTiming();
-
-    // console.log(`%c${ASCII}`, `${styles.block}color:#8be9fd;`);
+    console.log(`${prompt} whoami`);
     console.log(
-      `%c${mergedConfig.brand}%c  ${mergedConfig.tagline || ""}`,
-      "color:#bd93f9;font-size:16px;font-weight:800;",
-      "color:#f8f8f2;font-size:12px;",
-    );
-    console.log(
-      `%cVersion:%c ${mergedConfig.version || "1.0.0"}   %cEnvironment:%c ${mergedConfig.environment || "production"}`,
-      styles.label,
-      styles.value,
-      styles.label,
-      styles.value,
+      `${settings.name} · ${settings.role}\n${settings.stack
+        .slice(0, 4)
+        .join(" · ")}`,
     );
 
-    if (mergedConfig.techStack?.length) {
-      console.log(`%cTech Stack:%c ${mergedConfig.techStack.join(" • ")}`, styles.label, styles.ok);
-    }
+    console.log(`\n${prompt} status`);
+    console.log(`✓ ${settings.status}`);
 
-    printGroup("Page", pageInfo);
-    printGroup("System", systemInfo);
-    printGroup("Connection", connectionInfo);
-    printGroup("Memory", memoryInfo);
-
-    if (navTiming) {
-      printGroup("Performance", {
-        navigationType: navTiming.type,
-        dnsLookup: formatMs(navTiming.dns),
-        tcpConnect: formatMs(navTiming.tcp),
-        ttfb: formatMs(navTiming.ttfb),
-        responseDownload: formatMs(navTiming.download),
-        domInteractive: formatMs(navTiming.domInteractive),
-        domComplete: formatMs(navTiming.domComplete),
-        loadEventEnd: formatMs(navTiming.loadEvent),
-      });
-    }
-
-    if (vercelInfo) {
-      printGroup("Deployment", vercelInfo);
-    }
-
-    if (mergedConfig.githubUrl) {
-      console.log(`%cGitHub:%c ${mergedConfig.githubUrl}`, styles.label, styles.value);
-    }
-
-    if (mergedConfig.linkedinUrl) {
-      console.log(`%cLinkedIn:%c ${mergedConfig.linkedinUrl}`, styles.label, styles.value);
-    }
-
-    if (mergedConfig.enableContactPrompt) {
-      console.log(
-        "%cWant to get in touch?%c  Use %candrewConsole.reply('Y')%c or %candrewConsole.reply('N')",
-        styles.label,
-        styles.value,
-        styles.ok,
-        styles.value,
-      );
-
-      console.log("%cQuick email:%c andrewConsole.email()", styles.label, styles.link);
-      console.log("%cEmail with message:%c andrewConsole.emailWithMessage()", styles.label, styles.link);
-    }
+    console.log(`\n${prompt} help`);
+    console.log("Run andrew.help()");
   }, [config]);
 
   return null;

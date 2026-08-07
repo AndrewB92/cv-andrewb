@@ -1,11 +1,11 @@
 import type { RainbowGlowLinkIconName } from "@/components/RainbowGlowLink/RainbowGlowLink";
 
 export const siteMetadata = {
-  siteName: "<Andrew_Dev/>",
+  siteName: "<andrew-b.is-a.dev/>",
   tagline: "Product-focused web developer",
   description:
     "Frontend-focused engineer building thoughtful WordPress & React experiences with a focus on performance and storytelling.",
-  baseUrl: "https://cv-andrewb.vercel.app",
+  baseUrl: "https://andrew-b.is-a.dev",
 };
 
 export const primaryNavigation = [
