@@ -13,7 +13,7 @@ type DescriptionToggleProps = {
 };
 
 function cssEscape(value: string) {
-  const esc = (globalThis as any).CSS?.escape;
+  const esc = globalThis.CSS?.escape;
   return typeof esc === "function" ? esc(value) : value.replace(/[^a-zA-Z0-9_-]/g, "\\$&");
 }
 

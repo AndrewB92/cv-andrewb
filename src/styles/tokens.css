@@ -1,8 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
+/* Breakpoints (CSS variables cannot be used in media conditions):
+ * Shared: 420 compact controls, 540 archive details, 640 compact cards/footer,
+ * 700 archive stacking, 768 page gutters, 900 header navigation, 1080 hero/cards.
+ * Existing content-fit exceptions: 460 contact actions, 720 calendar sheet,
+ * 760 contact/portrait, 960 footer columns, 1000 spotlight, 1180 archive columns.
+ * Preserve these exceptions to avoid changing responsive layouts in this pass.
+ * Runtime coordinates, card geometry, pointer/halo state and SVG artwork stay local.
+ */
 :root {
   color-scheme: light;
 
+  /* Colors — surfaces, text, accents and status */
   --color-surface: #f6f7fb;
   --color-surface-alt: #ffffff;
   --color-border: #e2e6f0;
@@ -10,36 +19,251 @@
   --color-text-secondary: #475569;
   --color-text-muted: #6b7280;
   --color-accent: #2563eb;
-  --color-accent-contrast: #ffffff;
   --color-muted: #f1f5f9;
-
   --color-surface-dark: #020617;
-  --color-surface-alt-dark: #0f172a;
   --color-border-dark: #1e293b;
   --color-text-primary-dark: #f8fafc;
   --color-text-secondary-dark: #cbd5f5;
   --color-text-muted-dark: #94a3b8;
-  --color-muted-dark: #0f172a;
+  --color-accent-secondary: #ba25d1;
+  --color-accent-highlight: #e651fd;
+  --color-focus: #d357e6;
+  --color-success: #2ecc71;
+  --color-availability: #35c46a;
+  --color-status-text: #c5cddc;
+  --color-heart: #ef4444;
+  --color-surface-chip: #192133;
+  --color-surface-media: #0b0e15;
+  --color-surface-placeholder: #111722;
+  --color-surface-card: #161b22;
+  --color-border-card: #2a2f3a;
+  --color-surface-control: #0f1117;
+  --color-surface-dialog: #0a0a0c;
+  --color-surface-loading: #0f0f12;
+  --color-surface-portrait: #0a0d13;
+  --color-accent-violet: #7c3aed;
+  --color-code-string: #a6e3a1;
+  --color-code-number: #f9e2af;
+  --color-code-keyword: #cba6f7;
+  --color-code-type: #74c7ec;
+  --color-code-function: #89b4fa;
+  --color-code-text: #b4c4c6;
+  --color-accent-contrast: #ffffff;
+  --color-surface-alt-dark: #0f172a;
+  --color-white: #ffffff;
 
+  /* Colors — translucent surfaces and accents */
+  --color-surface-popover: rgba(20, 20, 24, 0.87);
+  --color-overlay-modal: rgba(0, 0, 0, 0.76);
+  --color-overlay-loading: rgba(0, 0, 0, 0.55);
+  --color-surface-header-dark: rgb(2 6 23 / 0.85);
+  --color-surface-placeholder-glass: rgba(17, 23, 34, 0.96);
+  --color-focus-accent: rgba(186, 37, 209, 0.8);
+  --color-focus-info: rgba(6, 182, 212, 0.55);
+  --color-surface-media-caption: rgba(10, 14, 24, 0.9);
+  --color-surface-media-control: rgba(10, 14, 24, 0.82);
+  --color-surface-media-dots: rgba(10, 14, 24, 0.72);
+  --color-accent-surface: rgba(186, 37, 209, 0.08);
+  --color-accent-surface-soft: rgba(186, 37, 209, 0.05);
+  --color-accent-surface-hover: rgba(186, 37, 209, 0.07);
+  --color-accent-border: rgba(186, 37, 209, 0.22);
+  --color-accent-border-emphasis: rgba(186, 37, 209, 0.24);
+  --color-accent-border-hover: rgba(186, 37, 209, 0.45);
+  --color-focus-surface: rgba(211, 87, 230, 0.09);
+  --color-focus-border: rgba(211, 87, 230, 0.2);
+  --color-accent-transparent: #ba25d100;
+  --color-cal-brand-light: #292929;
+
+  /* Colors — translucent borders, glass and ink */
+  --color-glass-faint: rgba(255, 255, 255, 0.02);
+  --color-glass-subtle: rgba(255, 255, 255, 0.03);
+  --color-glass-soft: rgba(255, 255, 255, 0.035);
+  --color-glass: rgba(255, 255, 255, 0.04);
+  --color-glass-hover: rgba(255, 255, 255, 0.05);
+  --color-glass-badge: rgba(255, 255, 255, 0.055);
+  --color-glass-highlight: rgba(255, 255, 255, 0.06);
+  --color-glass-active: rgba(255, 255, 255, 0.07);
+  --color-border-faint: rgba(255, 255, 255, 0.08);
+  --color-border-subtle: rgba(255, 255, 255, 0.09);
+  --color-border-light: rgba(255, 255, 255, 0.1);
+  --color-border-translucent: rgba(255, 255, 255, 0.12);
+  --color-border-soft: rgba(255, 255, 255, 0.14);
+  --color-border-hover: rgba(255, 255, 255, 0.16);
+  --color-border-emphasis: rgba(255, 255, 255, 0.18);
+  --color-border-active: rgba(255, 255, 255, 0.2);
+  --color-border-strong: rgba(255, 255, 255, 0.32);
+  --color-control-inactive: rgba(255, 255, 255, 0.42);
+  --color-ink-dim: rgba(255, 255, 255, 0.62);
+  --color-ink-muted: rgba(255, 255, 255, 0.7);
+  --color-ink-soft: rgba(255, 255, 255, 0.74);
+  --color-ink-secondary: rgba(255, 255, 255, 0.78);
+  --color-ink-caption: rgba(255, 255, 255, 0.82);
+  --color-ink-hover: rgba(255, 255, 255, 0.86);
+  --color-ink-emphasis: rgba(255, 255, 255, 0.88);
+  --color-ink-bright: rgba(255, 255, 255, 0.9);
+  --color-ink-primary: rgba(255, 255, 255, 0.92);
+  --color-ink-title: rgba(255, 255, 255, 0.94);
+  --color-ink-active: rgba(255, 255, 255, 0.96);
+  --color-ink-watermark-12: rgba(255,255,255,0.12);
+  --color-ink-watermark-10: rgba(255,255,255,0.1);
+
+  /* Typography */
   --font-geist-sans: "Geist Mono", monospace;
   --font-geist-mono: "Geist Mono", monospace;
   --font-sans-stack: var(--font-geist-sans), "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono-stack: var(--font-geist-mono), "Geist Mono", monospace;
+  --font-system-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-code-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-control: 13.3333px Arial;
+  --font-size-micro: 0.65rem;
+  --font-size-caption-xs: 0.68rem;
+  --font-size-caption-sm: 0.7rem;
+  --font-size-caption: 0.72rem;
+  --font-size-xs: 0.75rem;
+  --font-size-label-sm: 0.78rem;
+  --font-size-label: 0.8rem;
+  --font-size-label-lg: 0.82rem;
+  --font-size-small: 0.85rem;
+  --font-size-body-sm: 0.88rem;
+  --font-size-sm: 0.9rem;
+  --font-size-control: 0.95rem;
+  --font-size-base: 1rem;
+  --font-size-body-lg: 1.05rem;
+  --font-size-lg: 1.1rem;
+  --font-size-subtitle: 1.2rem;
+  --font-size-section: 1.75rem;
+  --font-size-code-xs: 12px;
+  --font-size-code-sm: 13px;
+  --font-size-code: 14px;
+  --font-size-card-sm: 17px;
+  --font-size-card: 18px;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-emphasis: 650;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+  --font-leading-solid: 1;
+  --font-leading-heading: 1.05;
+  --font-leading-compact: 1.3;
+  --font-leading-label: 1.35;
+  --font-leading-control: 1.4;
+  --font-leading-body: 1.6;
+  --font-leading-relaxed: 1.65;
+  --font-leading-prose: 1.7;
+  --font-leading-intro: 1.75;
+  --font-tracking-label: .08em;
+  --font-tracking-eyebrow: .12em;
+  --font-tracking-eyebrow-wide: .14em;
+  --font-tracking-heading: -.04em;
+  --font-tracking-display: -.055em;
 
+  /* Spacing — shared rhythm */
+  --space-3xs: 0.125rem;
   --space-2xs: 0.25rem;
+  --space-xs-tight: 0.375rem;
   --space-xs: 0.5rem;
+  --space-sm-tight: 0.625rem;
   --space-sm: 0.75rem;
+  --space-md-tight: 0.875rem;
   --space-md: 1rem;
+  --space-md-wide: 1.125rem;
+  --space-lg-tight: 1.25rem;
   --space-lg: 1.5rem;
   --space-xl: 2rem;
+  --space-xl-wide: 2.5rem;
   --space-2xl: 3rem;
+  --space-3xl: 4rem;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-tag: 6px;
+  --radius-control: 7px;
+  --radius-sm: 8px;
+  --radius-card: 0.6rem;
+  --radius-control-lg: 10px;
+  --radius-button: 12px;
+  --radius-popover: 14px;
+  --radius-md: 16px;
+  --radius-panel: 20px;
+  --radius-dialog: 22px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --radius-round: 50%;
 
-  --shadow-soft: 0 20px 55px rgba(15, 23, 42, 0.08);
+  /* Layout and shared control sizes */
+  --layout-container-width: 1200px;
+  --layout-page-gutter: var(--space-xl);
+  --layout-shell-gutter: 2rem;
+  --layout-header-height: 4.5rem;
+  --size-icon-button-sm: 28px;
+  --size-icon-button: 32px;
+  --size-control: 40px;
+  --size-control-lg: 42px;
+  --size-touch-target: 44px;
+  --size-glow-border: 640px;
+
+  /* Shadows and blur */
   --shadow-card: 0 12px 40px rgba(15, 23, 42, 0.09);
+  --shadow-popover: 0 20px 60px rgba(0, 0, 0, 0.35);
+  --shadow-header: 0 14px 40px rgb(0 0 0 / 0.08);
+  --shadow-header-open: 0 18px 50px rgb(0 0 0 / 0.16), 0 0 30px rgb(186 37 209 / 0.08);
+  --shadow-dialog: 0 24px 80px rgba(0, 0, 0, 0.52);
+  --shadow-portrait: 0 1.5rem 4rem rgba(0, 0, 0, 0.32), inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  --shadow-terminal: 0 5px 15px 0px rgba(0,0,0,0.6);
+  --size-blur-media: 8px;
+  --size-blur-popover: 10px;
+  --size-blur-backdrop: 16px;
+  --size-blur-border: 18px;
+  --size-blur-glow: 12px;
+  --size-blur-glow-soft: 14px;
+
+  /* Motion — exact existing timings */
+  --duration-pointer: 80ms;
+  --duration-instant: 120ms;
+  --duration-quick: 140ms;
+  --duration-brief: 150ms;
+  --duration-fast: 160ms;
+  --duration-normal: 180ms;
+  --duration-fade: 200ms;
+  --duration-medium: 220ms;
+  --duration-gentle: 250ms;
+  --duration-enter: 260ms;
+  --duration-collapse: 280ms;
+  --duration-slide: 300ms;
+  --duration-emphasized: 320ms;
+  --duration-reveal: 350ms;
+  --duration-expand: 420ms;
+  --ease-standard: ease;
+  --ease-linear: linear;
+  --ease-in-out: ease-in-out;
+  --ease-out: ease-out;
+  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expand: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-indicator: cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  /* Opacity */
+  --opacity-dim: .5;
+  --opacity-subtle: .55;
+  --opacity-muted: .6;
+  --opacity-soft: .7;
+  --opacity-subdued: .75;
+  --opacity-secondary: .8;
+  --opacity-readable: .85;
+  --opacity-emphasis: .9;
+
+  /* Layers — local stacking contexts retain their ordering */
+  --z-base: 0;
+  --z-content: 1;
+  --z-controls: 2;
+  --z-raised: 5;
+  --z-header: 20;
+  --z-popover: 50;
+  --z-overlay: 9999;
+  --z-cursor-dot: 10000;
+
+  /* Gradients */
+  --gradient-accent: linear-gradient(90deg, var(--color-accent-secondary), var(--color-accent));
+  --gradient-text: linear-gradient(to right, var(--color-accent-secondary), var(--color-accent), var(--color-accent-highlight), var(--color-accent-secondary));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,6 +275,11 @@
     --color-text-primary: var(--color-text-primary-dark);
     --color-text-secondary: var(--color-text-secondary-dark);
     --color-text-muted: var(--color-text-muted-dark);
-    /* --color-muted: var(--color-muted-dark); */
   }
+}
+@media (max-width: 900px) {
+  :root { --layout-header-height: 4.25rem; }
+}
+@media (max-width: 768px) {
+  :root { --layout-page-gutter: var(--space-md); }
 }

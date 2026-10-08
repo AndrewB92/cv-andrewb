@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 import styles from "./StatusBadge.module.css";
 
 type StatusBadgeProps = {
@@ -10,13 +12,13 @@ type StatusBadgeProps = {
 
 export function StatusBadge({
   text,
-  color = "#2ecc71",
+  color = "var(--color-success)",
   ping = true,
 }: StatusBadgeProps) {
   return (
     <div
       className={styles.badge}
-      style={{ ["--status-color" as any]: color }}
+      style={{ "--status-color": color } as CSSProperties}
       role="status"
       aria-live="polite"
     >

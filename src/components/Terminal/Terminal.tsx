@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import styles from "./Terminal.module.css";
 
 type TerminalProps = {
@@ -123,6 +123,7 @@ export function TerminalCode({
   language = "tsx",
   copyLabel = "Copy",
 }: TerminalCodeProps) {
+  const copyTimeout = useRef<number | undefined>(undefined);
   const [copied, setCopied] = useState(false);
 
   const lines = useMemo(() => code.replace(/\r\n/g, "\n").split("\n"), [code]);
@@ -137,8 +138,8 @@ async function handleCopy() {
     await navigator.clipboard.writeText(code);
     setCopied(true);
 
-    window.clearTimeout((handleCopy as any)._t);
-    (handleCopy as any)._t = window.setTimeout(() => setCopied(false), 1100);
+    window.clearTimeout(copyTimeout.current);
+    copyTimeout.current = window.setTimeout(() => setCopied(false), 1100);
   } catch {
     setCopied(false);
   }
@@ -159,8 +160,8 @@ async function handleCopy() {
             type="button"
             className={styles.iconBtn}
             onClick={handleCopy}
-            aria-label={copied ? "Copied" : "Copy terminal content"}
-            title={copied ? "Copied" : "Copy"}
+            aria-label={copied ? "Copied" : `${copyLabel} terminal content`}
+            title={copied ? "Copied" : copyLabel}
             >
             {copied ? <CheckIcon /> : <CopyIcon />}
         </button>

@@ -30,8 +30,6 @@ function getClientPromise(): Promise<MongoClient> {
   global._mongoClientPromise = client.connect().catch((error) => {
     global._mongoClientPromise = undefined;
 
-    console.error("Failed to initialize MongoDB client", error);
-
     throw error;
   });
 

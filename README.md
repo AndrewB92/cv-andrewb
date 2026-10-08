@@ -98,8 +98,6 @@ The website focuses on the areas most relevant to my work as a frontend and Word
 ```text
 src/
 ├── app/
-│   ├── api/
-│   │   └── projects/
 │   ├── contact/
 │   ├── projects/
 │   ├── layout.tsx
@@ -126,24 +124,15 @@ The project archive is powered by:
 GET /api/projects
 ```
 
-Supported query parameters include:
+The obsolete `/api/projects` endpoint has been removed; the site had no API consumers.
 
-```text
-?page=1
-?stack=Next.js
-```
+## Metadata and styles
 
 Example response:
 
-```json
-{
-  "projects": [],
-  "totalPages": 1,
-  "totalItems": 0,
-  "currentPage": 1,
-  "stackCounts": []
-}
-```
+`src/styles/tokens.css` contains shared colors, typography, spacing, radii, layout dimensions,
+shadows, motion and layers. Component-specific geometry and runtime animation variables stay
+local. Responsive breakpoint exceptions are documented in the token file to preserve layouts.
 
 The endpoint supports paginated results, technology filtering, total project counts, and stack usage statistics.
 

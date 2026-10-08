@@ -6,11 +6,10 @@
   margin: 0;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 16%, transparent);
-  border-radius: clamp(1rem, 3vw, 2rem);
-  background: #0a0d13;
+  border-radius: clamp(var(--radius-md), 3vw, 2rem);
+  background: var(--color-surface-portrait);
   box-shadow:
-    0 1.5rem 4rem rgba(0, 0, 0, 0.32),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+    var(--shadow-portrait);
   outline: none;
 }
 
@@ -21,7 +20,7 @@
   border-radius: inherit;
   background:
     linear-gradient(to top, rgba(4, 6, 12, 0.38), transparent 35%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 40%);
+    linear-gradient(135deg, var(--color-glass-highlight), transparent 40%);
   pointer-events: none;
 }
 
@@ -44,25 +43,25 @@
 }
 
 .canvas {
-  z-index: 1;
+  z-index: var(--z-content);
 }
 
 .caption {
   position: absolute;
-  z-index: 2;
+  z-index: var(--z-controls);
   right: 1rem;
   bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.45rem;
   padding: 0.45rem 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-pill);
   background: rgba(7, 9, 14, 0.72);
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--color-ink-caption);
   font-family: var(--font-geist-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
+  font-size: var(--font-size-micro);
+  letter-spacing: var(--font-tracking-label);
   text-transform: uppercase;
   pointer-events: none;
 }
@@ -72,7 +71,7 @@
   display: none;
   width: 0.4rem;
   height: 0.4rem;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: var(--color-accent);
 }
 

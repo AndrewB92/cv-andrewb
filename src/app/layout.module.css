@@ -26,16 +26,16 @@
 
 .mainContent {
   flex: 1;
-  padding: var(--space-2xl) var(--space-xl);
+  padding: var(--space-2xl) var(--layout-page-gutter);
 }
 
 .mainContent > * {
-  max-width: 1200px;
+  max-width: var(--layout-container-width);
   margin: 0 auto;
 }
 
 @media (max-width: 768px) {
   .mainContent {
-    padding: var(--space-xl) var(--space-md);
+    padding: var(--space-xl) var(--layout-page-gutter);
   }
 }

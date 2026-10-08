@@ -1,66 +1,19 @@
-import Link from "next/link";
 import styles from "./projects.module.css";
-import { getProjects, type Project, type ProjectCategory } from "@/data/profile";
+import { getPortfolioContent } from "@/data/profile";
+import { projectArchive, CATEGORY_LABELS, STATUS_LABELS, type ProjectSearchParams } from "@/data/projects";
+import { pageMetadata } from "@/config/metadata";
 import { ProjectsGallery } from "@/components/ProjectsGallery";
 import { ProjectImageSlider } from "@/components/portfolio/ProjectImageSlider";
-import { PROJECTS_PAGE_SIZE } from "@/config/ui";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 
-export const dynamic = "force-dynamic";
+export const metadata = pageMetadata("/projects", "Projects");
 
-type Props = {
-  searchParams: Promise<{ category?: string; page?: string }>;
-};
-
-const PROJECT_CATEGORIES: readonly ProjectCategory[] = [
-  "ecommerce",
-  "corporate",
-  "content-platform",
-  "education",
-];
-
-const CATEGORY_LABELS: Record<ProjectCategory, string> = {
-  ecommerce: "E-commerce",
-  corporate: "Corporate",
-  "content-platform": "Content platform",
-  education: "Education",
-};
-
-const STATUS_LABELS: Record<Project["status"], string> = {
-  production: "Production",
-  maintenance: "Ongoing maintenance",
-  archived: "Archived",
-  offline: "Offline",
-  private: "Private",
-};
-
-const isCategory = (value?: string): value is ProjectCategory =>
-  Boolean(value && PROJECT_CATEGORIES.includes(value as ProjectCategory));
-
-const normalizePage = (value: string | undefined, totalPages: number) => {
-  const parsed = Number(value ?? "1");
-  if (!Number.isFinite(parsed) || parsed < 1) return 1;
-  return Math.min(Math.floor(parsed), totalPages);
-};
+type Props = { searchParams: Promise<ProjectSearchParams> };
 
 export default async function ProjectsPage({ searchParams }: Props) {
   const params = await searchParams;
-  const projects = await getProjects();
-  const activeCategory = isCategory(params.category) ? params.category : null;
-
-  const categoryCounts = PROJECT_CATEGORIES.map((name) => ({
-    name,
-    count: projects.filter((project) => project.category === name).length,
-  })).filter((item) => item.count > 0);
-
-  const filtered = activeCategory
-    ? projects.filter((project) => project.category === activeCategory)
-    : projects;
-  const totalItems = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / PROJECTS_PAGE_SIZE));
-  const currentPage = normalizePage(params.page, totalPages);
-  const start = (currentPage - 1) * PROJECTS_PAGE_SIZE;
-  const initialProjects = filtered.slice(start, start + PROJECTS_PAGE_SIZE);
+  const { projects, available } = await getPortfolioContent();
+  const { categories, ...archive } = projectArchive(projects, params);
 
   const spotlightProjects = projects
     .filter((project) => project.spotlight)
@@ -70,18 +23,18 @@ export default async function ProjectsPage({ searchParams }: Props) {
   const technologiesCount = new Set(projects.flatMap((project) => project.stack)).size;
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.intro}>
         <div className={styles.introContent}>
           {/* <p className={styles.eyebrow}>Project archive</p> */}
           <h1>Project archive</h1>
           <p className={styles.description}>Commercial websites, content platforms, interactive interfaces, and modernization projects built across WordPress, WooCommerce, React, Next.js, and custom frontend architecture.</p>
         </div>
-        <dl className={styles.stats} aria-label="Project archive statistics">
+        {available ? <dl className={styles.stats} aria-label="Project archive statistics">
           <div><dt>Projects</dt><dd>{projects.length}</dd></div>
           <div><dt>In production</dt><dd>{productionCount}</dd></div>
           <div><dt>Technologies</dt><dd>{technologiesCount}</dd></div>
-        </dl>
+        </dl> : null}
       </header>
 
       {spotlightProjects.length ? (
@@ -131,8 +84,8 @@ export default async function ProjectsPage({ searchParams }: Props) {
                       {project.stack.map((item) => <li key={`${project.id}-${item}`}>{item}</li>)}
                     </ul>
                     <div className={styles.spotlightLinks}>
-                      <a href={project.link} target="_blank" rel="noreferrer">Visit website <span aria-hidden="true">↗</span></a>
-                      {project.github ? <a href={project.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a> : null}
+                      {project.link ? <a href={project.link} target="_blank" rel="noopener noreferrer">Visit website <span aria-hidden="true">↗</span></a> : null}
+                      {project.github ? <a href={project.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a> : null}
                     </div>
                   </div>
                 </div>
@@ -142,7 +95,9 @@ export default async function ProjectsPage({ searchParams }: Props) {
         </section>
       ) : null}
 
-      <ProjectsGallery categories={categoryCounts} initialData={{ projects: initialProjects, totalPages, totalItems, currentPage, activeCategory }} />
+      {available ? <ProjectsGallery categories={categories} initialData={archive} /> : (
+        <p role="status">Project information is temporarily unavailable. Please try again later or contact me.</p>
+      )}
 
       <section className={`${styles.contactCta} glow-border`} aria-labelledby="projects-contact-title">
         <div>
@@ -163,6 +118,6 @@ export default async function ProjectsPage({ searchParams }: Props) {
           Discuss a project
         </RainbowGlowLink>
       </section>
-    </main>
+    </div>
   );
 }

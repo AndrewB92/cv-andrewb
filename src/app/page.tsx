@@ -1,18 +1,16 @@
 // src/app/page.tsx
-import Link from "next/link";
-import Script from "next/script";
+import { Suspense } from "react";
+import { identity, siteMetadata } from "@/config/site";
 import styles from "./page.module.css";
 import { Section } from "@/components/Section";
 import {
   getPortfolioContent,
   type Project,
 } from "@/data/profile";
-// import { siteMetadata } from "@/config/site";
 import { MagicText } from "@/components/MagicText/MagicText";
 import { HeroMetaPopover } from "@/components/HeroMetaPopover";
 import { SkillsHoverList } from "@/components/SkillsHoverList";
 import { ExperienceSection } from "./ExperienceSection";
-import TypedRotator from "@/components/TypedRotator";
 import { Terminal, TerminalCode } from "@/components/Terminal/Terminal";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import { CalPopup } from "@/components/CalPopup/CalPopup";
@@ -48,11 +46,10 @@ const isHomepageFeaturedProject = (
   (project.status === "production" ||
     project.status === "maintenance");
 
-export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   // Single fetch: avoid calling getPortfolioContent() more than once.
-  const { profile, skills, projects, experiences } =
+  const { profile, skills, projects, experiences, available } =
     await getPortfolioContent();
 
   /**
@@ -67,9 +64,9 @@ export default async function HomePage() {
     .slice(0, 3);
 
   return (
-    <main>
+    <div>
       <article className={`${styles.hero} glow-border`}>
-        <Terminal path="~/andrew.dev/welcome.tsx">
+        <Terminal path={`~/${siteMetadata.domain}/welcome.tsx`}>
           <TerminalCode code={welcomeCode} language="tsx" />
         </Terminal>
 
@@ -103,7 +100,7 @@ export default async function HomePage() {
             </RainbowGlowLink>
 
             <RainbowGlowLink
-              href="https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link"
+              href={identity.resumeUrl}
               blob
               variant="flat"
               className={styles.flatButton}
@@ -138,7 +135,7 @@ export default async function HomePage() {
               </p>
 
               <p>
-                <strong>Timezone:</strong> EET (UTC+2)
+                <strong>Timezone:</strong> {identity.timezone}
               </p>
 
               <p>
@@ -148,7 +145,7 @@ export default async function HomePage() {
             </div>
           </HeroMetaPopover>
 
-          <StatusBadge text="Available" color="#2ecc71" />
+          <StatusBadge text="Available" />
         </div>
       </article>
 
@@ -160,10 +157,14 @@ export default async function HomePage() {
           title="Skills"
           description="My tech stack and tools I know how to use."
         >
-          <SkillsHoverList skills={skills} />
+          {available ? <SkillsHoverList skills={skills} /> : <p>Skills are temporarily unavailable.</p>}
         </Section>
 
-        <ExperienceSection experiences={experiences} />
+        {available ? <ExperienceSection experiences={experiences} /> : (
+          <Section id="experience" className="glow-border" eyebrow="Journey" title="Experience">
+            <p>Experience is temporarily unavailable.</p>
+          </Section>
+        )}
       </div>
 
       <Section
@@ -176,7 +177,7 @@ export default async function HomePage() {
         {featuredProjects.length > 0 ? (
           <PortfolioSection featuredProjects={featuredProjects} />
         ) : (
-          <p>No public featured projects are currently available.</p>
+          <p>{available ? "No public featured projects are currently available." : "Project information is temporarily unavailable. Please try again later or contact me."}</p>
         )}
 
         <RainbowGlowLink
@@ -192,12 +193,9 @@ export default async function HomePage() {
         </RainbowGlowLink>
       </Section>
 
-      <CalPopup
-        paramKey="meet"
-        linksByKey={{
-          "hour-meeting": "andrew-bielous-iyuwdo/hour-meeting",
-        }}
-      />
-    </main>
+      <Suspense fallback={null}>
+        <CalPopup paramKey="meet" />
+      </Suspense>
+    </div>
   );
 }

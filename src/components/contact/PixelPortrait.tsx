@@ -4,8 +4,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  type FocusEvent,
-  type PointerEvent,
 } from "react";
 
 import styles from "./PixelPortrait.module.css";
@@ -473,11 +471,11 @@ export function PixelPortrait({
     };
   }, [cancelAnimation, initialiseCanvas, src]);
 
-  const reveal = (_event?: PointerEvent | FocusEvent) => {
+  const reveal = () => {
     animateTo("clear", revealDurationMs);
   };
 
-  const pixelate = (_event?: PointerEvent | FocusEvent) => {
+  const pixelate = () => {
     animateTo("pixelated", pixelateDurationMs);
   };
 

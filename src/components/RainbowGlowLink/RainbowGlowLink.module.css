@@ -10,31 +10,31 @@
 :global(#highlights) .wrapper {
   display: block;
   width: fit-content;
-  margin: 2rem auto 0;
+  margin: var(--space-xl) auto 0;
 }
 
 .link {
   position: relative;
-  z-index: 2 !important;
+  z-index: var(--z-controls) !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--space-sm-tight);
   padding: var(--space-sm) var(--space-xl);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--font-size-control);
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  transition: transform 120ms linear;
+  transition: transform var(--duration-instant) var(--ease-linear);
 }
 
 .text {
   display: inline-block;
-  opacity: 0.8;
-  transition: opacity 120ms linear;
+  opacity: var(--opacity-secondary);
+  transition: opacity var(--duration-instant) var(--ease-linear);
 }
 
 .wrapper:hover .text {
@@ -48,19 +48,19 @@
 .icon {
   position: relative;
   display: grid;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
+  width: var(--size-icon-button-sm);
+  height: var(--size-icon-button-sm);
+  flex: 0 0 var(--size-icon-button-sm);
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-pill);
+  background: var(--color-glass-subtle);
+  color: var(--color-ink-secondary);
   transition:
-    transform 180ms ease,
-    background 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease;
+    transform var(--duration-normal) var(--ease-standard),
+    background var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard),
+    color var(--duration-normal) var(--ease-standard);
 }
 
 .icon svg {
@@ -92,20 +92,20 @@
 
 .wrapper:hover .icon,
 .wrapper:focus-within .icon {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.96);
+  border-color: var(--color-border-active);
+  background: var(--color-glass-active);
+  color: var(--color-ink-active);
 }
 
 .bg {
   position: absolute;
   inset: -1px;
-  z-index: 1 !important;
+  z-index: var(--z-content) !important;
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-surface-alt);
   transform: translateZ(0);
-  transition: opacity 250ms linear;
+  transition: opacity var(--duration-gentle) var(--ease-linear);
 }
 
 .bg::before {
@@ -114,15 +114,15 @@
   top: -20px;
   left: -20px;
   width: 56px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #ba25d1, #2563eb);
+  height: var(--size-control);
+  border-radius: var(--radius-button);
+  background: var(--gradient-accent);
   background-position: calc(var(--blob-mix) * 100%) 50%;
   background-size: 200% 100%;
   opacity: var(--spot-opacity);
-  filter: blur(14px);
+  filter: blur(var(--size-blur-glow-soft));
   transform: translate(var(--pointer-x), var(--pointer-y)) translateZ(0);
-  transition: opacity 160ms linear;
+  transition: opacity var(--duration-fast) var(--ease-linear);
   pointer-events: none;
 }
 
@@ -139,7 +139,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: 0 !important;
+  z-index: var(--z-base) !important;
   width: 90%;
   height: 70%;
   border-radius: var(--radius-md);
@@ -151,10 +151,10 @@
     #00c6ff 75%,
     #ff2cdf 100%
   ) 0 0 / 600% 600%;
-  filter: blur(12px);
+  filter: blur(var(--size-blur-glow));
   transform: translateZ(0) translateX(-50%) translateY(-50%);
-  animation: glowShift 8s ease infinite;
-  transition: filter 150ms linear;
+  animation: glowShift 8s var(--ease-standard) infinite;
+  transition: filter var(--duration-brief) var(--ease-linear);
 }
 
 .noGlow .glow {

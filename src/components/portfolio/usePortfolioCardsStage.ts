@@ -89,7 +89,7 @@ export function usePortfolioCardsStage(
     }
   }, []);
 
-  const getStageVariables = () => {
+  const getStageVariables = useCallback(() => {
     const stage = stageRef.current;
     if (!stage) return { gap: 20, sideGap: 0 };
 
@@ -99,9 +99,9 @@ export function usePortfolioCardsStage(
       sideGap:
         Number.parseFloat(styles.getPropertyValue("--side-gap")) || 0,
     };
-  };
+  }, []);
 
-  const writeDesktopPositions = () => {
+  const writeDesktopPositions = useCallback(() => {
     const stage = stageRef.current;
     if (!stage || isCompactViewport()) return;
 
@@ -120,9 +120,9 @@ export function usePortfolioCardsStage(
         `${Math.round(index * (cardWidth + gap))}px`,
       );
     });
-  };
+  }, [count, getStageVariables, isCompactViewport]);
 
-  const measureDesktopHeight = () => {
+  const measureDesktopHeight = useCallback(() => {
     const stage = stageRef.current;
     if (!stage || isCompactViewport()) return;
 
@@ -131,7 +131,7 @@ export function usePortfolioCardsStage(
     let maximumHeight = 0;
     for (const card of cardRefs.current) {
       if (!card) continue;
-      card.style.height = "auto";
+      card.style.setProperty("height", "auto");
       maximumHeight = Math.max(
         maximumHeight,
         Math.ceil(card.getBoundingClientRect().height),
@@ -142,12 +142,12 @@ export function usePortfolioCardsStage(
       const height = `${maximumHeight}px`;
       stage.style.setProperty("--cards-h", height);
       for (const card of cardRefs.current) {
-        if (card) card.style.height = height;
+        if (card) card.style.setProperty("height", height);
       }
     }
 
     stage.removeAttribute("data-measuring");
-  };
+  }, [isCompactViewport]);
 
   const computeExpandedGeometry = useCallback(
     (index: number) => {
@@ -172,7 +172,7 @@ export function usePortfolioCardsStage(
         `${Math.round(sideGap - baseX)}px`,
       );
     },
-    [isCompactViewport],
+    [getStageVariables, isCompactViewport],
   );
 
   const layoutDesktop = useCallback(async () => {
@@ -196,7 +196,9 @@ export function usePortfolioCardsStage(
     cancelScheduledLayout,
     computeExpandedGeometry,
     isCompactViewport,
+    measureDesktopHeight,
     resetAllCardStyles,
+    writeDesktopPositions,
   ]);
 
   const scheduleDesktopLayout = useCallback(() => {

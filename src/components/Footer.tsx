@@ -6,7 +6,7 @@ import {
 } from "@/components/RainbowGlowLink/RainbowGlowLink";
 import {
   footerNavigation,
-  siteMetadata,
+  identity,
   socialLinks,
 } from "@/config/site";
 
@@ -38,7 +38,7 @@ export function Footer() {
             </p>
             <br /><br />
             <RainbowGlowLink
-              href="https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=drive_link"
+              href={identity.resumeUrl}
               blob
               variant="flat"
               className={styles.flatButton}
@@ -106,7 +106,7 @@ export function Footer() {
           </nav>
 
           <p className={styles.credit}>
-            <span>© {currentYear} Andrew Bielous.</span>
+            <span>© {currentYear} {identity.name}.</span>
 
             <span className={styles.madeBy}>
               Made with

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { siteMetadata } from "@/config/site";
 
 type TypedLogoProps = {
   text?: string;
@@ -20,7 +21,7 @@ function isHTMLElement(v: Element | null): v is HTMLElement {
 }
 
 export default function TypedLogo({
-  text = "andrew-b.is-a.dev",
+  text = siteMetadata.domain,
   startDelay = 450,
   baseSpeed = 120,
   variance = 35,
@@ -53,7 +54,6 @@ export default function TypedLogo({
       return;
     }
 
-    const prefix = prefixEl;
     const typed = typedEl;
     const suffix = suffixEl;
     const cursor = cursorEl;
@@ -146,7 +146,7 @@ export default function TypedLogo({
   }, [text, startDelay, baseSpeed, variance, blinkMs]);
 
   return (
-    <div className="cv-logo" ref={rootRef} aria-label="<andrew.dev/> logo">
+    <div className="cv-logo" ref={rootRef} aria-label={`<${text}/> logo`}>
       <span className="cv-logo__prefix">&lt;</span>
       <span className="cv-logo__typed" aria-hidden="true" />
       <span className="cv-logo__suffix">/&gt;</span>

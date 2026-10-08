@@ -7,7 +7,7 @@
 }
 
 :global(#highlights) {
-  margin-top: 48px;
+  margin-top: var(--space-2xl);
 }
 
 .header {
@@ -17,15 +17,15 @@
 }
 
 .eyebrow {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.3em;
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .title {
-  font-size: 1.75rem;
+  font-size: var(--font-size-section);
   color: var(--color-text-primary);
   margin: 0;
 }
@@ -33,7 +33,7 @@
 .description {
   color: var(--color-text-secondary);
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 .body {
