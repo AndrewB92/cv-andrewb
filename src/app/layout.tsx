@@ -6,6 +6,7 @@ import styles from "./layout.module.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import ConsoleIntro from "@/components/ConsoleIntro/ConsoleIntro";
 
 import GlowBorderProvider from "./GlowBorderProvider";
@@ -30,6 +31,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gaId = process.env.GA_ID;
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -53,6 +56,7 @@ export default function RootLayout({
         </div>
 
         <ConsoleIntro />
+        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>
     </html>
   );
