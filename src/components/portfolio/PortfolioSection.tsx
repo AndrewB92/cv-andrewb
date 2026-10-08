@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { trackEvent } from "@/lib/analytics/client";
+import { analyticsAttributes } from "@/lib/analytics/events";
 import styles from "./PortfolioSection.module.css";
 import { ProjectImageSlider } from "./ProjectImageSlider";
 import { usePortfolioCardsStage } from "./usePortfolioCardsStage";
@@ -191,6 +193,7 @@ export default function PortfolioSection({
                         <div className={styles.cardActionsExpanded}>
                           <a
                             href={project.link}
+                            {...analyticsAttributes("project_link_click", { project: project.name, destination: "live_site", source: "home_featured" })}
                             className={styles.btn}
                             target="_blank"
                             rel="noreferrer"
@@ -201,6 +204,7 @@ export default function PortfolioSection({
                           {project.github ? (
                             <a
                               href={project.github}
+                              {...analyticsAttributes("project_link_click", { project: project.name, destination: "github", source: "home_featured" })}
                               className={[styles.btn, styles.btnOutline].join(
                                 " ",
                               )}
@@ -218,6 +222,7 @@ export default function PortfolioSection({
                   <div className={styles.cardActions}>
                     <a
                       href={project.link}
+                      {...analyticsAttributes("project_link_click", { project: project.name, destination: "live_site", source: "home_featured" })}
                       className={styles.btn}
                       target="_blank"
                       rel="noreferrer"
@@ -228,6 +233,7 @@ export default function PortfolioSection({
                     {project.github ? (
                       <a
                         href={project.github}
+                        {...analyticsAttributes("project_link_click", { project: project.name, destination: "github", source: "home_featured" })}
                         className={[styles.btn, styles.btnOutline].join(" ")}
                         target="_blank"
                         rel="noreferrer"
@@ -241,7 +247,12 @@ export default function PortfolioSection({
                       className={styles.cardToggle}
                       aria-expanded={isActive && isExpanded}
                       aria-controls={detailsId}
-                      onClick={() => onToggle(index)}
+                      onClick={() => {
+                        if (!isActive) {
+                          trackEvent("project_details_open", { project: project.name, source: "home_featured" });
+                        }
+                        onToggle(index);
+                      }}
                       data-role="toggle"
                     >
                       {isCompactLayout && isActive && isExpanded

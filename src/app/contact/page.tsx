@@ -15,6 +15,7 @@ import {
 import { SiGravatar } from "react-icons/si";
 
 import { PixelPortrait } from "@/components/contact/PixelPortrait";
+import { analyticsAttributes, type AnalyticsAttributes } from "@/lib/analytics/events";
 import { identity } from "@/config/site";
 import { pageMetadata } from "@/config/metadata";
 import styles from "./contact.module.css";
@@ -32,6 +33,7 @@ type ContactLink = {
   icon: React.ReactNode;
   external?: boolean;
   featured?: boolean;
+  analytics: AnalyticsAttributes;
 };
 
 type ContactGroup = {
@@ -51,6 +53,7 @@ function ContactLinkCard({ link }: { link: ContactLink }) {
         .filter(Boolean)
         .join(" ")}
       href={link.url}
+      {...link.analytics}
       target={link.external ? "_blank" : undefined}
       rel={link.external ? "noopener noreferrer" : undefined}
     >
@@ -79,6 +82,7 @@ export default function ContactPage() {
       links: [
         {
           label: "Email",
+          analytics: analyticsAttributes("contact_click", { channel: "email", source: "contact_grid" }),
           description: email,
           url: `mailto:${email}`,
           icon: <HiOutlineEnvelope />,
@@ -86,6 +90,7 @@ export default function ContactPage() {
         },
         {
           label: "Schedule a call",
+          analytics: analyticsAttributes("schedule_click", { source: "contact_grid", meeting_type: "general" }),
           description: "on Cal.com",
           url: identity.scheduling.cal,
           icon: <FaCalendarAlt />,
@@ -99,6 +104,7 @@ export default function ContactPage() {
       links: [
         {
           label: "Telegram",
+          analytics: analyticsAttributes("contact_click", { channel: "telegram", source: "contact_grid" }),
           description: "",
           url: identity.socials.telegram,
           icon: <FaTelegramPlane />,
@@ -106,6 +112,7 @@ export default function ContactPage() {
         },
         {
           label: "WhatsApp",
+          analytics: analyticsAttributes("contact_click", { channel: "whatsapp", source: "contact_grid" }),
           description: "",
           url: identity.socials.whatsapp,
           icon: <FaWhatsapp />,
@@ -119,6 +126,7 @@ export default function ContactPage() {
       links: [
         {
           label: "GitHub",
+          analytics: analyticsAttributes("profile_click", { platform: "github", source: "contact_grid" }),
           description: "Repositories and work",
           url: identity.socials.github,
           icon: <FaGithub />,
@@ -126,6 +134,7 @@ export default function ContactPage() {
         },
         {
           label: "LinkedIn",
+          analytics: analyticsAttributes("profile_click", { platform: "linkedin", source: "contact_grid" }),
           description: "Background and experience",
           url: identity.socials.linkedin,
           icon: <FaLinkedinIn />,
@@ -133,6 +142,7 @@ export default function ContactPage() {
         },
         {
           label: "CodePen",
+          analytics: analyticsAttributes("profile_click", { platform: "codepen", source: "contact_grid" }),
           description: "Concepts & experiments",
           url: identity.socials.codepen,
           icon: <FaCodepen />,
@@ -140,6 +150,7 @@ export default function ContactPage() {
         },
         {
           label: "Gravatar",
+          analytics: analyticsAttributes("profile_click", { platform: "gravatar", source: "contact_grid" }),
           description: "Public profile",
           url: identity.socials.gravatar,
           icon: <SiGravatar />,
@@ -166,6 +177,7 @@ export default function ContactPage() {
           <div className={styles.primaryActions}>
             <RainbowGlowLink
               href={`mailto:${email}`}
+              {...analyticsAttributes("contact_click", { channel: "email", source: "contact_hero" })}
               blob
               variant="flat"
               className={styles.flatButton}
@@ -178,6 +190,7 @@ export default function ContactPage() {
 
             <RainbowGlowLink
               href={identity.socials.telegram}
+              {...analyticsAttributes("contact_click", { channel: "telegram", source: "contact_hero" })}
               blob
               variant="glow"
               className={styles.flatButton}

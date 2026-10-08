@@ -29,6 +29,7 @@ import {
 } from "react-icons/si";
 
 import styles from "./RainbowGlowLink.module.css";
+import type { AnalyticsAttributes } from "@/lib/analytics/events";
 
 export type RainbowGlowLinkIconName =
   | "arrow"
@@ -141,7 +142,7 @@ type RainbowGlowLinkProps = {
   iconAriaLabel?: string;
   threshold?: number;
   rootMargin?: string;
-} & ForwardedAnchorProps;
+} & ForwardedAnchorProps & AnalyticsAttributes;
 
 export function RainbowGlowLink({
   href,
@@ -162,6 +163,7 @@ export function RainbowGlowLink({
   "aria-label": ariaLabel,
   title,
   download,
+  ...dataAttributes
 }: RainbowGlowLinkProps) {
   const wrapRef = useRef<HTMLSpanElement | null>(null);
   const [inView, setInView] = useState(true);
@@ -415,6 +417,7 @@ export function RainbowGlowLink({
       data-paused={inView ? "0" : "1"}
     >
       <Link
+        {...dataAttributes}
         href={href}
         className={styles.link}
         target={target}

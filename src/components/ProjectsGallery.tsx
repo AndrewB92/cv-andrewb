@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { analyticsAttributes } from "@/lib/analytics/events";
 import { CATEGORY_LABELS, STATUS_LABELS, projectsHref } from "@/data/projects";
 import styles from "./ProjectsGallery.module.css";
 import type { Project, ProjectCategory } from "@/data/profile";
@@ -43,13 +44,13 @@ export function ProjectsGallery({ categories, initialData }: Props) {
 
         <ul className={styles.filters} aria-label="Filter projects by category">
           <li>
-            <Link href={projectsHref(null)} scroll={false} className={styles.filterButton} aria-current={initialData.activeCategory === null ? "page" : undefined}>
+            <Link href={projectsHref(null)} {...analyticsAttributes("projects_filter", { category: "all" })} scroll={false} className={styles.filterButton} aria-current={initialData.activeCategory === null ? "page" : undefined}>
               <span>All</span><small>{totalArchiveItems}</small>
             </Link>
           </li>
           {categories.map((category) => (
             <li key={category.name}>
-              <Link href={projectsHref(category.name)} scroll={false} className={styles.filterButton} aria-current={initialData.activeCategory === category.name ? "page" : undefined}>
+              <Link href={projectsHref(category.name)} {...analyticsAttributes("projects_filter", { category: category.name })} scroll={false} className={styles.filterButton} aria-current={initialData.activeCategory === category.name ? "page" : undefined}>
                 <span>{CATEGORY_LABELS[category.name]}</span><small>{category.count}</small>
               </Link>
             </li>
@@ -110,6 +111,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
                         {project.link ? (
                           <a
                             href={project.link}
+                            {...analyticsAttributes("project_link_click", { project: project.name, destination: "live_site", source: "projects_archive" })}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -121,6 +123,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
                         {project.github ? (
                           <a
                             href={project.github}
+                            {...analyticsAttributes("project_link_click", { project: project.name, destination: "github", source: "projects_archive" })}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -132,6 +135,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
                         {project.codepen ? (
                           <a
                             href={project.codepen}
+                            {...analyticsAttributes("project_link_click", { project: project.name, destination: "codepen", source: "projects_archive" })}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -160,11 +164,11 @@ export function ProjectsGallery({ categories, initialData }: Props) {
       {initialData.totalPages > 1 ? (
         <nav className={styles.pagination} aria-label="Projects pagination">
           {initialData.currentPage > 1 ? (
-            <Link className={styles.pageLink} href={projectsHref(initialData.activeCategory, initialData.currentPage - 1)} scroll={false} rel="prev">Previous</Link>
+            <Link className={styles.pageLink} href={projectsHref(initialData.activeCategory, initialData.currentPage - 1)} {...analyticsAttributes("projects_pagination", { page: initialData.currentPage - 1, direction: "previous", category: initialData.activeCategory ?? "all" })} scroll={false} rel="prev">Previous</Link>
           ) : <span className={styles.pageLink} aria-disabled="true">Previous</span>}
           <p className={styles.status}>Page {initialData.currentPage} of {initialData.totalPages}</p>
           {initialData.currentPage < initialData.totalPages ? (
-            <Link className={styles.pageLink} href={projectsHref(initialData.activeCategory, initialData.currentPage + 1)} scroll={false} rel="next">Next</Link>
+            <Link className={styles.pageLink} href={projectsHref(initialData.activeCategory, initialData.currentPage + 1)} {...analyticsAttributes("projects_pagination", { page: initialData.currentPage + 1, direction: "next", category: initialData.activeCategory ?? "all" })} scroll={false} rel="next">Next</Link>
           ) : <span className={styles.pageLink} aria-disabled="true">Next</span>}
         </nav>
       ) : null}

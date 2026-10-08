@@ -1,5 +1,6 @@
 // src/app/page.tsx
 import { Suspense } from "react";
+import { analyticsAttributes } from "@/lib/analytics/events";
 import { identity, siteMetadata } from "@/config/site";
 import styles from "./page.module.css";
 import { Section } from "@/components/Section";
@@ -94,6 +95,7 @@ export default async function HomePage() {
           <div className={styles.heroActions}>
             <RainbowGlowLink
               href="/?meet=hour-meeting"
+              {...analyticsAttributes("schedule_click", { source: "home_hero", meeting_type: "intro_call" })}
               glow
               blob
               iconPosition="end"
@@ -105,6 +107,7 @@ export default async function HomePage() {
 
             <RainbowGlowLink
               href={identity.resumeUrl}
+              {...analyticsAttributes("resume_click", { source: "home_hero" })}
               blob
               variant="flat"
               className={styles.flatButton}
@@ -144,7 +147,7 @@ export default async function HomePage() {
 
               <p>
                 <strong>Email:</strong>{" "}
-                <a href={`mailto:${profile.email}`}>{profile.email}</a>
+                <a href={`mailto:${profile.email}`} {...analyticsAttributes("contact_click", { channel: "email", source: "home_meta" })}>{profile.email}</a>
               </p>
             </div>
           </HeroMetaPopover>
@@ -186,6 +189,7 @@ export default async function HomePage() {
 
         <RainbowGlowLink
           href="/projects"
+          {...analyticsAttributes("cta_click", { cta: "view_all_projects", source: "home_highlights" })}
           blob
           variant="flat"
           className={styles.flatButton}

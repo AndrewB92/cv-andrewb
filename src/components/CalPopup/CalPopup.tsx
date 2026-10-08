@@ -12,6 +12,8 @@ import {
 
 import styles from "./CalPopup.module.css";
 import { schedulingTabs as CAL_TABS } from "@/config/site";
+import { trackEvent } from "@/lib/analytics/client";
+import type { MeetingType } from "@/lib/analytics/events";
 
 const Cal = dynamic(
   () => import("@calcom/embed-react").then((module) => module.default),
@@ -22,6 +24,11 @@ const Cal = dynamic(
 );
 
 type CalTabKey = (typeof CAL_TABS)[number]["key"];
+
+const MEETING_TYPES: Record<CalTabKey, MeetingType> = {
+  "intro-call": "intro_call",
+  "career-conversation": "career_conversation",
+};
 
 type CalPopupProps = {
   /** URL parameter used to open and select the popup tab. */
@@ -151,6 +158,7 @@ export function CalPopup({
   const selectTab = useCallback(
     (key: CalTabKey) => {
       if (key === activeTab) return;
+      trackEvent("schedule_tab_change", { meeting_type: MEETING_TYPES[key] });
       setActiveTab(key);
       updateUrl(key);
     },
@@ -159,7 +167,7 @@ export function CalPopup({
 
   useEffect(() => {
     // Search params are the source of truth for direct links and browser history.
-    // eslint-disable react-hooks/set-state-in-effect -- Mirror direct links and browser history into modal state.
+    /* eslint-disable react-hooks/set-state-in-effect -- Mirror direct links and browser history into modal state. */
     const requestedTab = resolveTabKey(searchParams.get(paramKey));
 
     if (requestedTab) {
@@ -169,7 +177,7 @@ export function CalPopup({
     }
 
     setIsOpen(false);
-    // eslint-enable react-hooks/set-state-in-effect
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [paramKey, searchParams]);
 
   useEffect(() => {
@@ -235,12 +243,24 @@ export function CalPopup({
     if (!isOpen) return;
 
     let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
 
     void import("@calcom/embed-react").then(async ({ getCalApi }) => {
       if (cancelled) return;
 
       const cal = await getCalApi({ namespace: activeTab });
       if (cancelled) return;
+
+      // Never read the event payload. One completion per mounted meeting embed.
+      let bookingTracked = false;
+      const onBookingComplete = () => {
+        if (cancelled || bookingTracked) return;
+        bookingTracked = true;
+        trackEvent("booking_complete", { meeting_type: MEETING_TYPES[activeTab] });
+      };
+      const subscription = { action: "bookingSuccessfulV2", callback: onBookingComplete } as const;
+      cal("on", subscription);
+      unsubscribe = () => cal("off", subscription);
 
       const tokens = getComputedStyle(document.documentElement);
       cal("ui", {
@@ -251,10 +271,17 @@ export function CalPopup({
         hideEventTypeDetails: false,
         layout: "month_view",
       });
+    }).catch(() => {
+      // Blocked embeds or analytics must not break dialog interaction.
     });
 
     return () => {
       cancelled = true;
+      try {
+        unsubscribe?.();
+      } catch {
+        // The callback is already inactive even if the embed failed to unsubscribe.
+      }
     };
   }, [activeTab, isOpen]);
 

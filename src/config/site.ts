@@ -1,4 +1,5 @@
 import type { RainbowGlowLinkIconName } from "@/components/RainbowGlowLink/RainbowGlowLink";
+import { analyticsAttributes, type AnalyticsAttributes } from "@/lib/analytics/events";
 
 type Identity = {
   name: string;
@@ -67,9 +68,9 @@ export const primaryNavigation = [
   { label: "Contact", href: "/contact" },
 ];
 
-export const footerNavigation: { label: string; href: string; external?: boolean }[] = [
+export const footerNavigation: { label: string; href: string; external?: boolean; analytics?: AnalyticsAttributes }[] = [
   ...primaryNavigation,
-  { label: "Download CV", href: identity.resumeUrl, external: true },
+  { label: "Download CV", href: identity.resumeUrl, external: true, analytics: analyticsAttributes("resume_click", { source: "footer" }) },
 ];
 
 type SocialLink = {
@@ -78,14 +79,15 @@ type SocialLink = {
   href: string;
   icon: RainbowGlowLinkIconName;
   external: boolean;
+  analytics: AnalyticsAttributes;
 };
 
 export const socialLinks = [
-  { label: "GitHub", description: "Repositories and source code", href: identity.socials.github, icon: "github", external: true },
-  { label: "CodePen", description: "Frontend concepts and experiments", href: identity.socials.codepen, icon: "codepen", external: true },
-  { label: "LinkedIn", description: "Experience and professional profile", href: identity.socials.linkedin, icon: "linkedin", external: true },
-  { label: "Email", description: identity.email, href: `mailto:${identity.email}`, icon: "mail", external: false },
-  { label: "Telegram", description: "Direct message", href: identity.socials.telegram, icon: "telegram", external: true },
-  { label: "Cal.com", description: "Schedule an introductory call", href: identity.scheduling.cal, icon: "calendar", external: true },
-  { label: "WhatsApp", description: "Quick conversation", href: identity.socials.whatsapp, icon: "whatsapp", external: true },
+  { label: "GitHub", description: "Repositories and source code", href: identity.socials.github, icon: "github", external: true, analytics: analyticsAttributes("profile_click", { platform: "github", source: "footer" }) },
+  { label: "CodePen", description: "Frontend concepts and experiments", href: identity.socials.codepen, icon: "codepen", external: true, analytics: analyticsAttributes("profile_click", { platform: "codepen", source: "footer" }) },
+  { label: "LinkedIn", description: "Experience and professional profile", href: identity.socials.linkedin, icon: "linkedin", external: true, analytics: analyticsAttributes("profile_click", { platform: "linkedin", source: "footer" }) },
+  { label: "Email", description: identity.email, href: `mailto:${identity.email}`, icon: "mail", external: false, analytics: analyticsAttributes("contact_click", { channel: "email", source: "footer" }) },
+  { label: "Telegram", description: "Direct message", href: identity.socials.telegram, icon: "telegram", external: true, analytics: analyticsAttributes("contact_click", { channel: "telegram", source: "footer" }) },
+  { label: "Cal.com", description: "Schedule an introductory call", href: identity.scheduling.cal, icon: "calendar", external: true, analytics: analyticsAttributes("schedule_click", { source: "footer", meeting_type: "general" }) },
+  { label: "WhatsApp", description: "Quick conversation", href: identity.socials.whatsapp, icon: "whatsapp", external: true, analytics: analyticsAttributes("contact_click", { channel: "whatsapp", source: "footer" }) },
 ] satisfies readonly SocialLink[];

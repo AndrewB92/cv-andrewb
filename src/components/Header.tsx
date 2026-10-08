@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { analyticsAttributes } from "@/lib/analytics/events";
 import { usePathname } from "next/navigation";
 import {
   useEffect,
@@ -253,6 +254,7 @@ function MeetingLink({ className, tabIndex, onClick }: MeetingLinkProps) {
   return (
     <Link
       href={identity.scheduling.cal}
+      {...analyticsAttributes("schedule_click", { source: "header", meeting_type: "general" })}
       className={`${styles.meetingLink} ${className ?? ""}`}
       tabIndex={tabIndex}
       onClick={onClick}

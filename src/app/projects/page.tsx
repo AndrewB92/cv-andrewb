@@ -1,4 +1,5 @@
 import styles from "./projects.module.css";
+import { analyticsAttributes } from "@/lib/analytics/events";
 import { getPortfolioContent } from "@/data/profile";
 import { projectArchive, CATEGORY_LABELS, STATUS_LABELS, type ProjectSearchParams } from "@/data/projects";
 import { pageMetadata } from "@/config/metadata";
@@ -88,8 +89,8 @@ export default async function ProjectsPage({ searchParams }: Props) {
                       {project.stack.map((item) => <li key={`${project.id}-${item}`}>{item}</li>)}
                     </ul>
                     <div className={styles.spotlightLinks}>
-                      {project.link ? <a href={project.link} target="_blank" rel="noopener noreferrer">Visit website <span aria-hidden="true">↗</span></a> : null}
-                      {project.github ? <a href={project.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a> : null}
+                      {project.link ? <a href={project.link} {...analyticsAttributes("project_link_click", { project: project.name, destination: "live_site", source: "projects_spotlight" })} target="_blank" rel="noopener noreferrer">Visit website <span aria-hidden="true">↗</span></a> : null}
+                      {project.github ? <a href={project.github} {...analyticsAttributes("project_link_click", { project: project.name, destination: "github", source: "projects_spotlight" })} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a> : null}
                     </div>
                   </div>
                 </div>
@@ -112,6 +113,7 @@ export default async function ProjectsPage({ searchParams }: Props) {
         {/* <Link href="/contact" className={styles.contactLink}>Discuss a project <span aria-hidden="true">→</span></Link> */}
         <RainbowGlowLink
           href="/contact"
+          {...analyticsAttributes("cta_click", { cta: "discuss_project", source: "projects_bottom" })}
           blob
           variant="flat"
           className={styles.flatButton}
