@@ -59,7 +59,7 @@ function ExperiencePanel({
     window.addEventListener("resize", onResize);
 
     // In case fonts load and change height
-    const fonts = (document as any).fonts;
+    const fonts = document.fonts;
     const fontsReady =
       fonts && typeof fonts.ready?.then === "function" ? fonts.ready : null;
 
@@ -78,9 +78,8 @@ function ExperiencePanel({
       className={styles.expPanel}
       aria-hidden={!open}
       style={{
-        overflow: "hidden",
         maxHeight: reducedMotion ? "none" : `${maxHeight}px`,
-        transition: reducedMotion ? "none" : "max-height 280ms ease",
+        transition: reducedMotion ? "none" : "max-height var(--duration-collapse) var(--ease-standard)",
       }}
     >
       {children}
@@ -120,7 +119,7 @@ export function ExperienceSection({ experiences }: { experiences: Experience[] }
               <p>{experience.role}</p>
 
               <ExperiencePanel id={achievementsId} open={isOpen}>
-                <ul className={styles.experienceAchievements} style={{ marginTop: 0 }}>
+                <ul className={styles.experienceAchievements}>
                   {experience.achievements.map((achievement, i) => (
                     <li key={`${experience.company}-${index}-${i}`}>{achievement}</li>
                   ))}

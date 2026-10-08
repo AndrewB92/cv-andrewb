@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/config/metadata";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
@@ -23,40 +23,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Andrew Bielous • Frontend Developer",
-
-  description:
-    "Frontend developer building performant web experiences with Next.js, React, TypeScript, and WordPress.",
-
-  metadataBase: new URL("https://andrew-b.is-a.dev"),
-
-  openGraph: {
-    title: "Andrew Bielous • Frontend Developer",
-    description:
-      "Frontend developer focused on performant, maintainable web experiences.",
-    url: "https://andrew-b.is-a.dev",
-    siteName: "Andrew Bielous",
-    type: "website",
-
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Andrew Bielous — Frontend Developer",
-      },
-    ],
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "Andrew Bielous • Frontend Developer",
-    description:
-      "Frontend developer focused on performant, maintainable web experiences.",
-    images: ["/og-image.png"],
-  },
-};
+export const metadata = pageMetadata("/");
 
 export default function RootLayout({
   children,
@@ -85,27 +52,7 @@ export default function RootLayout({
           <Footer />
         </div>
 
-        <ConsoleIntro
-          config={{
-            name: "Andrew Bielous",
-            role: "Frontend Developer",
-            status: "available for opportunities",
-
-            email: "babujjioh@gmail.com",
-
-            stack: [
-              "Next.js",
-              "React",
-              "TypeScript",
-              "WordPress",
-            ],
-
-            githubUrl: "https://github.com/AndrewB92",
-            linkedinUrl: "https://www.linkedin.com/in/bielousandrew",
-
-            version: "1.0.0",
-          }}
-        />
+        <ConsoleIntro />
       </body>
     </html>
   );

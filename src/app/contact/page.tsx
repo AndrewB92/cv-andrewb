@@ -11,19 +11,17 @@ import {
   HiOutlineClock,
   HiOutlineEnvelope,
   HiOutlineMapPin,
-  HiOutlinePhone,
 } from "react-icons/hi2";
 import { SiGravatar } from "react-icons/si";
 
 import { PixelPortrait } from "@/components/contact/PixelPortrait";
-import { getProfile } from "@/data/profile";
-import { contactDefaults } from "@/config/site";
+import { identity } from "@/config/site";
+import { pageMetadata } from "@/config/metadata";
 import styles from "./contact.module.css";
 import { RainbowGlowLink } from "@/components/RainbowGlowLink/RainbowGlowLink";
 
-export const dynamic = "force-dynamic";
+export const metadata = pageMetadata("/contact", "Contact");
 
-const PHONE = "+380681025393";
 const PORTRAIT_URL =
   "https://res.cloudinary.com/dnefeqtp4/image/upload/v1785161524/avatar-3_hyb5me.webp";
 
@@ -53,7 +51,7 @@ function ContactLinkCard({ link }: { link: ContactLink }) {
         .join(" ")}
       href={link.url}
       target={link.external ? "_blank" : undefined}
-      rel={link.external ? "noreferrer" : undefined}
+      rel={link.external ? "noopener noreferrer" : undefined}
     >
       <span className={styles.contactIcon} aria-hidden="true">
         {link.icon}
@@ -69,11 +67,8 @@ function ContactLinkCard({ link }: { link: ContactLink }) {
   );
 }
 
-export default async function ContactPage() {
-  const profile = await getProfile();
-
-  const email = profile.email ?? contactDefaults.email;
-  const location = profile.location ?? contactDefaults.location;
+export default function ContactPage() {
+  const { email, location } = identity;
 
   const groups: ContactGroup[] = [
     {
@@ -87,16 +82,10 @@ export default async function ContactPage() {
           icon: <HiOutlineEnvelope />,
           featured: true,
         },
-        // {
-        //   label: "Phone",
-        //   description: PHONE,
-        //   url: `tel:${PHONE}`,
-        //   icon: <HiOutlinePhone />,
-        // },
         {
           label: "Schedule a call",
           description: "on Cal.com",
-          url: "https://cal.com/andrew-bielous",
+          url: identity.scheduling.cal,
           icon: <FaCalendarAlt />,
           featured: true,
         },
@@ -109,14 +98,14 @@ export default async function ContactPage() {
         {
           label: "Telegram",
           description: "",
-          url: "https://t.me/pm4life",
+          url: identity.socials.telegram,
           icon: <FaTelegramPlane />,
           external: true,
         },
         {
           label: "WhatsApp",
           description: "",
-          url: "https://wa.me/380681025393",
+          url: identity.socials.whatsapp,
           icon: <FaWhatsapp />,
           external: true,
         },
@@ -129,28 +118,28 @@ export default async function ContactPage() {
         {
           label: "GitHub",
           description: "Repositories and work",
-          url: "https://github.com/AndrewB92",
+          url: identity.socials.github,
           icon: <FaGithub />,
           external: true,
         },
         {
           label: "LinkedIn",
           description: "Background and experience",
-          url: "https://linkedin.com/in/bielousandrew",
+          url: identity.socials.linkedin,
           icon: <FaLinkedinIn />,
           external: true,
         },
         {
           label: "CodePen",
           description: "Concepts & experiments",
-          url: "https://codepen.io/bielous-andrew",
+          url: identity.socials.codepen,
           icon: <FaCodepen />,
           external: true,
         },
         {
           label: "Gravatar",
           description: "Public profile",
-          url: "https://gravatar.com/babujioh",
+          url: identity.socials.gravatar,
           icon: <SiGravatar />,
           external: true,
         },
@@ -159,7 +148,7 @@ export default async function ContactPage() {
   ];
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <section className={`${styles.hero} glow-border`} aria-labelledby="contact-title">
         <div className={styles.heroContent}>
           {/* <p className={styles.eyebrow}>Contact</p> */}
@@ -174,7 +163,7 @@ export default async function ContactPage() {
 
           <div className={styles.primaryActions}>
             <RainbowGlowLink
-              href="mailto:${email}"
+              href={`mailto:${email}`}
               blob
               variant="flat"
               className={styles.flatButton}
@@ -186,7 +175,7 @@ export default async function ContactPage() {
             </RainbowGlowLink>
 
             <RainbowGlowLink
-              href="https://t.me/pm4life"
+              href={identity.socials.telegram}
               blob
               variant="glow"
               className={styles.flatButton}
@@ -220,7 +209,7 @@ export default async function ContactPage() {
         <div className={styles.portraitColumn}>
           <PixelPortrait
             src={PORTRAIT_URL}
-            alt="Andrew Bielous"
+            alt={identity.name}
             blockSize={60}
             faceMask={{
               centerX: 0.5,
@@ -273,6 +262,6 @@ export default async function ContactPage() {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

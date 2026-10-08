@@ -82,10 +82,9 @@ export default function TypedRotator({
   // Cursor blinking
   useEffect(() => {
     if (!cursorBlinkMs || cursorBlinkMs <= 0) {
-      setCursorVisible(true);
       return;
     }
-    let id: number | undefined = window.setInterval(() => {
+    const id: number | undefined = window.setInterval(() => {
       setCursorVisible((v) => !v);
     }, cursorBlinkMs);
 
@@ -93,6 +92,9 @@ export default function TypedRotator({
       if (id) window.clearInterval(id);
     };
   }, [cursorBlinkMs]);
+
+  const isCursorVisible =
+    !cursorBlinkMs || cursorBlinkMs <= 0 || cursorVisible;
 
   useEffect(() => {
     if (safeItems.length === 0) return;
@@ -181,25 +183,12 @@ export default function TypedRotator({
   return (
     <span className={className} aria-label={ariaLabel}>
       <span aria-hidden="true">{text}</span>
-      <span aria-hidden="true" style={{ opacity: cursorVisible ? 1 : 0 }}>
+      <span aria-hidden="true" style={{ opacity: isCursorVisible ? 1 : 0 }}>
         {cursor}
       </span>
 
       {/* Helpful for screen readers (no constant updates) */}
-      <span style={srOnly}>{safeItems[index] ?? ""}</span>
+      <span className="sr-only">{safeItems[index] ?? ""}</span>
     </span>
   );
 }
-
-// Minimal sr-only style without needing a CSS file
-const srOnly: React.CSSProperties = {
-  position: "absolute",
-  width: 1,
-  height: 1,
-  padding: 0,
-  margin: -1,
-  overflow: "hidden",
-  clip: "rect(0, 0, 0, 0)",
-  whiteSpace: "nowrap",
-  border: 0,
-};

@@ -17,7 +17,7 @@
 }
 
 .before {
-  color: #fff;
+  color: var(--color-white);
 }
 
 .magic {
@@ -47,22 +47,22 @@
 }
 
 /* restart animation without reflow */
-.magicStar[data-a="0"] { animation: scaleA 1200ms ease-in-out forwards;}
-.magicStar[data-a="1"] { animation: scaleB 700ms ease-in-out forwards;}
+.magicStar[data-a="0"] { animation: scaleA 1200ms var(--ease-in-out) forwards;}
+.magicStar[data-a="1"] { animation: scaleB 700ms var(--ease-in-out) forwards;}
 
 .magicStar svg {
-  animation: rotate 1000ms linear infinite;
+  animation: rotate 1000ms var(--ease-linear) infinite;
   display: block;
-  opacity: 0.7;
+  opacity: var(--opacity-soft);
   will-change: transform;
 }
 
 .magicStar svg path {
-  fill: var(--violet);
+  fill: var(--color-accent);
 }
 
 .magicText {
-  background: linear-gradient(    to right,    var(--purple),    var(--violet),    var(--pink),    var(--purple)  );
+  background: var(--gradient-text);
   background-size: 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -82,7 +82,7 @@
 
 /* Optional: slow down the gradient to reduce churn */
 .magicText {
-  animation: background-pan 16s linear infinite;
+  animation: background-pan 16s var(--ease-linear) infinite;
 }
 
 /* Optional: reduce painting cost a bit */

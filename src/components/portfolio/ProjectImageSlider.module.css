@@ -10,14 +10,14 @@
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  background: #0b0e15;
+  background: var(--color-surface-media);
 }
 
 .track {
   display: flex;
   height: 100%;
   transform: translate3d(0, 0, 0);
-  transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform var(--duration-slide) var(--ease-expand);
 }
 
 .slide {
@@ -35,7 +35,7 @@
 }
 
 .root[data-fit="contain"] .img {
-  padding: clamp(12px, 2vw, 24px);
+  padding: clamp(var(--space-sm), 2vw, var(--space-lg));
   object-fit: contain;
 }
 
@@ -47,33 +47,33 @@
   width: fit-content;
   max-width: calc(100% - 28px);
   margin: 0;
-  padding: 7px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 7px;
-  background: rgba(10, 14, 24, 0.9);
+  padding: 7px var(--space-sm-tight);
+  border: 1px solid var(--color-border-translucent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-media-caption);
   color: var(--color-text-primary);
-  font-size: 0.75rem;
-  line-height: 1.4;
-  backdrop-filter: blur(8px);
+  font-size: var(--font-size-xs);
+  line-height: var(--font-leading-control);
+  backdrop-filter: blur(var(--size-blur-media));
 }
 
 .nav {
   position: absolute;
   top: 50%;
-  z-index: 2;
+  z-index: var(--z-controls);
   display: grid;
-  width: 42px;
-  height: 42px;
-  padding: 0 0 2px;
+  width: var(--size-control-lg);
+  height: var(--size-control-lg);
+  padding: 0 0 var(--space-3xs);
   place-items: center;
   transform: translateY(-50%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(10, 14, 24, 0.82);
-  color: #fff;
+  border: 1px solid var(--color-border-emphasis);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-media-control);
+  color: var(--color-white);
   cursor: pointer;
   font-size: 28px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--size-blur-media));
 }
 
 .prev { left: 14px; }
@@ -81,16 +81,16 @@
 
 .dots {
   position: absolute;
-  z-index: 2;
+  z-index: var(--z-controls);
   top: 14px;
   left: 50%;
   display: flex;
-  gap: 6px;
-  padding: 6px 8px;
+  gap: var(--space-xs-tight);
+  padding: var(--space-xs-tight) var(--space-xs);
   transform: translateX(-50%);
-  border-radius: 999px;
-  background: rgba(10, 14, 24, 0.72);
-  backdrop-filter: blur(8px);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-media-dots);
+  backdrop-filter: blur(var(--size-blur-media));
 }
 
 .dot {
@@ -98,10 +98,10 @@
   height: 8px;
   padding: 0;
   border: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-pill);
+  background: var(--color-control-inactive);
   cursor: pointer;
-  transition: width 180ms ease, background-color 180ms ease;
+  transition: width var(--duration-normal) var(--ease-standard), background-color var(--duration-normal) var(--ease-standard);
 }
 
 .dotActive {
@@ -111,7 +111,7 @@
 
 .nav:focus-visible,
 .dot:focus-visible {
-  outline: 2px solid #d357e6;
+  outline: 2px solid var(--color-focus);
   outline-offset: 3px;
 }
 
@@ -122,7 +122,7 @@
   }
 
   .root[data-fit="contain"] .img {
-    padding: 8px;
+    padding: var(--space-xs);
   }
 }
 

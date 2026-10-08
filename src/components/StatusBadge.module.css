@@ -1,10 +1,10 @@
 .badge {
-    --status-color: #2ecc71;
+    --status-color: var(--color-success);
     background: var(--color-surface-alt);
     border: 0.5px solid #ffffff14;
-    border-radius: .75rem;
+    border-radius: var(--radius-button);
     
-    padding: 2px 10px;
+    padding: var(--space-3xs) var(--space-sm-tight);
     
     /* box-shadow: 0 5px 12px #0006,0 0 0 0.5px #46506480; */
     
@@ -16,20 +16,20 @@
 .indicator {
   display: inline-flex;
   align-items: center;
-  font-size: 0.95rem;
-  line-height: 1;
+  font-size: var(--font-size-control);
+  line-height: var(--font-leading-solid);
 }
 
 .text {
-  color: #c5cddc;
-  font-weight: 500;
+  color: var(--color-status-text);
+  font-weight: var(--font-weight-medium);
 }
 
 .dotWrap {
   position: relative;
   width: 0.625rem;
   height: 0.625rem;
-  margin-right: 0.625rem;
+  margin-right: var(--space-sm-tight);
   flex-shrink: 0;
 }
 
@@ -38,16 +38,16 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: var(--status-color);
 }
 
 .ping {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: var(--status-color);
-  opacity: 0.75;
+  opacity: var(--opacity-subdued);
   animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 

@@ -1,4 +1,8 @@
-import { Db } from "mongodb";
+import { Db, MongoNetworkError, MongoServerSelectionError } from "mongodb";
+import { unstable_cache } from "next/cache";
+import { connection } from "next/server";
+import { cache } from "react";
+import { identity } from "@/config/site";
 import { getDatabase } from "@/lib/mongodb";
 
 export type SkillGroup = {
@@ -59,21 +63,6 @@ export type Project = {
   details?: string;
 };
 
-export type SocialLink = {
-  label: string;
-  url: string;
-};
-
-export type Profile = {
-  name: string;
-  title: string;
-  summary: string;
-  location: string;
-  email: string;
-  resumeUrl: string;
-  socials: SocialLink[];
-};
-
 const PROFILE_COLLECTIONS = ["_profile", "profiles", "profile"];
 const PROFILE_MAIN_DOCS = ["main", "_main"];
 const PROFILE_SKILLS_DOCS = ["skills", "_skills"];
@@ -83,14 +72,6 @@ const EXPERIENCE_COLLECTIONS = [
   "experiences",
 ];
 const PROJECT_COLLECTIONS = ["_portfolio", "portfolio", "projects"];
-const PROJECT_DOC_IDS = ["projects", "_projects"];
-
-const PROJECT_CATEGORIES: ReadonlySet<ProjectCategory> = new Set([
-  "ecommerce",
-  "corporate",
-  "content-platform",
-  "education",
-]);
 
 const PROJECT_STATUSES: ReadonlySet<ProjectStatus> = new Set([
   "production",
@@ -99,102 +80,6 @@ const PROJECT_STATUSES: ReadonlySet<ProjectStatus> = new Set([
   "offline",
   "private",
 ]);
-
-const fallbackProfile: Profile = {
-  name: "Andrew Bielous",
-  title: "Full-Stack Engineer",
-  summary:
-    "I enjoy building resilient, accessible web experiences that stay fast even when product requirements grow. My current focus is on React, TypeScript, and serverless backends.",
-  location: "Odessa • Remote",
-  email: "babujioh@gmail.com",
-  resumeUrl: "https://drive.google.com/file/d/1dJCK8rjvaY-1shKXnndvIjn9-5irKb6P/view?usp=sharing",
-  socials: [
-    { label: "GitHub", url: "https://github.com/andrewb" },
-    { label: "LinkedIn", url: "https://linkedin.com/in/andrewb" },
-  ],
-};
-
-const fallbackSkills: SkillGroup[] = [
-  {
-    title: "Frontend",
-    items: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Accessibility"],
-  },
-  {
-    title: "Backend & Cloud",
-    items: ["Firebase", "Node.js", "Cloud Functions", "Prisma", "REST APIs"],
-  },
-  {
-    title: "Workflow",
-    items: ["Vercel", "GitHub Actions", "Product Discovery", "Design Systems"],
-  },
-];
-
-const fallbackExperiences: Experience[] = [
-  {
-    company: "Freelance",
-    role: "Senior Frontend Engineer",
-    start: "2021",
-    end: "Present",
-    achievements: [
-      "Built performant marketing sites and dashboards for climate-tech founders.",
-      "Introduced component libraries that cut feature delivery time by 30%.",
-      "Mentored junior developers on testing, accessibility, and DX improvements.",
-    ],
-  },
-  {
-    company: "Acme Robotics",
-    role: "Full-Stack Engineer",
-    start: "2018",
-    end: "2021",
-    achievements: [
-      "Launched a Next.js portal that streams live telemetry for internal teams.",
-      "Moved realtime event ingestion to Firebase, improving reliability by 40%.",
-      "Led migration from monolith deployments to Vercel edge functions.",
-    ],
-  },
-];
-
-const fallbackProjects: Project[] = [
-  {
-    id: "project-alpha",
-    name: "Project Alpha",
-    summary:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    category: "corporate",
-    status: "production",
-    stack: ["Framework A", "Service B", "Platform C"],
-    link: "https://example.com/project-alpha",
-    year: 1999,
-  },
-  {
-    id: "project-beta",
-    name: "Project Beta",
-    summary:
-      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    description:
-      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    category: "corporate",
-    status: "production",
-    stack: ["Library X", "Backend Y", "Database Z"],
-    link: "https://example.com/project-beta",
-    year: 1999,
-  },
-  {
-    id: "project-gamma",
-    name: "Project Gamma",
-    summary:
-      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    description:
-      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    category: "corporate",
-    status: "production",
-    stack: ["Tool One", "Tool Two", "Tool Three"],
-    link: "https://example.com/project-gamma",
-    year: 1999,
-  },
-];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -396,22 +281,6 @@ const normalizeBoolean = (value: unknown): boolean | undefined => {
   return undefined;
 };
 
-const normalizeSocials = (value: unknown): SocialLink[] => {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .map((item) => {
-      if (!isRecord(item)) return undefined;
-
-      const label = sanitizeString(item.label);
-      const url = sanitizeString(item.url);
-
-      if (!label || !url) return undefined;
-      return { label, url };
-    })
-    .filter((social): social is SocialLink => Boolean(social));
-};
-
 const mapExperience = (
   payload: Record<string, unknown>,
 ): Experience | undefined => {
@@ -444,8 +313,8 @@ const mapProject = (
 
   const summary =
     sanitizeString(payload.summary) ??
-    sanitizeString(payload.description) ??
-    "Project information is being updated.";
+    sanitizeString(payload.description);
+  if (!summary) return undefined;
 
   const contribution =
     sanitizeString(payload.contribution) ?? sanitizeString(payload.details);
@@ -552,144 +421,88 @@ const fetchCollectionItems = async (
   return [];
 };
 
-export async function getProfile(): Promise<Profile> {
+type PortfolioData = {
+  skills: SkillGroup[];
+  experiences: Experience[];
+  projects: Project[];
+};
+
+class PortfolioUnavailableError extends Error {
+  constructor(readonly code: "missing_configuration" | "database_unavailable") {
+    super(`Portfolio data is temporarily unavailable (${code}).`);
+    this.name = "PortfolioUnavailableError";
+  }
+}
+
+let lastFailure: { code: string; at: number } | undefined;
+function logDataFailure(code: string) {
+  const now = Date.now();
+  // One outage summary per minute per process, never driver messages or URIs.
+  if (lastFailure?.code === code && now - lastFailure.at < 60_000) return;
+  lastFailure = { code, at: now };
+  console.error(JSON.stringify({ event: "portfolio.load_failed", code, action: code === "missing_configuration" ? "Configure MONGODB_URI" : "Check MongoDB availability and document schema" }));
+}
+
+async function loadPortfolio(): Promise<PortfolioData> {
+  if (!process.env.MONGODB_URI?.trim()) {
+    throw new PortfolioUnavailableError("missing_configuration");
+  }
+
   try {
     const db = await getDatabase();
-    const profileDoc = await findDocInCollections(
-      db,
-      PROFILE_COLLECTIONS,
-      PROFILE_MAIN_DOCS,
-    );
+    // Collection compatibility is retained until the current production schema is confirmed.
+    const [skillsDoc, experienceDocs, projectDocs] = await Promise.all([
+      findDocInCollections(db, PROFILE_COLLECTIONS, PROFILE_SKILLS_DOCS),
+      fetchCollectionItems(db, EXPERIENCE_COLLECTIONS),
+      fetchCollectionItems(db, PROJECT_COLLECTIONS),
+    ]);
+    if (!skillsDoc) throw new Error("Missing skills document");
+    const skills = Object.entries(skillsDoc)
+      .filter(([key]) => !key.startsWith("_"))
+      .map(([key, value]) => ({ title: toTitleCase(key), items: sanitizeStringArray(value) }))
+      .filter(({ items }) => items.length > 0);
 
-    const socials = normalizeSocials(profileDoc?.socials);
+    const rawExperiences = experienceDocs.length ? experienceDocs
+      : (await findDocInCollections(db, PROFILE_COLLECTIONS, PROFILE_MAIN_DOCS))?.experiences;
+    if (!Array.isArray(rawExperiences)) throw new Error("Invalid experience documents");
+    const experiences = rawExperiences.map((value) => isRecord(value) ? mapExperience(value) : undefined);
+    if (experiences.some((value) => !value)) throw new Error("Invalid experience document");
 
+    const rawProjects = projectDocs.flatMap((document) => Array.isArray(document.items) ? document.items : [document]);
+    const projects = rawProjects.map((value) => isRecord(value) ? mapProject(value) : undefined);
+    if (projects.some((value) => !value)) throw new Error("Invalid project document");
+    if (new Set(projects.map((project) => project?.id)).size !== projects.length) throw new Error("Duplicate project IDs");
+
+    lastFailure = undefined;
     return {
-      ...fallbackProfile,
-      name: sanitizeString(profileDoc?.name) ?? fallbackProfile.name,
-      title:
-        sanitizeString(profileDoc?.job_title) ??
-        sanitizeString(profileDoc?.title) ??
-        fallbackProfile.title,
-      summary: sanitizeString(profileDoc?.summary) ?? fallbackProfile.summary,
-      location: sanitizeString(profileDoc?.location) ?? fallbackProfile.location,
-      email: sanitizeString(profileDoc?.email) ?? fallbackProfile.email,
-      resumeUrl:
-        sanitizeString(profileDoc?.resume_url) ??
-        sanitizeString(profileDoc?.resumeUrl) ??
-        fallbackProfile.resumeUrl,
-      socials: socials.length ? socials : fallbackProfile.socials,
+      skills,
+      experiences: (experiences as Experience[]).sort((a, b) => parseDateValue(b.start) - parseDateValue(a.start) || parseDateValue(b.end) - parseDateValue(a.end)),
+      projects: projects as Project[],
     };
   } catch (error) {
-    console.error("Failed to fetch profile from MongoDB", error);
-    return fallbackProfile;
-  }
-}
-
-export async function getSkills(): Promise<SkillGroup[]> {
-  try {
-    const db = await getDatabase();
-    const skillsDoc = await findDocInCollections(
-      db,
-      PROFILE_COLLECTIONS,
-      PROFILE_SKILLS_DOCS,
-    );
-
-    if (!skillsDoc) return fallbackSkills;
-
-    const groups = Object.entries(skillsDoc)
-      .map(([key, value]) => {
-        if (key.startsWith("_")) return undefined;
-
-        const items = sanitizeStringArray(value);
-        if (!items.length) return undefined;
-
-        return { title: toTitleCase(key), items };
-      })
-      .filter((group): group is SkillGroup => Boolean(group));
-
-    return groups.length ? groups : fallbackSkills;
-  } catch (error) {
-    console.error("Failed to fetch skills from MongoDB", error);
-    return fallbackSkills;
-  }
-}
-
-export async function getExperiences(): Promise<Experience[]> {
-  try {
-    const db = await getDatabase();
-    const experienceDocs = await fetchCollectionItems(
-      db,
-      EXPERIENCE_COLLECTIONS,
-    );
-
-    const rawExperiences = experienceDocs.length
-      ? experienceDocs
-      : ((await findDocInCollections(
-          db,
-          PROFILE_COLLECTIONS,
-          PROFILE_MAIN_DOCS,
-        ))?.experiences as unknown[]) ?? [];
-
-    const experiences = rawExperiences
-      .filter(isRecord)
-      .map((document) => mapExperience(document))
-      .filter((experience): experience is Experience => Boolean(experience))
-      .sort((a, b) => {
-        const startDiff = parseDateValue(b.start) - parseDateValue(a.start);
-        if (startDiff !== 0) return startDiff;
-        return parseDateValue(b.end) - parseDateValue(a.end);
-      });
-
-    return experiences.length ? experiences : fallbackExperiences;
-  } catch (error) {
-    console.error("Failed to fetch experiences from MongoDB", error);
-    return fallbackExperiences;
-  }
-}
-
-export async function getProjects(): Promise<Project[]> {
-  try {
-    const db = await getDatabase();
-    const projectDocs = await fetchCollectionItems(db, PROJECT_COLLECTIONS);
-
-    let rawProjects: unknown[] = [];
-
-    if (projectDocs.length) {
-      rawProjects = projectDocs.flatMap((document) => {
-        const record = document as Record<string, unknown>;
-        return Array.isArray(record.items) ? (record.items as unknown[]) : [record];
-      });
-    } else {
-      const projectsDoc = await findDocInCollections(
-        db,
-        PROJECT_COLLECTIONS,
-        PROJECT_DOC_IDS,
-      );
-
-      if (Array.isArray(projectsDoc?.items)) {
-        rawProjects = projectsDoc.items as unknown[];
-      }
+    if (error instanceof MongoNetworkError || error instanceof MongoServerSelectionError) {
+      throw new PortfolioUnavailableError("database_unavailable");
     }
-
-    const projects = rawProjects
-      .filter(isRecord)
-      .map((document) => mapProject(document))
-      .filter((project): project is Project => Boolean(project));
-
-    return projects.length ? projects : fallbackProjects;
-  } catch (error) {
-    console.error("Failed to fetch projects from MongoDB", error);
-    return fallbackProjects;
+    logDataFailure("invalid_configuration_or_content");
+    // Permanent errors must fail visibly, without leaking driver diagnostics.
+    throw new Error("Portfolio content could not be loaded. Check database configuration and schema.");
   }
 }
 
-export async function getPortfolioContent() {
-  const [profile, skills, experiences, projects] = await Promise.all([
-    getProfile(),
-    getSkills(),
-    getExperiences(),
-    getProjects(),
-  ]);
+const getCachedPortfolio = unstable_cache(loadPortfolio, ["portfolio-content-v2"], {
+  revalidate: 86_400,
+  tags: ["portfolio"],
+});
 
-  return { profile, skills, experiences, projects };
-}
+/** Successful normalized data is cached for 24h; thrown errors never become cache entries. */
+export const getPortfolioContent = cache(async (): Promise<PortfolioData & { profile: typeof identity; available: boolean }> => {
+  try {
+    return { profile: identity, ...await getCachedPortfolio(), available: true as const };
+  } catch (error) {
+    if (!(error instanceof PortfolioUnavailableError)) throw error;
+    logDataFailure(error.code);
+    // A cold outage must not turn an empty response into a statically cached homepage.
+    await connection();
+    return { profile: identity, skills: [], experiences: [], projects: [], available: false as const };
+  }
+});

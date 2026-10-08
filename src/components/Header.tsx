@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import TypedLogo from "@/components/TypedLogo";
-import { primaryNavigation } from "@/config/site";
+import { identity, primaryNavigation } from "@/config/site";
 import styles from "./Header.module.css";
 
 function isActivePath(pathname: string, href: string) {
@@ -87,6 +87,8 @@ export function Header() {
   }, [activeHref]);
 
   useEffect(() => {
+    // Route changes include browser history navigation, which should close the mobile menu.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Reset transient menu state after navigation.
     setIsMenuOpen(false);
   }, [pathname]);
 
@@ -113,7 +115,7 @@ export function Header() {
         <Link
           href="/"
           className={styles.brand}
-          aria-label="Andrew Bielous — home"
+          aria-label={`${identity.name} — home`}
           onClick={() => setIsMenuOpen(false)}
         >
           <TypedLogo />
@@ -248,7 +250,7 @@ type MeetingLinkProps = {
 function MeetingLink({ className, tabIndex, onClick }: MeetingLinkProps) {
   return (
     <Link
-      href="https://cal.com/andrew-bielous"
+      href={identity.scheduling.cal}
       className={`${styles.meetingLink} ${className ?? ""}`}
       tabIndex={tabIndex}
       onClick={onClick}

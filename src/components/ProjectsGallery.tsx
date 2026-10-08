@@ -1,7 +1,5 @@
-"use client";
-
-import { useMemo, useTransition } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { CATEGORY_LABELS, STATUS_LABELS, projectsHref } from "@/data/projects";
 import styles from "./ProjectsGallery.module.css";
 import type { Project, ProjectCategory } from "@/data/profile";
 
@@ -19,52 +17,17 @@ type Props = {
   initialData: ProjectsData;
 };
 
-const CATEGORY_LABELS: Record<ProjectCategory, string> = {
-  ecommerce: "E-commerce",
-  corporate: "Corporate",
-  "content-platform": "Content platforms",
-  education: "Education",
-};
-
-const STATUS_LABELS: Record<Project["status"], string> = {
-  production: "Production",
-  maintenance: "Ongoing maintenance",
-  archived: "Archived",
-  offline: "Offline",
-  private: "Private",
-};
-
 const STACK_LIMIT = 4;
 
 export function ProjectsGallery({ categories, initialData }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
-  const totalArchiveItems = useMemo(
-    () => categories.reduce((total, item) => total + item.count, 0),
-    [categories],
-  );
-
-  const navigate = (category: ProjectCategory | null, page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    category ? params.set("category", category) : params.delete("category");
-    page > 1 ? params.set("page", String(page)) : params.delete("page");
-
-    const query = params.toString();
-    startTransition(() => {
-      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
-    });
-  };
+  const totalArchiveItems = categories.reduce((total, item) => total + item.count, 0);
 
   const activeLabel = initialData.activeCategory
     ? CATEGORY_LABELS[initialData.activeCategory]
     : "All projects";
 
   return (
-    <section className={styles.archive} aria-labelledby="projects-archive-title" aria-busy={isPending}>
+    <section className={styles.archive} aria-labelledby="projects-archive-title">
       <div className={styles.toolbar}>
         <div className={styles.toolbarIntro}>
           <p className={styles.toolbarEyebrow}>Browse the archive</p>
@@ -76,15 +39,15 @@ export function ProjectsGallery({ categories, initialData }: Props) {
 
         <ul className={styles.filters} aria-label="Filter projects by category">
           <li>
-            <button type="button" className={styles.filterButton} aria-pressed={initialData.activeCategory === null} onClick={() => navigate(null, 1)} disabled={isPending}>
+            <Link href={projectsHref(null)} scroll={false} className={styles.filterButton} aria-current={initialData.activeCategory === null ? "page" : undefined}>
               <span>All</span><small>{totalArchiveItems}</small>
-            </button>
+            </Link>
           </li>
           {categories.map((category) => (
             <li key={category.name}>
-              <button type="button" className={styles.filterButton} aria-pressed={initialData.activeCategory === category.name} onClick={() => navigate(category.name, 1)} disabled={isPending}>
+              <Link href={projectsHref(category.name)} scroll={false} className={styles.filterButton} aria-current={initialData.activeCategory === category.name ? "page" : undefined}>
                 <span>{CATEGORY_LABELS[category.name]}</span><small>{category.count}</small>
-              </button>
+              </Link>
             </li>
           ))}
         </ul>
@@ -94,7 +57,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
         {initialData.projects.length === 0 ? (
           <div className={styles.emptyState}>No projects are assigned to this category yet.</div>
         ) : (
-          <div className={`${styles.projectsGrid} ${isPending ? styles.projectsGridLoading : ""}`}>
+          <div className={styles.projectsGrid}>
             {initialData.projects.map((project) => {
               const visibleStack = project.stack.slice(0, STACK_LIMIT);
               const remainingStack = project.stack.length - visibleStack.length;
@@ -144,7 +107,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
                           <a
                             href={project.link}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                           >
                             Visit site
                             <span aria-hidden="true">↗</span>
@@ -155,7 +118,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
                           <a
                             href={project.github}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                           >
                             GitHub
                             <span aria-hidden="true">↗</span>
@@ -166,7 +129,7 @@ export function ProjectsGallery({ categories, initialData }: Props) {
                           <a
                             href={project.codepen}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                           >
                             CodePen
                             <span aria-hidden="true">↗</span>
@@ -188,14 +151,17 @@ export function ProjectsGallery({ categories, initialData }: Props) {
             })}
           </div>
         )}
-        {isPending ? <div className={styles.loaderOverlay} role="status" aria-label="Loading projects"><span className={styles.spinner} /></div> : null}
       </div>
 
       {initialData.totalPages > 1 ? (
         <nav className={styles.pagination} aria-label="Projects pagination">
-          <button type="button" onClick={() => navigate(initialData.activeCategory, initialData.currentPage - 1)} disabled={initialData.currentPage === 1 || isPending}>Previous</button>
+          {initialData.currentPage > 1 ? (
+            <Link className={styles.pageLink} href={projectsHref(initialData.activeCategory, initialData.currentPage - 1)} scroll={false} rel="prev">Previous</Link>
+          ) : <span className={styles.pageLink} aria-disabled="true">Previous</span>}
           <p className={styles.status}>Page {initialData.currentPage} of {initialData.totalPages}</p>
-          <button type="button" onClick={() => navigate(initialData.activeCategory, initialData.currentPage + 1)} disabled={initialData.currentPage === initialData.totalPages || isPending}>Next</button>
+          {initialData.currentPage < initialData.totalPages ? (
+            <Link className={styles.pageLink} href={projectsHref(initialData.activeCategory, initialData.currentPage + 1)} scroll={false} rel="next">Next</Link>
+          ) : <span className={styles.pageLink} aria-disabled="true">Next</span>}
         </nav>
       ) : null}
     </section>

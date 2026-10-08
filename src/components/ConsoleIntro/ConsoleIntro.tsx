@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { identity } from "@/config/site";
 import type {
   ConsoleIntroConfig,
   DeveloperConsole,
@@ -18,20 +19,13 @@ type Props = {
 };
 
 const DEFAULT_CONFIG: ConsoleIntroConfig = {
-  name: "Andrew",
-  role: "Frontend Developer",
-  status: "available for opportunities",
-  email: "babujjioh@gmail.com",
-
-  stack: [
-    "Next.js",
-    "React",
-    "TypeScript",
-    "WordPress",
-  ],
-
-  githubUrl: "https://github.com/AndrewB92",
-  linkedinUrl: "https://www.linkedin.com/in/bielousandrew",
+  name: identity.name,
+  role: identity.title,
+  status: identity.status,
+  email: identity.email,
+  stack: identity.stack,
+  githubUrl: identity.socials.github,
+  linkedinUrl: identity.socials.linkedin,
 
   version: "1.0.0",
 

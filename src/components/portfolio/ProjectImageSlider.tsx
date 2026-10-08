@@ -68,6 +68,8 @@ export function ProjectImageSlider({
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    // Keep the selected slide valid when MongoDB content changes the image list.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Clamp local UI state to the latest prop data.
     setIndex((current) =>
       slides.length ? Math.min(current, slides.length - 1) : 0,
     );

@@ -1,25 +1,25 @@
 .terminal {
-	color: #fff;
+	color: var(--color-white);
 	background-color: #4d25eb45;
-	border-radius: 0 0 7px 7px;
+	border-radius: 0 0 var(--radius-control) var(--radius-control);
 	left: -35px;
 	width: 30%;
 	/* height: clamp(220px, 30vh, 500px); */
     height: 260px;
 	align-self: center;
-	padding: 10px;
+	padding: var(--space-sm-tight);
 	font-size: .92em;
 	line-height: 1em;
 	position: relative;
-	box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+	box-shadow: var(--shadow-terminal);
 	transform: translatey(0px);
 	/* animation: float 12s ease-in-out infinite; */
-	z-index: 5;
+	z-index: var(--z-raised);
 	backdrop-filter: blur(2px);
 }
 
 .terminal::before {
-  border-radius: 7px 7px 0 0;
+  border-radius: var(--radius-control) var(--radius-control) 0 0;
   position: absolute;
   content: attr(data-content);
   display: block;
@@ -73,26 +73,26 @@
   display: flex;
   justify-content: flex-end;
   padding: 0;
-  z-index: 1;
+  z-index: var(--z-content);
 }
 
 .iconBtn {
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--color-border-translucent);
   background: rgba(0, 0, 0, 0.18);
-  color: #b4c4c6;
+  color: var(--color-code-text);
   width: 30px;
-  height: 28px;
-  border-radius: 10px;
+  height: var(--size-icon-button-sm);
+  border-radius: var(--radius-control-lg);
   display: inline-grid;
   place-items: center;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition: transform var(--duration-brief) var(--ease-standard), background var(--duration-brief) var(--ease-standard), border-color var(--duration-brief) var(--ease-standard);
 }
 
 .iconBtn:hover {
   background: rgba(0, 0, 0, 0.26);
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: var(--color-border-emphasis);
 }
 
 .iconBtn:active {
@@ -125,8 +125,7 @@
 
 .code {
   display: block;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  font-family: var(--font-code-stack);
   font-size: 0.95em;
 }
 
@@ -135,16 +134,16 @@
   display: grid;
   grid-template-columns: 24px 1fr;
   align-items: start;
-  gap: 6px;
+  gap: var(--space-xs-tight);
   padding: 1px 0;
 }
 
 .gutter {
   text-align: right;
-  padding-right: 10px;
+  padding-right: var(--space-sm-tight);
   color: rgba(180, 196, 198, 0.45);
   user-select: none;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid var(--color-border-faint);
   font-size: .7em;
 }
 
@@ -162,19 +161,19 @@
   color: rgba(180, 196, 198, 0.55);
 }
 .tok_string {
-  color: #a6e3a1;
+  color: var(--color-code-string);
 }
 .tok_number {
-  color: #f9e2af;
+  color: var(--color-code-number);
 }
 .tok_keyword {
-  color: #cba6f7;
+  color: var(--color-code-keyword);
 }
 .tok_type {
-  color: #74c7ec;
+  color: var(--color-code-type);
 }
 .tok_fn {
-  color: #89b4fa;
+  color: var(--color-code-function);
 }
 .tok_punct {
   color: rgba(180, 196, 198, 0.9);

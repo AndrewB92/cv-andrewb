@@ -7,11 +7,11 @@ import {
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 
 import styles from "./CalPopup.module.css";
+import { schedulingTabs as CAL_TABS } from "@/config/site";
 
 const Cal = dynamic(
   () => import("@calcom/embed-react").then((module) => module.default),
@@ -20,21 +20,6 @@ const Cal = dynamic(
     loading: () => <CalSkeleton />,
   }
 );
-
-const CAL_TABS = [
-  {
-    key: "intro-call",
-    label: "Intro call",
-    description: "A short call to discuss your project and requirements.",
-    calLink: "andrew-bielous/intro-call",
-  },
-  {
-    key: "career-conversation",
-    label: "Career conversation",
-    description: "A focused conversation about roles, experience, and fit.",
-    calLink: "andrew-bielous/career-conversation",
-  },
-] as const;
 
 type CalTabKey = (typeof CAL_TABS)[number]["key"];
 
@@ -65,12 +50,6 @@ const CAL_CONFIG = {
   layout: "month_view",
   useSlotsViewOnSmallScreen: "true",
 } as const;
-
-const CAL_STYLE: CSSProperties = {
-  width: "100%",
-  height: "100%",
-  overflow: "auto",
-};
 
 function isCalTabKey(value: string): value is CalTabKey {
   return CAL_TABS.some((tab) => tab.key === value);
@@ -174,6 +153,8 @@ export function CalPopup({
   );
 
   useEffect(() => {
+    // Search params are the source of truth for direct links and browser history.
+    // eslint-disable react-hooks/set-state-in-effect -- Mirror direct links and browser history into modal state.
     const requestedTab = resolveTabKey(searchParams.get(paramKey));
 
     if (requestedTab) {
@@ -183,6 +164,7 @@ export function CalPopup({
     }
 
     setIsOpen(false);
+    // eslint-enable react-hooks/set-state-in-effect
   }, [paramKey, searchParams]);
 
   useEffect(() => {
@@ -255,10 +237,11 @@ export function CalPopup({
       const cal = await getCalApi({ namespace: activeTab });
       if (cancelled) return;
 
+      const tokens = getComputedStyle(document.documentElement);
       cal("ui", {
         cssVarsPerTheme: {
-          light: { "cal-brand": "#292929" },
-          dark: { "cal-brand": "#d357e6" },
+          light: { "cal-brand": tokens.getPropertyValue("--color-cal-brand-light").trim() },
+          dark: { "cal-brand": tokens.getPropertyValue("--color-focus").trim() },
         },
         hideEventTypeDetails: false,
         layout: "month_view",
@@ -361,7 +344,7 @@ export function CalPopup({
             <Cal
               namespace={activeTabData.key}
               calLink={activeTabData.calLink}
-              style={CAL_STYLE}
+              className={styles.embed}
               config={CAL_CONFIG}
             />
           </div>

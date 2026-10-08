@@ -214,7 +214,7 @@ export function CustomCursor({ particleCount = 7 }: Options) {
         };
 
         // If supported, this avoids timers; otherwise it just keeps looping with same path.
-        (anim as unknown as { addEventListener?: Function }).addEventListener?.(
+        anim.addEventListener?.(
           "iteration",
           onIter
         );
@@ -233,7 +233,8 @@ export function CustomCursor({ particleCount = 7 }: Options) {
         const hidden = document.visibilityState === "hidden";
         particlesRef.current.forEach((p) => {
           if (!p.anim) return;
-          hidden ? p.anim.pause() : p.anim.play();
+          if (hidden) p.anim.pause();
+          else p.anim.play();
         });
       };
       document.addEventListener("visibilitychange", onVis, { passive: true });
@@ -244,8 +245,7 @@ export function CustomCursor({ particleCount = 7 }: Options) {
 
         particlesRef.current.forEach((p) => {
           try {
-            (p.anim as unknown as { removeEventListener?: Function })
-              .removeEventListener?.("iteration", p.onIter);
+            if (p.onIter) p.anim?.removeEventListener("iteration", p.onIter);
           } catch {}
           p.anim?.cancel();
         });

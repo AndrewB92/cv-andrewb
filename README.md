@@ -6,7 +6,7 @@ The site presents professional experience, technical skills, selected projects, 
 
 ## Live website
 
-[cv-andrewb.vercel.app](https://cv-andrewb.vercel.app/)
+The canonical origin is configured in `src/config/site.ts` (`siteMetadata.baseUrl`).
 
 ## Repository
 
@@ -15,8 +15,8 @@ The site presents professional experience, technical skills, selected projects, 
 ## Features
 
 - Responsive portfolio built with the Next.js App Router
-- Server-rendered profile, skills, experience, and project data
-- MongoDB-backed portfolio content with local fallback data
+- Shared static identity configuration and cached skills, experience, and project data
+- MongoDB-backed content with cached last-known-good results and explicit unavailable states
 - Filterable and paginated project archive
 - Responsive featured-project cards
 - Animated desktop project-card expansion
@@ -57,8 +57,6 @@ The site presents professional experience, technical skills, selected projects, 
 ```text
 src/
 ├── app/
-│   ├── api/
-│   │   └── projects/
 │   ├── contact/
 │   ├── projects/
 │   ├── layout.tsx
@@ -81,7 +79,7 @@ The exact component paths may evolve as the project is refactored, but the main 
 
 ### Requirements
 
-- Node.js 20 or newer
+- Node.js 20.9 or newer
 - npm
 - A MongoDB connection string for live portfolio data
 
@@ -125,7 +123,7 @@ http://localhost:3000
 | `MONGODB_URI` | Recommended | MongoDB connection string used to load portfolio data |
 | `MONGODB_DB` | Optional | Database name; defaults to `cv-andrewb` |
 
-The application contains fallback profile, skills, experience, and project data. This allows supported pages to render when MongoDB is unavailable, while database-backed features should still be tested with a valid local environment.
+Public identity, contact details, CV and scheduling links live only in `src/config/site.ts`. Successful MongoDB content is cached for 24 hours in the Next.js Data Cache. Failed revalidation retains the previous successful value. With no cached value, missing configuration or a network outage displays an explicit unavailable state, never demo CV content; that response is not statically cached. Invalid documents and permanent database errors fail visibly. A valid MongoDB environment is required to verify production content.
 
 Do not commit `.env.local` or production credentials.
 
@@ -187,11 +185,12 @@ MongoDB access is handled through:
 src/lib/mongodb.ts
 ```
 
-The data layer normalizes database documents and falls back to local values when a query fails.
+The shared portfolio loader normalizes skills, experience and projects once per cache refresh. It performs no identity query. Cache hits perform no MongoDB reads. The `portfolio` cache tag identifies the data; the 24-hour lifetime is defined in the data layer. Connection failures are logged centrally without credentials or driver messages.
+
+Current production document samples are not included in this repository. Until they are confirmed, the existing collection/field compatibility remains: `_profile` / `profiles` / `profile` with `skills` / `_skills`, `_profile_experiences` / `_experiences` / `experiences` (or embedded experiences in `main` / `_main`), and `_portfolio` / `portfolio` / `projects` (individual documents or `items` arrays). This compatibility must not be mistaken for a confirmed canonical schema.
 
 Supported content includes:
 
-- Profile information
 - Skills
 - Work experience
 - Portfolio projects
@@ -199,32 +198,30 @@ Supported content includes:
 - Technology stacks
 - Live-site, GitHub, and CodePen links
 
-## Project API
+## Project archive
 
-The project archive uses:
-
-```text
-GET /api/projects
-```
-
-Supported query parameters include:
+The `/projects` Server Component reads the shared cached portfolio data. Category filtering,
+counts and pagination are implemented once in `src/data/projects.ts`. Filters and pagination
+use Next.js links, including native new-tab and browser history behavior:
 
 ```text
-?page=1
-?stack=Next.js
+/projects
+/projects?category=corporate
+/projects?page=2
+/projects?category=corporate&page=2
 ```
 
-The response contains:
+The obsolete `/api/projects` endpoint has been removed; the site had no API consumers.
 
-```json
-{
-  "projects": [],
-  "totalPages": 1,
-  "totalItems": 0,
-  "currentPage": 1,
-  "stackCounts": []
-}
-```
+## Metadata and styles
+
+`src/config/metadata.ts` derives route metadata from the canonical origin and identity in
+`src/config/site.ts`. `/opengraph-image` generates a 1200×630 PNG for Open Graph and Twitter.
+`/sitemap.xml` lists the three public routes; `/robots.txt` allows indexing.
+
+`src/styles/tokens.css` contains shared colors, typography, spacing, radii, layout dimensions,
+shadows, motion and layers. Component-specific geometry and runtime animation variables stay
+local. Responsive breakpoint exceptions are documented in the token file to preserve layouts.
 
 ## Cal.com scheduling
 
@@ -319,7 +316,7 @@ The project favors:
 - Transform- and opacity-based UI animation
 - Cancelled animation frames when interactions change
 - Reduced-motion support
-- Fallback content when external services are unavailable
+- Cached last-known-good content and honest unavailable states during service failures
 - Reusable configuration and centralized data normalization
 
 ## Accessibility

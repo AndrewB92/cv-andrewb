@@ -21,7 +21,7 @@ export default function GlowCard({
   radius = 'var(--radius-lg)',
   borderWidth = 1,
   glowSize = 420,
-  glowColor = 'rgba(186, 37, 209, 1)',
+  glowColor = 'var(--color-accent-secondary)',
   background = 'var(--color-surface-alt)',
   borderColor = 'var(--color-border)',
   blur = 2,
@@ -91,7 +91,7 @@ export default function GlowCard({
           border-radius: var(--r);
           background: var(--cardBg);
           border: var(--bw) solid var(--borderColor);
-          padding: 24px;
+          padding: var(--space-lg);
           touch-action: none;
         }
 
@@ -109,7 +109,7 @@ export default function GlowCard({
           );
 
           opacity: var(--glow-opacity);
-          transition: opacity 200ms ease;
+          transition: opacity var(--duration-fade) var(--ease-standard);
           filter: blur(var(--blur));
 
           /* border-only mask */

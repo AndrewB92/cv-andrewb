@@ -1,49 +1,49 @@
 .cursor {
   width: 30px;
   height: 30px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   position: fixed;
   left: 0;
   top: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: var(--z-overlay);
   contain: layout paint style;
   will-change: transform, opacity, background-color;
-  transition: opacity 200ms ease, background-color 300ms linear, transform 80ms linear;
+  transition: opacity var(--duration-fade) var(--ease-standard), background-color var(--duration-slide) var(--ease-linear), transform var(--duration-pointer) var(--ease-linear);
   opacity: 1;
   transform: translate3d(-9999px, -9999px, 0);
-  background-color: #ba25d100;
+  background-color: var(--color-accent-transparent);
 }
 
 .cursorDot {
   width: 5px;
   height: 5px;
-  border-radius: 999px;
-  background-color: #ba25d1;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent-secondary);
   position: fixed;
   left: 0;
   top: 0;
   pointer-events: none;
-  z-index: 10000;
+  z-index: var(--z-cursor-dot);
   contain: layout paint style;
   will-change: transform, width, height, opacity;
   transform: translate3d(-9999px, -9999px, 0) translate3d(-50%, -50%, 0);
-  transition: opacity 200ms ease, transform 80ms linear, width 0.3s linear, height 0.3s linear;
+  transition: opacity var(--duration-fade) var(--ease-standard), transform var(--duration-pointer) var(--ease-linear), width var(--duration-slide) var(--ease-linear), height var(--duration-slide) var(--ease-linear);
 }
 
 .hover {
-  background-color: #ba25d1;
-  opacity: 0.5;
+  background-color: var(--color-accent-secondary);
+  opacity: var(--opacity-dim);
 }
 
 .click {
-  opacity: 0.7;
+  opacity: var(--opacity-soft);
 }
 
 .dotActive {
   width: 30px;
   height: 30px;
-  opacity: 0.5;
+  opacity: var(--opacity-dim);
   transform: translate3d(var(--x, -9999px), var(--y, -9999px), 0)
     translate3d(-50%, -50%, 0) scale(1.4);
 }
@@ -57,8 +57,8 @@
 
 .particle {
   position: absolute;
-  border-radius: 50%;
-  background-color: #ba25d1;
+  border-radius: var(--radius-round);
+  background-color: var(--color-accent-secondary);
   will-change: transform, opacity;
   transform: translate3d(0, 0, 0) scale(0.6);
   opacity: 0;
