@@ -170,7 +170,7 @@
   top: calc(100% + 10px);
   right: 0;
 
-  min-width: 260px;
+  min-width: 282px;
   max-width: min(360px, 80vw);
 
   padding: var(--space-md-tight);

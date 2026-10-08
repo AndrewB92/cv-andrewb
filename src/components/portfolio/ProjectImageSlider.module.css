@@ -35,7 +35,7 @@
 }
 
 .root[data-fit="contain"] .img {
-  padding: clamp(var(--space-sm), 2vw, var(--space-lg));
+  /* padding: clamp(var(--space-sm), 2vw, var(--space-lg)); */
   object-fit: contain;
 }
 
