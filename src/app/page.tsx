@@ -47,6 +47,10 @@ const isHomepageFeaturedProject = (
     project.status === "maintenance");
 
 
+/**
+ * Renders the profile and portfolio highlights, with notices when content is unavailable.
+ * Portfolio loading errors other than temporary unavailability propagate to Next.js.
+ */
 export default async function HomePage() {
   // Single fetch: avoid calling getPortfolioContent() more than once.
   const { profile, skills, projects, experiences, available } =

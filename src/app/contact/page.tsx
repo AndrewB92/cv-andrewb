@@ -40,6 +40,7 @@ type ContactGroup = {
   links: ContactLink[];
 };
 
+/** Renders a contact link, opening links marked external in a new tab. */
 function ContactLinkCard({ link }: { link: ContactLink }) {
   return (
     <a
@@ -67,6 +68,7 @@ function ContactLinkCard({ link }: { link: ContactLink }) {
   );
 }
 
+/** Renders contact channels and an interactive portrait using the configured identity. */
 export default function ContactPage() {
   const { email, location } = identity;
 

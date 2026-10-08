@@ -10,6 +10,10 @@ export const metadata = pageMetadata("/projects", "Projects");
 
 type Props = { searchParams: Promise<ProjectSearchParams> };
 
+/**
+ * Renders spotlights and a category-filtered archive page from URL search parameters.
+ * Shows an unavailable notice for temporary outages; other loading errors propagate.
+ */
 export default async function ProjectsPage({ searchParams }: Props) {
   const params = await searchParams;
   const { projects, available } = await getPortfolioContent();

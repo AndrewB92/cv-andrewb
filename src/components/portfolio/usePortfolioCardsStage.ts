@@ -27,6 +27,12 @@ const afterTwoFrames = () =>
     });
   });
 
+/**
+ * Manages card expansion and returns DOM refs, layout state, and toggle/close handlers.
+ * Attach the stage and card refs in index order. Delays are in milliseconds and the
+ * inclusive compact breakpoint is in CSS pixels. Compact mode skips transition delays;
+ * desktop mode writes card geometry and focuses close/toggle controls after transitions.
+ */
 export function usePortfolioCardsStage(
   count: number,
   options: Options = {},
@@ -89,6 +95,7 @@ export function usePortfolioCardsStage(
     }
   }, []);
 
+  /** Reads numeric gap values; missing values use zero, or a 20px gap if no stage exists. */
   const getStageVariables = useCallback(() => {
     const stage = stageRef.current;
     if (!stage) return { gap: 20, sideGap: 0 };
@@ -101,6 +108,7 @@ export function usePortfolioCardsStage(
     };
   }, []);
 
+  /** Sets equal card widths and horizontal positions when the desktop stage has positive width. */
   const writeDesktopPositions = useCallback(() => {
     const stage = stageRef.current;
     if (!stage || isCompactViewport()) return;
@@ -122,6 +130,7 @@ export function usePortfolioCardsStage(
     });
   }, [count, getStageVariables, isCompactViewport]);
 
+  /** Measures desktop cards at natural height and applies the tallest positive height to all cards. */
   const measureDesktopHeight = useCallback(() => {
     const stage = stageRef.current;
     if (!stage || isCompactViewport()) return;

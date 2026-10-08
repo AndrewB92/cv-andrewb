@@ -20,6 +20,7 @@ type FooterSocialLink = {
   external: boolean;
 };
 
+/** Displays configured resume, social, and navigation links with the current copyright year. */
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const footerSocialLinks = socialLinks satisfies readonly FooterSocialLink[];

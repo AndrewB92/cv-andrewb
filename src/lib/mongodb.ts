@@ -18,6 +18,11 @@ function getMongoUri(): string {
   return uri;
 }
 
+/**
+ * Reuses the process-wide MongoDB connection promise, creating it on first use.
+ * Missing/invalid configuration throws synchronously; connection failures reject and
+ * clear the stored promise so a later call can retry. Driver errors propagate unchanged.
+ */
 function getClientPromise(): Promise<MongoClient> {
   if (global._mongoClientPromise) {
     return global._mongoClientPromise;

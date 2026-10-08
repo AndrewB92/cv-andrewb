@@ -12,6 +12,10 @@ type DescriptionToggleProps = {
   panelClassName?: string;
 };
 
+/**
+ * Escapes a class selector with CSS.escape when available, otherwise backslash-escapes
+ * characters outside ASCII letters, digits, underscores, and hyphens.
+ */
 function cssEscape(value: string) {
   const esc = globalThis.CSS?.escape;
   return typeof esc === "function" ? esc(value) : value.replace(/[^a-zA-Z0-9_-]/g, "\\$&");

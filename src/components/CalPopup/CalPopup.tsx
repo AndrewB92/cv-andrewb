@@ -87,6 +87,11 @@ function lockPageScroll() {
   };
 }
 
+/**
+ * Opens a lazy-loaded scheduling dialog for a supported URL tab or `.js-cal-open` trigger.
+ * Tab changes and closing replace the URL parameter; an absent or unsupported value
+ * closes the dialog. While open, it locks page scrolling and manages keyboard focus.
+ */
 export function CalPopup({
   paramKey = "meet",
   ariaLabel = "Schedule a meeting",

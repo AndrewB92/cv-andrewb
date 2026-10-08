@@ -19,8 +19,17 @@ export type ProjectSearchParams = {
   page?: string | string[];
 };
 
+/** Uses the first occurrence of a repeated URL parameter, or undefined for an empty array. */
 const first = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
 
+/**
+ * Filters by an exact category key, then paginates in input order without mutating projects.
+ * Repeated parameters use their first value; unknown categories leave the archive unfiltered.
+ * Pages are one-based: invalid or sub-one values use 1, fractions round down, and values
+ * above the last page are clamped. Even an empty result has one page.
+ * Returns the page, filtered totals, active category, and nonzero category counts for
+ * the whole archive in configured category order.
+ */
 export function projectArchive(projects: Project[], params: ProjectSearchParams) {
   const category = first(params.category);
   const activeCategory = PROJECT_CATEGORIES.includes(category as ProjectCategory)
@@ -39,6 +48,10 @@ export function projectArchive(projects: Project[], params: ProjectSearchParams)
   return { categories, projects: filtered.slice(start, start + PROJECTS_PAGE_SIZE), totalItems, totalPages, currentPage, activeCategory };
 }
 
+/**
+ * Builds an archive URL, omitting a null category and pages not greater than 1.
+ * The caller supplies the page; values above 1 are serialized without rounding or clamping.
+ */
 export function projectsHref(category: ProjectCategory | null, page = 1) {
   const params = new URLSearchParams();
   if (category) params.set("category", category);

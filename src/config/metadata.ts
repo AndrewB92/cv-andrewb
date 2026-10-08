@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { identity, siteMetadata } from "./site";
 
+/**
+ * Builds canonical and social metadata using the shared site identity and preview image.
+ * path is the canonical/Open Graph URL, resolved by Next.js against the site base URL.
+ * A nonempty page label prefixes the name; otherwise the title uses the person's role.
+ */
 export function pageMetadata(path: string, page?: string): Metadata {
   const title = page
     ? `${page} • ${identity.name}`

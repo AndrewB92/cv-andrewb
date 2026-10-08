@@ -19,6 +19,10 @@ type Props = {
 
 const STACK_LIMIT = 4;
 
+/**
+ * Renders an already filtered and paginated archive with counts for the whole archive.
+ * Category links reset the page; pagination links retain the selected category.
+ */
 export function ProjectsGallery({ categories, initialData }: Props) {
   const totalArchiveItems = categories.reduce((total, item) => total + item.count, 0);
 

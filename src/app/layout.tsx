@@ -27,6 +27,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = pageMetadata("/");
 
+/** Wraps pages in the shared navigation and footer, with configured analytics integrations. */
 export default function RootLayout({
   children,
 }: Readonly<{

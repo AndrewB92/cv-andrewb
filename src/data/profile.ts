@@ -295,6 +295,11 @@ const mapExperience = (
   return { company, role, start, end, achievements };
 };
 
+/**
+ * Normalizes a project and legacy field aliases, or returns undefined without a nonblank
+ * name or summary. Infers missing categories, defaults unrecognized statuses to production,
+ * and derives a slug ID from the explicit ID or name; uniqueness is checked by the loader.
+ */
 const mapProject = (
   payload: Record<string, unknown>,
 ): Project | undefined => {
@@ -428,6 +433,7 @@ type PortfolioData = {
 };
 
 class PortfolioUnavailableError extends Error {
+  /** Creates the recoverable error used to distinguish missing configuration from database outages. */
   constructor(readonly code: "missing_configuration" | "database_unavailable") {
     super(`Portfolio data is temporarily unavailable (${code}).`);
     this.name = "PortfolioUnavailableError";
@@ -435,6 +441,7 @@ class PortfolioUnavailableError extends Error {
 }
 
 let lastFailure: { code: string; at: number } | undefined;
+/** Emits a failure summary, suppressing repeats of the last code for one minute per process. */
 function logDataFailure(code: string) {
   const now = Date.now();
   // One outage summary per minute per process, never driver messages or URIs.
@@ -443,6 +450,14 @@ function logDataFailure(code: string) {
   console.error(JSON.stringify({ event: "portfolio.load_failed", code, action: code === "missing_configuration" ? "Configure MONGODB_URI" : "Check MongoDB availability and document schema" }));
 }
 
+/**
+ * Loads and normalizes MongoDB portfolio content, retaining legacy collection/field aliases.
+ * Returns experiences ordered by descending start date, then end date, and projects in
+ * database order. Missing skills, malformed records, and duplicate project IDs fail the load.
+ *
+ * @throws {PortfolioUnavailableError} For a missing URI or a network/server-selection failure.
+ * @throws {Error} For other database or content failures, with a sanitized configuration/schema message.
+ */
 async function loadPortfolio(): Promise<PortfolioData> {
   if (!process.env.MONGODB_URI?.trim()) {
     throw new PortfolioUnavailableError("missing_configuration");
@@ -494,7 +509,14 @@ const getCachedPortfolio = unstable_cache(loadPortfolio, ["portfolio-content-v2"
   tags: ["portfolio"],
 });
 
-/** Successful normalized data is cached for 24h; thrown errors never become cache entries. */
+/**
+ * Returns the configured profile with normalized portfolio content and an availability flag.
+ * Successful data uses Next.js caching with a 24-hour revalidation interval; stale data may
+ * remain available if background revalidation fails. Calls are also memoized by React.
+ * Missing configuration or a database outage without cached data opts into request-time
+ * rendering and returns empty collections with available=false, outside the persistent cache.
+ * Other loading/cache errors and errors from connection() propagate to the caller.
+ */
 export const getPortfolioContent = cache(async (): Promise<PortfolioData & { profile: typeof identity; available: boolean }> => {
   try {
     return { profile: identity, ...await getCachedPortfolio(), available: true as const };

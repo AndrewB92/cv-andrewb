@@ -25,6 +25,7 @@ type Indicator = {
   visible: boolean;
 };
 
+/** Renders active-route navigation and a mobile menu that closes on navigation or Escape. */
 export function Header() {
   const pathname = usePathname();
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -247,6 +248,7 @@ type MeetingLinkProps = {
   onClick?: () => void;
 };
 
+/** Renders the configured scheduling link with optional navigation interaction props. */
 function MeetingLink({ className, tabIndex, onClick }: MeetingLinkProps) {
   return (
     <Link
