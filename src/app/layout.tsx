@@ -6,6 +6,7 @@ import styles from "./layout.module.css";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import MicrosoftClarity from '@/components/analytics/MicrosoftClarity';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import ConsoleIntro from "@/components/ConsoleIntro/ConsoleIntro";
 
@@ -57,6 +58,7 @@ export default function RootLayout({
 
         <ConsoleIntro />
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
+        <MicrosoftClarity />
       </body>
     </html>
   );

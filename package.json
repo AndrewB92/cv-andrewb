@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
+    "@microsoft/clarity": "^1.0.2",
     "@next/third-parties": "^16.4.0",
     "@thelevicole/stripe-gradient": "github:thelevicole/stripe-gradient",
     "mongodb": "^7.0.0",
