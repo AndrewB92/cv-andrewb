@@ -205,3 +205,19 @@
   .link,
   .icon { transition: none; }
 }
+
+@media (hover: none), (pointer: coarse) {
+  .glow {
+    animation: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .wrapper,
+  .link {
+    width: 100%;
+  }
+  .bg::before {
+    display: none;
+  }
+}
