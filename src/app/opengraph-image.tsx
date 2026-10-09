@@ -5,6 +5,7 @@ export const alt = `${identity.name} — ${identity.title}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+/** Returns the configured identity and stack as a 1200 × 630 PNG social preview. */
 export default function OpenGraphImage() {
   // ImageResponse renders standalone artwork, without the site's CSS cascade.
   return new ImageResponse(

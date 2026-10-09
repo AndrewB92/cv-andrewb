@@ -20,6 +20,11 @@ function isHTMLElement(v: Element | null): v is HTMLElement {
   return v instanceof HTMLElement;
 }
 
+/**
+ * Types the logo text inside tag brackets, then leaves the cursor blinking.
+ * All timing options are in milliseconds; variance adds jitter to each character delay.
+ * Reduced motion displays the full text immediately with a solid cursor.
+ */
 export default function TypedLogo({
   text = siteMetadata.domain,
   startDelay = 450,

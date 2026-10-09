@@ -167,6 +167,12 @@ function withFaceClip(
   context.restore();
 }
 
+/**
+ * Displays a portrait with a pixelated face that clears on hover or focus.
+ * blockSize must be positive and is measured in canvas pixels. Face-mask positions
+ * and radii are canvas fractions; rotation is clockwise in radians. Reveal and
+ * pixelation durations are milliseconds, with a minimum animation duration of 120 ms.
+ */
 export function PixelPortrait({
   src,
   alt,
@@ -471,10 +477,12 @@ export function PixelPortrait({
     };
   }, [cancelAnimation, initialiseCanvas, src]);
 
+  /** Reveals the face unless the canvas is unready or already revealing or clear. */
   const reveal = () => {
     animateTo("clear", revealDurationMs);
   };
 
+  /** Restores face pixelation unless the canvas is unready or already pixelating or pixelated. */
   const pixelate = () => {
     animateTo("pixelated", pixelateDurationMs);
   };

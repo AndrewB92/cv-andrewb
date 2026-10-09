@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { analyticsAttributes } from "@/lib/analytics/events";
 
 import {
   RainbowGlowLink,
@@ -20,6 +21,7 @@ type FooterSocialLink = {
   external: boolean;
 };
 
+/** Displays configured resume, social, and navigation links with the current copyright year. */
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const footerSocialLinks = socialLinks satisfies readonly FooterSocialLink[];
@@ -39,6 +41,7 @@ export function Footer() {
             <br /><br />
             <RainbowGlowLink
               href={identity.resumeUrl}
+              {...analyticsAttributes("resume_click", { source: "footer" })}
               blob
               variant="flat"
               className={styles.flatButton}
@@ -61,6 +64,7 @@ export function Footer() {
                 <li key={item.label}>
                   <RainbowGlowLink
                     href={item.href}
+                    {...item.analytics}
                     className={styles.socialLink}
                     variant="flat"
                     glow={false}
@@ -93,6 +97,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    {...item.analytics}
                     target={item.external ? "_blank" : undefined}
                     rel={
                       item.external ? "noopener noreferrer" : undefined

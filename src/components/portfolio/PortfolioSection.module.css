@@ -497,7 +497,8 @@
 
   .cardActions,
   .isOpen .isActive .cardActions {
-    display: grid;
+    /* display: grid; */
+    display: flex;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-sm-tight);
     padding: var(--space-md-tight) var(--space-md) var(--space-md);
@@ -511,6 +512,7 @@
 
   .btn {
     width: 100%;
+    flex: 1;
   }
 }
 

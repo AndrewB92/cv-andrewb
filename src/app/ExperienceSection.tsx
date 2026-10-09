@@ -26,6 +26,7 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
+/** Animates the panel height; reduced motion removes the height limit and transition. */
 function ExperiencePanel({
   id,
   open,
@@ -87,6 +88,7 @@ function ExperiencePanel({
   );
 }
 
+/** Displays roles with at most one achievements panel selected at a time. */
 export function ExperienceSection({ experiences }: { experiences: Experience[] }) {
   const uid = useId();
   const [openIndex, setOpenIndex] = useState<number | null>(null);

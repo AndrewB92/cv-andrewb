@@ -7,6 +7,7 @@ import styles from "./layout.module.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import MicrosoftClarity from '@/components/analytics/MicrosoftClarity';
+import { AnalyticsEventListener } from "@/components/analytics/AnalyticsEventListener";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import ConsoleIntro from "@/components/ConsoleIntro/ConsoleIntro";
 
@@ -27,6 +28,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = pageMetadata("/");
 
+/** Wraps pages in the shared navigation and footer, with configured analytics integrations. */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,6 +61,7 @@ export default function RootLayout({
         <ConsoleIntro />
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
         <MicrosoftClarity />
+        <AnalyticsEventListener gaEnabled={Boolean(gaId)} />
       </body>
     </html>
   );

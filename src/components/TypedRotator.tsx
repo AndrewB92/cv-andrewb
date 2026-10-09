@@ -52,6 +52,12 @@ function prefersReducedMotion() {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 }
 
+/**
+ * Types nonempty items in sequence, optionally deleting between them and looping.
+ * Timing options are in milliseconds; a nonpositive cursor interval keeps it visible.
+ * Reduced motion shows the first item without typing; cursor blinking is independent.
+ * With looping disabled, the final item remains visible.
+ */
 export default function TypedRotator({
   items,
   startDelay = 300,

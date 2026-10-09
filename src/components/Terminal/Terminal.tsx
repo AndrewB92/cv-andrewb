@@ -118,6 +118,7 @@ function CheckIcon() {
   );
 }
 
+/** Displays numbered, highlighted code with a copy button; language labels the block. */
 export function TerminalCode({
   code,
   language = "tsx",
@@ -133,6 +134,7 @@ export function TerminalCode({
     return lines.map((line) => highlightTs(line));
   }, [lines]);
 
+/** Copies the original code and shows success for 1.1 seconds; clipboard failures clear success. */
 async function handleCopy() {
   try {
     await navigator.clipboard.writeText(code);

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { analyticsAttributes } from "@/lib/analytics/events";
 import { usePathname } from "next/navigation";
 import {
   useEffect,
@@ -25,6 +26,7 @@ type Indicator = {
   visible: boolean;
 };
 
+/** Renders active-route navigation and a mobile menu that closes on navigation or Escape. */
 export function Header() {
   const pathname = usePathname();
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -247,10 +249,12 @@ type MeetingLinkProps = {
   onClick?: () => void;
 };
 
+/** Renders the configured scheduling link with optional navigation interaction props. */
 function MeetingLink({ className, tabIndex, onClick }: MeetingLinkProps) {
   return (
     <Link
       href={identity.scheduling.cal}
+      {...analyticsAttributes("schedule_click", { source: "header", meeting_type: "general" })}
       className={`${styles.meetingLink} ${className ?? ""}`}
       tabIndex={tabIndex}
       onClick={onClick}

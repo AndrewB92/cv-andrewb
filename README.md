@@ -222,6 +222,64 @@ npm run build
 
 When dependencies change, commit both `package.json` and `package-lock.json`.
 
+## Interaction analytics
+
+The root layout keeps the existing `GoogleAnalytics` integration. Set `GA_ID` for GA4
+and `NEXT_PUBLIC_CLARITY_PROJECT_ID` for Clarity in the preview/production environment.
+Clarity is already installed; its public ID is embedded at build time, so rebuild after
+changing it. Leave both unset locally to avoid analytics traffic.
+
+`src/lib/analytics/events.ts` defines the typed event taxonomy, allowed metadata, and
+Clarity policy. Server Components call `analyticsAttributes(event, parameters)` on links;
+one root `AnalyticsEventListener` delegates their clicks. Existing Client Components call
+`trackEvent` from `src/lib/analytics/client.ts` for state-dependent actions. Add future
+events to the central taxonomy; do not import provider SDKs in individual UI components.
+
+| Event | GA4 | Clarity | Parameters | Locations |
+| --- | --- | --- | --- | --- |
+| `resume_click` | Yes | Yes | `source` | Home hero, both footer CV links |
+| `project_details_open` | Yes | Yes | `project`, `source` | Home featured projects, opening only |
+| `project_link_click` | Yes | Yes | `project`, `destination`, `source` | Featured projects, archive, spotlights |
+| `contact_click` | Yes | Yes | `channel`, `source` | Home facts, contact hero/grid, footer |
+| `profile_click` | Yes | Yes | `platform`, `source` | Contact grid, footer |
+| `schedule_click` | Yes | Yes | `source`, `meeting_type` | Home hero, header, contact grid, footer |
+| `schedule_tab_change` | Yes | No | `meeting_type` | Intentional Cal tab changes |
+| `booking_complete` | Yes | Yes | `meeting_type` | Successful embedded Cal booking |
+| `projects_filter` | Yes | No | `category` | Project archive |
+| `projects_pagination` | Yes | No | `page`, `direction`, `category` | Project archive |
+| `cta_click` | Yes | No | `cta`, `source` | View all projects, Discuss a project |
+
+Custom parameters contain only site metadata, never addresses, phone numbers, identities,
+form input, URLs, or booking attendee data. Clarity receives only the event name; no
+`identify` calls or custom tags are used. Project names come from public portfolio content.
+Ordinary navigation, pageviews, scrolling, carousel controls, and menu toggles have no custom
+events. Provider failures are silent, and tracking never waits for delivery or cancels navigation.
+
+The installed `@calcom/embed-react` 1.5.3 supports `bookingSuccessfulV2` and `off` through
+`getCalApi`. The active tab owns its listener, with cleanup on tab changes, close, or unmount.
+The callback ignores the entire payload and records the first completion per mounted embed;
+repeat callbacks are suppressed. The `hour-meeting` alias reports `intro_call`.
+External Cal.com links record scheduling intent only: the portfolio cannot observe bookings
+made on a separate Cal.com page. See [Cal's embed events](https://cal.com/help/embedding/embed-events).
+
+Run `node --test tests/*.test.mjs` alongside lint, a clean build, TypeScript, and
+`git diff --check`. Tests use in-memory provider doubles and do not send analytics.
+
+Before considering delivery verified, use a deployment with real provider IDs:
+
+1. In GA4 Realtime (or DebugView when configured), click each action above once and check
+   the event name and allowed parameters. Test nested icons, keyboard activation, compact
+   and expanded cards, browser back/forward, tab switches, and popup reopen. Closing details
+   or opening a default Cal tab must not create another engagement event.
+2. In Clarity, check high-value events under Recordings / Filters / Smart Events; archive
+   filters, pagination, tab changes, and CTA clicks should not appear as custom API events.
+   See [Clarity smart events](https://learn.microsoft.com/en-us/clarity/setup-and-installation/smart-events).
+3. Complete one booking using an appropriate test event/attendee. Inspect the outgoing GA
+   request and provider dashboards: exactly one `booking_complete`, with only `meeting_type`
+   as its custom parameter, and no attendee data. Close/reopen and repeat for the other tab.
+
+Local automated checks do not establish GA4/Clarity delivery or verify a real booking.
+
 ## Deployment
 
 The production website is deployed with Vercel.

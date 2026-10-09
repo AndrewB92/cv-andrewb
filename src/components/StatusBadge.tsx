@@ -10,6 +10,7 @@ type StatusBadgeProps = {
   ping?: boolean;          // enable / disable ping animation
 };
 
+/** Announces status text with a CSS-colored indicator and an optional ping animation. */
 export function StatusBadge({
   text,
   color = "var(--color-success)",

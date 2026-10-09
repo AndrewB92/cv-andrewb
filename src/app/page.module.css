@@ -31,14 +31,14 @@
 @media screen and (max-width: 1080px){
   .heroContent{
     width: 100%;
-    padding: calc(var(--space-xl) + var(--space-lg-tight)) var(--space-xl) var(--space-xl);
+    padding: calc(var(--space-xl) + var(--space-lg-tight)) var(--space-lg-tight) var(--space-xl);
   }
 }
 
 .heroContent h1 {
   margin: 0 0 var(--space-md);
   color: var(--color-text-primary);
-  font-size: clamp(2rem,3.4vw,3.6rem);
+  font-size: clamp(2.5rem,3.4vw,3.6rem);
   font-weight: var(--font-weight-black);
   line-height: 96%;
   letter-spacing: -1px;
@@ -387,6 +387,13 @@
   margin: var(--space-sm) 0 0;
   padding-left: 1.2rem;
   color: var(--color-text-secondary);
+}
+
+@media screen and (max-width: 768px) {
+  .experienceHeader {
+    flex-direction: column-reverse;
+    gap: var(--space-xs);
+  }
 }
 
 

@@ -15,6 +15,10 @@ type GlowCardProps = {
   blur?: number;
 };
 
+/**
+ * Wraps content in a card whose border glow follows the pointer.
+ * Border width, glow size, and blur are in pixels; radius accepts a CSS length.
+ */
 export default function GlowCard({
   children,
   className,

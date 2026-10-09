@@ -44,6 +44,10 @@ function randFloat(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
+/**
+ * Displays a pointer-following cursor with hover and click feedback on fine pointers.
+ * Reduced motion or a nonpositive particle count disables the particle animation.
+ */
 export function CustomCursor({ particleCount = 7 }: Options) {
   const cursorRef = useRef<HTMLDivElement | null>(null);
   const dotRef = useRef<HTMLDivElement | null>(null);
@@ -229,6 +233,7 @@ export function CustomCursor({ particleCount = 7 }: Options) {
       };
       window.addEventListener("resize", onResize, { passive: true });
 
+      /** Pauses particles while the document is hidden and resumes them when visible. */
       const onVis = () => {
         const hidden = document.visibilityState === "hidden";
         particlesRef.current.forEach((p) => {

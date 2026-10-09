@@ -119,10 +119,17 @@
   .nav {
     width: 38px;
     height: 38px;
+    top: 55%;
+    bottom: unset;
+    transform: unset;
+  }
+
+  .dots {
+    top: 58%;
   }
 
   .root[data-fit="contain"] .img {
-    padding: var(--space-xs);
+    /* padding: var(--space-xs); */
   }
 }
 
